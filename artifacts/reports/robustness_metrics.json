@@ -1,0 +1,177 @@
+{
+  "clean": {
+    "sample_count": 20,
+    "valid_json_rate": 0.85,
+    "per_field": {
+      "company": {
+        "raw_exact_match": 0.25,
+        "normalized_exact_match": 0.25,
+        "normalized_similarity": 0.741651705126495
+      },
+      "address": {
+        "raw_exact_match": 0.0,
+        "normalized_exact_match": 0.0,
+        "normalized_similarity": 0.565004765403965
+      },
+      "date": {
+        "raw_exact_match": 0.25,
+        "normalized_exact_match": 0.25,
+        "normalized_similarity": 0.755
+      },
+      "total": {
+        "raw_exact_match": 0.05,
+        "normalized_exact_match": 0.05,
+        "normalized_similarity": 0.42823232323232324
+      }
+    },
+    "company_accuracy": 0.25,
+    "address_similarity": 0.565004765403965,
+    "date_accuracy": 0.25,
+    "total_accuracy": 0.05,
+    "complete_record_raw_exact_match": 0.0,
+    "complete_record_normalized_exact_match": 0.0,
+    "average_inference_latency_seconds": 11.918241980014136,
+    "median_inference_latency_seconds": 11.274819750047754,
+    "peak_gpu_memory_mib": 653.1025390625
+  },
+  "gaussian_blur": {
+    "sample_count": 20,
+    "valid_json_rate": 0.85,
+    "per_field": {
+      "company": {
+        "raw_exact_match": 0.25,
+        "normalized_exact_match": 0.25,
+        "normalized_similarity": 0.7522025308451412
+      },
+      "address": {
+        "raw_exact_match": 0.0,
+        "normalized_exact_match": 0.0,
+        "normalized_similarity": 0.5579157239296271
+      },
+      "date": {
+        "raw_exact_match": 0.2,
+        "normalized_exact_match": 0.25,
+        "normalized_similarity": 0.75
+      },
+      "total": {
+        "raw_exact_match": 0.05,
+        "normalized_exact_match": 0.05,
+        "normalized_similarity": 0.4576262626262626
+      }
+    },
+    "company_accuracy": 0.25,
+    "address_similarity": 0.5579157239296271,
+    "date_accuracy": 0.25,
+    "total_accuracy": 0.05,
+    "complete_record_raw_exact_match": 0.0,
+    "complete_record_normalized_exact_match": 0.0,
+    "average_inference_latency_seconds": 19.539606905012626,
+    "median_inference_latency_seconds": 19.76607499999227,
+    "peak_gpu_memory_mib": 653.1025390625
+  },
+  "jpeg_compression": {
+    "sample_count": 20,
+    "valid_json_rate": 0.9,
+    "per_field": {
+      "company": {
+        "raw_exact_match": 0.25,
+        "normalized_exact_match": 0.25,
+        "normalized_similarity": 0.778250404722512
+      },
+      "address": {
+        "raw_exact_match": 0.0,
+        "normalized_exact_match": 0.0,
+        "normalized_similarity": 0.5858733884139191
+      },
+      "date": {
+        "raw_exact_match": 0.25,
+        "normalized_exact_match": 0.25,
+        "normalized_similarity": 0.785
+      },
+      "total": {
+        "raw_exact_match": 0.05,
+        "normalized_exact_match": 0.05,
+        "normalized_similarity": 0.4474242424242424
+      }
+    },
+    "company_accuracy": 0.25,
+    "address_similarity": 0.5858733884139191,
+    "date_accuracy": 0.25,
+    "total_accuracy": 0.05,
+    "complete_record_raw_exact_match": 0.0,
+    "complete_record_normalized_exact_match": 0.0,
+    "average_inference_latency_seconds": 10.969814544997643,
+    "median_inference_latency_seconds": 9.584723450010642,
+    "peak_gpu_memory_mib": 653.1025390625
+  },
+  "reduced_brightness": {
+    "sample_count": 20,
+    "valid_json_rate": 0.75,
+    "per_field": {
+      "company": {
+        "raw_exact_match": 0.2,
+        "normalized_exact_match": 0.2,
+        "normalized_similarity": 0.6377594708700968
+      },
+      "address": {
+        "raw_exact_match": 0.05,
+        "normalized_exact_match": 0.05,
+        "normalized_similarity": 0.4867614712026232
+      },
+      "date": {
+        "raw_exact_match": 0.15,
+        "normalized_exact_match": 0.15,
+        "normalized_similarity": 0.625
+      },
+      "total": {
+        "raw_exact_match": 0.05,
+        "normalized_exact_match": 0.05,
+        "normalized_similarity": 0.48123737373737374
+      }
+    },
+    "company_accuracy": 0.2,
+    "address_similarity": 0.4867614712026232,
+    "date_accuracy": 0.15,
+    "total_accuracy": 0.05,
+    "complete_record_raw_exact_match": 0.0,
+    "complete_record_normalized_exact_match": 0.0,
+    "average_inference_latency_seconds": 6.380958289996488,
+    "median_inference_latency_seconds": 6.058474050019868,
+    "peak_gpu_memory_mib": 653.1025390625
+  },
+  "rotation": {
+    "sample_count": 20,
+    "valid_json_rate": 0.85,
+    "per_field": {
+      "company": {
+        "raw_exact_match": 0.15,
+        "normalized_exact_match": 0.15,
+        "normalized_similarity": 0.6910995755475595
+      },
+      "address": {
+        "raw_exact_match": 0.0,
+        "normalized_exact_match": 0.0,
+        "normalized_similarity": 0.5111580695972672
+      },
+      "date": {
+        "raw_exact_match": 0.2,
+        "normalized_exact_match": 0.2,
+        "normalized_similarity": 0.735
+      },
+      "total": {
+        "raw_exact_match": 0.1,
+        "normalized_exact_match": 0.1,
+        "normalized_similarity": 0.48883838383838385
+      }
+    },
+    "company_accuracy": 0.15,
+    "address_similarity": 0.5111580695972672,
+    "date_accuracy": 0.2,
+    "total_accuracy": 0.1,
+    "complete_record_raw_exact_match": 0.0,
+    "complete_record_normalized_exact_match": 0.0,
+    "average_inference_latency_seconds": 7.290483614994446,
+    "median_inference_latency_seconds": 6.654971299984027,
+    "peak_gpu_memory_mib": 653.1025390625
+  }
+}

@@ -15,6 +15,7 @@ model:
 evaluation:
   split: test
   sample_limit: 100
+  robustness_sample_limit: 20
   seed: 42
 
 generation:

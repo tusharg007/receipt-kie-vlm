@@ -1,0 +1,83 @@
+{
+  "training": {
+    "config_path": "E:\\VLM-Receipt-OCR-main\\VLM-Receipt-OCR-main\\configs\\smoke_test.yaml",
+    "output_dir": "E:\\VLM-Receipt-OCR-main\\VLM-Receipt-OCR-main\\artifacts\\checkpoints\\smoke-test",
+    "runtime": {
+      "device": "cuda",
+      "dtype_name": "bf16",
+      "attention": "eager",
+      "bf16_supported": true,
+      "flash_attention_2_installed": false
+    },
+    "parameter_statistics": {
+      "total_parameters": 257848896,
+      "trainable_parameters": 1363968,
+      "trainable_percentage": 0.5289795772482191,
+      "target_modules": [
+        "q_proj",
+        "k_proj",
+        "v_proj",
+        "o_proj"
+      ],
+      "candidate_linear_module_suffixes": [
+        "down_proj",
+        "fc1",
+        "fc2",
+        "gate_proj",
+        "k_proj",
+        "lm_head",
+        "o_proj",
+        "out_proj",
+        "proj",
+        "q_proj",
+        "up_proj",
+        "v_proj"
+      ],
+      "estimated_adapter_size_mib_fp32": 5.2
+    },
+    "train_samples": 12,
+    "eval_samples": 4,
+    "global_steps": 3,
+    "duration_seconds": 10.572187000070699,
+    "seconds_per_optimization_step": 3.5240623333568997,
+    "peak_gpu_memory_mib": 766.58544921875,
+    "finite_loss_count": 3,
+    "lora_parameter_changed": true,
+    "train_metrics": {
+      "train_runtime": 10.3618,
+      "train_samples_per_second": 0.29,
+      "train_steps_per_second": 0.29,
+      "total_flos": 968676551424.0,
+      "train_loss": 2.851442337036133,
+      "epoch": 0.25
+    },
+    "masking_report_last_batch": [
+      {
+        "full_tokens": 244,
+        "prompt_tokens": 146,
+        "assistant_tokens": 98
+      }
+    ],
+    "seed": 42
+  },
+  "adapter_exists": true,
+  "adapter_reload_succeeded": true,
+  "inference_succeeded": true,
+  "parser_succeeded_without_crash": true,
+  "prediction": {
+    "raw_output": "{\n    \"company\": \"Ginger\",\n    \"address\": {\n        \"city\": \"Bangkok\",\n        \"state\": \"Kuala Lumpur\",\n        \"zip\": \"980001\",\n        \"country\": \"Bangkok\"\n    },\n    \"total\": {\n        \"total_price\": [\n            {\n                \"price\": \"100.00\"\n            },\n            {\n                \"price\": \"100.00\"\n            },\n            {\n                \"price\": \"100.00\"\n            },\n            {\n                \"price\": \"100",
+    "valid_json": false,
+    "parsed_prediction": null,
+    "parse_method": "invalid",
+    "parse_error": "No safely parseable JSON object found",
+    "latency_seconds": 19.26728909998201,
+    "peak_gpu_memory_mib": 654.8369140625
+  },
+  "ground_truth": {
+    "company": "GERBANG ALAF RESTAURANTS SDN BHD",
+    "address": "LEVEL 6, BANGUNAN TH, DAMANSARA UPTOWN3 NO.3, JALAN SS21/39, 47400 PETALING JAYA SELANGOR",
+    "date": "24/06/2018",
+    "total": "7.35"
+  },
+  "passed": true
+}

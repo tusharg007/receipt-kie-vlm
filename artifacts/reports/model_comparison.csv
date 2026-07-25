@@ -1,0 +1,15 @@
+metric,base,lora,absolute_improvement
+valid_json_rate,0.19,0.85,0.6599999999999999
+complete_record_normalized_exact_match,0.0,0.0,0.0
+company_raw_exact_match,0.0,0.22,0.22
+company_normalized_exact_match,0.01,0.23,0.22
+company_normalized_similarity,0.07481160204656802,0.6657001484622229,0.5908885464156549
+address_raw_exact_match,0.0,0.0,0.0
+address_normalized_exact_match,0.0,0.01,0.01
+address_normalized_similarity,0.027496341404337186,0.5173625469024633,0.4898662054981261
+date_raw_exact_match,0.01,0.25,0.24
+date_normalized_exact_match,0.01,0.26,0.25
+date_normalized_similarity,0.04640151515151515,0.6939022556390978,0.6475007404875827
+total_raw_exact_match,0.0,0.26,0.26
+total_normalized_exact_match,0.0,0.29,0.29
+total_normalized_similarity,0.01774587520462957,0.5915909090909091,0.5738450338862795
