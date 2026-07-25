@@ -1,0 +1,32 @@
+default_permissions = "ml-workspace"
+approval_policy = "on-request"
+approvals_reviewer = "auto_review"
+
+[permissions.ml-workspace.filesystem]
+":minimal" = "read"
+":workspace_roots" = "write"
+":tmpdir" = "write"
+":slash_tmp" = "write"
+
+[permissions.ml-workspace.network]
+enabled = true
+mode = "limited"
+allow_local_binding = false
+
+[permissions.ml-workspace.network.domains]
+"pypi.org" = "allow"
+"files.pythonhosted.org" = "allow"
+"huggingface.co" = "allow"
+"cdn-lfs.huggingface.co" = "allow"
+"hf.co" = "allow"
+"**.hf.co" = "allow"
+"github.com" = "allow"
+"raw.githubusercontent.com" = "allow"
+"download.pytorch.org" = "allow"
+"kaggle.com" = "allow"
+"www.kaggle.com" = "allow"
+"storage.googleapis.com" = "allow"
+
+# Needed when opening a local Jupyter server.
+"localhost" = "allow"
+"127.0.0.1" = "allow"

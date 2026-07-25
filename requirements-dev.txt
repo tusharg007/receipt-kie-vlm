@@ -1,0 +1,6 @@
+-r requirements.txt
+
+ipykernel>=6.29,<7
+jupyterlab>=4.2,<5
+pytest>=8,<10
+ruff>=0.9,<1
