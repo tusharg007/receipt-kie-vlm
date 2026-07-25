@@ -25,7 +25,13 @@ from receipt_kie.dataset import load_records
 from receipt_kie.inference import ReceiptKIEPredictor
 from receipt_kie.metrics import evaluate_predictions, normalize_field
 from receipt_kie.prompts import CANONICAL_FIELDS
-from receipt_kie.utils import project_path, setup_logging, write_json, write_jsonl
+from receipt_kie.utils import (
+    project_path,
+    repository_relative,
+    setup_logging,
+    write_json,
+    write_jsonl,
+)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -62,7 +68,7 @@ def run_evaluation(config_path: str | Path) -> dict[str, Any]:
             rows.append(
                 {
                     "sample_id": record.sample_id,
-                    "image_path": record.image_path,
+                    "image_path": repository_relative(record.image_path),
                     "ground_truth": record.target,
                     **prediction,
                 }
@@ -120,7 +126,7 @@ def run_robustness_evaluation(config_path: str | Path) -> dict[str, Any]:
             rows.append(
                 {
                     "sample_id": record.sample_id,
-                    "image_path": str(prediction_path),
+                    "image_path": repository_relative(prediction_path),
                     "ground_truth": record.target,
                     **prediction,
                 }
@@ -226,7 +232,7 @@ def _copy_examples(rows: dict[str, list[dict[str, Any]]]) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     for category, sample_ids in selected.items():
         for sample_id in sample_ids:
-            source = Path(lora_by_id[sample_id]["image_path"])
+            source = project_path(lora_by_id[sample_id]["image_path"])
             shutil.copy2(source, output_dir / f"{category}__{sample_id}{source.suffix.lower()}")
     write_json("artifacts/predictions/examples/index.json", selected)
 

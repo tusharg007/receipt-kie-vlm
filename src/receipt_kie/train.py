@@ -25,6 +25,7 @@ from receipt_kie.utils import (
     ensure_artifact_directories,
     package_versions,
     project_path,
+    repository_relative,
     seed_everything,
     setup_logging,
     write_json,
@@ -86,8 +87,8 @@ def run_training(
         if "loss" in row and math.isfinite(float(row["loss"]))
     ]
     summary = {
-        "config_path": str(project_path(config_path)),
-        "output_dir": str(output_dir),
+        "config_path": repository_relative(config_path),
+        "output_dir": repository_relative(output_dir),
         "runtime": runtime.to_dict(),
         "parameter_statistics": parameter_stats,
         "train_samples": len(train_records),

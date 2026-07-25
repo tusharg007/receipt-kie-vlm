@@ -1,0 +1,28 @@
+{
+  "base_model_id": "HuggingFaceTB/SmolVLM-256M-Instruct",
+  "adapter_sha256": "7fc369231dd37e064bb9a18777f66ba418d1dd7ae9720db71ba7d2183e6e4ba4",
+  "adapter_size_bytes": 10956944,
+  "adapter_config_sha256": "6f796bc4ff83e9c4097edcbda6a987dc2348a98a56b20a44ed95e1d96e476f71",
+  "adapter_config_size_bytes": 719,
+  "training_timestamp_utc": "2026-07-25T21:37:57.4263394Z",
+  "training_sample_count": 626,
+  "validation_sample_count": 64,
+  "epoch_count": 2,
+  "completed_epochs": 1.9936102236421727,
+  "optimizer_step_count": 156,
+  "lora_rank": 16,
+  "lora_alpha": 32,
+  "lora_dropout": 0.05,
+  "target_modules": [
+    "q_proj",
+    "k_proj",
+    "v_proj",
+    "o_proj"
+  ],
+  "precision": "bf16",
+  "image_longest_edge": 512,
+  "random_seed": 42,
+  "final_validation_loss": 1.028235912322998,
+  "evaluation_sample_count": 100,
+  "results_git_commit": "0f79b4d1ae8a9734fdeaf6ade6d5fc95e8bc7f8f"
+}

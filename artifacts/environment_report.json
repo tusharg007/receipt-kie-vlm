@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-07-25T20:38:29.930020+00:00",
-  "project_root": "E:\\VLM-Receipt-OCR-main\\VLM-Receipt-OCR-main",
+  "generated_at_utc": "2026-07-25T23:17:37.037321+00:00",
+  "project_root": ".",
   "operating_system": {
     "system": "Windows",
     "release": "11",
@@ -9,7 +9,7 @@
   },
   "python": {
     "version": "3.12.13",
-    "executable": "E:\\VLM-Receipt-OCR-main\\VLM-Receipt-OCR-main\\.venv\\Scripts\\python.exe"
+    "executable": "python.exe"
   },
   "pytorch": {
     "version": "2.5.1+cu124",
@@ -29,14 +29,14 @@
   },
   "system_memory": {
     "total_gib": 15.68,
-    "available_gib": 2.53
+    "available_gib": 3.99
   },
   "project_drive": {
     "total_gib": 173.83,
-    "used_gib": 143.11,
-    "free_gib": 30.72
+    "used_gib": 144.67,
+    "free_gib": 29.15
   },
   "attention_decision": "sdpa",
   "precision_decision": "bf16",
-  "hf_home": "E:\\VLM-Receipt-OCR-main\\VLM-Receipt-OCR-main\\.cache\\huggingface"
+  "hf_home": ".cache/huggingface"
 }

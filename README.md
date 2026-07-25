@@ -12,7 +12,53 @@ entities:
 
 This repository contains a newly implemented structured-KIE pipeline, a newly
 trained LoRA adapter, and evaluation artifacts produced locally from that adapter.
-It does not claim that SmolVLM was trained from scratch.
+The final adapter is included under `models/receipt-kie-lora/`. It does not claim
+that SmolVLM was trained from scratch.
+
+## Clone and Run the Trained Model
+
+```bash
+git clone <REPOSITORY_URL_PLACEHOLDER>
+cd receipt-kie-vlm
+python -m venv .venv
+```
+
+Windows:
+
+```powershell
+.\.venv\Scripts\activate
+```
+
+Linux/macOS:
+
+```bash
+source .venv/bin/activate
+```
+
+Then install and run:
+
+```bash
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+python scripts/verify_installation.py
+python scripts/demo_inference.py
+```
+
+To use another image:
+
+```bash
+python scripts/demo_inference.py --image path/to/receipt.png
+```
+
+The trained LoRA adapter is stored directly in this repository. On first use,
+the public `HuggingFaceTB/SmolVLM-256M-Instruct` base model and processor download
+automatically, so internet access is required for that initial run. GPU inference
+is recommended but optional; the demo falls back to CPU. Inference uses the
+fictional image in `assets/demo/` and requires neither SROIE nor a Kaggle account.
+Training and evaluation require the separately obtained SROIE dataset.
+`assets/demo/expected_output.json` documents the fictional text rendered in the
+image; it is not a promise that this small research model predicts every field
+exactly.
 
 ## Problem statement
 
@@ -220,8 +266,8 @@ and evaluate:
 ```
 
 The base model downloads into `.cache/huggingface/`. Exact successful environment
-versions are recorded in `requirements-lock.txt` and the checkpoint's
-`package_versions.json`.
+versions are recorded in `requirements-lock.txt`. The default demo does not read
+the dataset or any training checkpoint.
 
 ## Repository structure
 
@@ -232,8 +278,9 @@ scripts/                    Preflight, audit, train, evaluate, report, integrity
 tests/                      Focused unit tests
 research_notebooks/         Preserved upstream research notebooks
 data/                       Git-ignored raw and derived datasets
+models/receipt-kie-lora/    Committed minimal LoRA inference adapter
 artifacts/
-  checkpoints/              Local PEFT adapter and trainer state (Git-ignored)
+  checkpoints/              Local trainer state and intermediate checkpoints (Git-ignored)
   figures/                  Generated plots
   predictions/              Auditable JSONL and curated receipt examples
   reports/                  Audits, metrics, comparisons, integrity check

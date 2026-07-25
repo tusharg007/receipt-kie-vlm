@@ -1,7 +1,7 @@
 paths:
   dataset_root: data/raw/sroie/SROIE2019
   hf_cache: .cache/huggingface
-  adapter_path: artifacts/checkpoints/receipt-kie-lora
+  adapter_path: models/receipt-kie-lora
   reports_dir: artifacts/reports
   predictions_dir: artifacts/predictions
   figures_dir: artifacts/figures

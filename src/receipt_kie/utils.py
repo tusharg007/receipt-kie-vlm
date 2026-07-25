@@ -44,6 +44,15 @@ def project_path(value: str | Path) -> Path:
     return path if path.is_absolute() else PROJECT_ROOT / path
 
 
+def repository_relative(value: str | Path) -> str:
+    """Render project-contained paths as portable POSIX-style relative paths."""
+    path = project_path(value).resolve()
+    try:
+        return path.relative_to(PROJECT_ROOT.resolve()).as_posix()
+    except ValueError:
+        return str(path)
+
+
 def ensure_artifact_directories() -> None:
     """Create the standard artifact hierarchy."""
     for relative in (

@@ -14,7 +14,7 @@ from typing import Any
 from PIL import Image, UnidentifiedImageError
 
 from receipt_kie.prompts import CANONICAL_FIELDS, canonical_json, canonical_target
-from receipt_kie.utils import project_path, write_json
+from receipt_kie.utils import project_path, repository_relative, write_json
 
 LOGGER = logging.getLogger(__name__)
 IMAGE_SUFFIXES = (".jpg", ".jpeg", ".png")
@@ -174,7 +174,7 @@ def build_audit(dataset_root: str | Path) -> dict[str, Any]:
     }
     exclusion_reasons = Counter(row["reason"].split(":", 1)[0] for row in all_exclusions)
     return {
-        "dataset_root": str(project_path(dataset_root).resolve()),
+        "dataset_root": repository_relative(dataset_root),
         "valid_pairs": len(all_records),
         "image_files": len(all_records)
         + sum(row["reason"] == "missing_entity" for row in all_exclusions),

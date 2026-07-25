@@ -159,6 +159,8 @@ venv.bak/
 
 # Local authentication helpers and credentials
 .codex-auth/
+.codex/
+.codex/
 
 # Local datasets, annotations, checkpoints, and experiment outputs
 input/
@@ -174,6 +176,15 @@ data/raw/
 data/processed/
 artifacts/checkpoints/**/checkpoint-*/
 artifacts/logs/*.tmp
+
+# Publish only the minimal final inference adapter. Training checkpoints remain ignored.
+models/*
+!models/receipt-kie-lora/
+models/receipt-kie-lora/*
+!models/receipt-kie-lora/adapter_model.safetensors
+!models/receipt-kie-lora/adapter_config.json
+!models/receipt-kie-lora/training_metadata.json
+!models/receipt-kie-lora/README.md
 
 # Spyder project settings
 .spyderproject

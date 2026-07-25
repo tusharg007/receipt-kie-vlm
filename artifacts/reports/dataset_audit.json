@@ -1,5 +1,5 @@
 {
-  "dataset_root": "E:\\VLM-Receipt-OCR-main\\VLM-Receipt-OCR-main\\data\\raw\\sroie\\SROIE2019",
+  "dataset_root": "data/raw/sroie/SROIE2019",
   "valid_pairs": 973,
   "image_files": 973,
   "annotation_files": 973,

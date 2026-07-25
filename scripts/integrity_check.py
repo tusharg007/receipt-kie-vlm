@@ -1,21 +1,24 @@
-"""Verify that claims and generated artifacts derive from the current run."""
+"""Verify that committed claims and artifacts derive from the recorded run."""
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import re
 import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from receipt_kie.metrics import evaluate_predictions  # noqa: E402
 
 
-def _json(relative_path: str) -> dict[str, Any]:
+def _json(relative_path: str) -> Any:
     with (PROJECT_ROOT / relative_path).open(encoding="utf-8") as handle:
         return json.load(handle)
 
@@ -23,6 +26,14 @@ def _json(relative_path: str) -> dict[str, Any]:
 def _jsonl(relative_path: str) -> list[dict[str, Any]]:
     with (PROJECT_ROOT / relative_path).open(encoding="utf-8") as handle:
         return [json.loads(line) for line in handle if line.strip()]
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _tracked_files() -> list[str]:
@@ -38,11 +49,12 @@ def _tracked_files() -> list[str]:
 def main() -> None:
     checks: list[tuple[str, bool, str]] = []
     required = (
-        "artifacts/checkpoints/receipt-kie-lora/adapter_model.safetensors",
-        "artifacts/checkpoints/receipt-kie-lora/adapter_config.json",
-        "artifacts/checkpoints/receipt-kie-lora/loss_history.json",
-        "artifacts/checkpoints/receipt-kie-lora/trainer_state.json",
-        "artifacts/logs/training.log",
+        "models/receipt-kie-lora/adapter_model.safetensors",
+        "models/receipt-kie-lora/adapter_config.json",
+        "models/receipt-kie-lora/training_metadata.json",
+        "models/receipt-kie-lora/README.md",
+        "assets/demo/synthetic_receipt.png",
+        "assets/demo/expected_output.json",
         "artifacts/reports/base_metrics.json",
         "artifacts/reports/lora_metrics.json",
         "artifacts/predictions/base_predictions.jsonl",
@@ -61,35 +73,77 @@ def main() -> None:
                 "",
             )
         )
-    training = _json("artifacts/checkpoints/receipt-kie-lora/training_summary.json")
-    loss_history = _json("artifacts/checkpoints/receipt-kie-lora/loss_history.json")
-    trainer_state = _json("artifacts/checkpoints/receipt-kie-lora/trainer_state.json")
-    adapter = PROJECT_ROOT / "artifacts/checkpoints/receipt-kie-lora/adapter_model.safetensors"
-    loss_file = PROJECT_ROOT / "artifacts/checkpoints/receipt-kie-lora/loss_history.json"
-    modification_delta = abs(adapter.stat().st_mtime - loss_file.stat().st_mtime)
-    checks.append(
+    metadata = _json("models/receipt-kie-lora/training_metadata.json")
+    adapter = PROJECT_ROOT / "models/receipt-kie-lora/adapter_model.safetensors"
+    adapter_hash = _sha256(adapter)
+    checks.extend(
         (
-            "Adapter timestamp corresponds to the current run",
-            modification_delta < 600,
-            f"adapter={datetime.fromtimestamp(adapter.stat().st_mtime, timezone.utc).isoformat()}",
+            (
+                "Committed adapter checksum matches training metadata",
+                adapter_hash == metadata["adapter_sha256"],
+                adapter_hash,
+            ),
+            (
+                "Committed adapter size matches training metadata",
+                adapter.stat().st_size == metadata["adapter_size_bytes"],
+                f"{adapter.stat().st_size} bytes",
+            ),
+            (
+                "Committed adapter is a real safetensors binary",
+                not adapter.read_bytes()[:128].startswith(
+                    b"version https://git-lfs.github.com/spec/v1"
+                ),
+                "",
+            ),
         )
     )
+    tracked = _tracked_files()
     checks.append(
         (
-            "A newly initialized LoRA parameter changed",
-            bool(training["lora_parameter_changed"]),
-            f"steps={training['global_steps']}",
+            "Final adapter is tracked by normal Git",
+            "models/receipt-kie-lora/adapter_model.safetensors" in tracked,
+            "",
         )
     )
-    optimization_rows = [row for row in trainer_state["log_history"] if "loss" in row]
-    checks.append(("Trainer state contains real optimization steps", bool(optimization_rows), ""))
-    checks.append(
-        (
-            "Loss history is non-empty and finite",
-            bool(loss_history),
-            f"rows={len(loss_history)}",
+    local_training_dir = PROJECT_ROOT / "artifacts/checkpoints/receipt-kie-lora"
+    if (local_training_dir / "training_summary.json").is_file():
+        training = _json("artifacts/checkpoints/receipt-kie-lora/training_summary.json")
+        loss_history = _json("artifacts/checkpoints/receipt-kie-lora/loss_history.json")
+        trainer_state = _json("artifacts/checkpoints/receipt-kie-lora/trainer_state.json")
+        local_adapter = local_training_dir / "adapter_model.safetensors"
+        optimization_rows = [row for row in trainer_state["log_history"] if "loss" in row]
+        checks.extend(
+            (
+                (
+                    "Local training adapter matches committed adapter",
+                    _sha256(local_adapter) == adapter_hash,
+                    "",
+                ),
+                (
+                    "A newly initialized LoRA parameter changed",
+                    bool(training["lora_parameter_changed"]),
+                    f"steps={training['global_steps']}",
+                ),
+                (
+                    "Trainer state contains real optimization steps",
+                    bool(optimization_rows),
+                    "",
+                ),
+                (
+                    "Loss history is non-empty and finite",
+                    bool(loss_history),
+                    f"rows={len(loss_history)}",
+                ),
+            )
         )
-    )
+    else:
+        checks.append(
+            (
+                "Clone does not require private trainer state",
+                True,
+                "committed adapter metadata and checksum are sufficient for inference",
+            )
+        )
     base_rows = _jsonl("artifacts/predictions/base_predictions.jsonl")
     lora_rows = _jsonl("artifacts/predictions/lora_predictions.jsonl")
     base_metrics = _json("artifacts/reports/base_metrics.json")
@@ -136,7 +190,6 @@ def main() -> None:
             ", ".join(expected_claims),
         )
     )
-    tracked = _tracked_files()
     checks.append(
         (
             "No raw dataset is tracked",
@@ -150,7 +203,15 @@ def main() -> None:
         re.compile(r"AIza[0-9A-Za-z_-]{30,}"),
         re.compile(r'"key"\s*:\s*"[A-Za-z0-9]{30,}"'),
     )
+    windows_user_root = "C:/" + "Users/"
+    mac_user_root = "/" + "Users/"
+    linux_user_root = "/" + "home/"
+    absolute_path_pattern = re.compile(
+        rf"(?:[A-Za-z]:\\\\|{re.escape(windows_user_root)}|"
+        rf"{re.escape(mac_user_root)}[^/\s]+/|{re.escape(linux_user_root)}[^/\s]+/)"
+    )
     secret_hits: list[str] = []
+    absolute_path_hits: list[str] = []
     for relative in tracked:
         path = PROJECT_ROOT / relative
         if not path.is_file() or path.stat().st_size > 5 * 2**20:
@@ -161,11 +222,20 @@ def main() -> None:
             continue
         if any(pattern.search(text) for pattern in secret_patterns):
             secret_hits.append(relative)
-    checks.append(
+        if absolute_path_pattern.search(text):
+            absolute_path_hits.append(relative)
+    checks.extend(
         (
-            "No credential-like strings in tracked text",
-            not secret_hits,
-            ", ".join(secret_hits),
+            (
+                "No credential-like strings in tracked text",
+                not secret_hits,
+                ", ".join(secret_hits),
+            ),
+            (
+                "No local absolute paths in tracked text",
+                not absolute_path_hits,
+                ", ".join(absolute_path_hits),
+            ),
         )
     )
     failed = [name for name, passed, _ in checks if not passed]
@@ -184,7 +254,8 @@ def main() -> None:
             "",
             f"**Overall: {'PASS' if not failed else 'FAIL'}**",
             "",
-            "This check validates the current local run. It does not assert production readiness.",
+            "This check validates the committed adapter and current evidence. "
+            "It does not assert production readiness.",
         ]
     )
     output = PROJECT_ROOT / "artifacts/reports/integrity_check.md"

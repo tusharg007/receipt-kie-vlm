@@ -46,7 +46,7 @@ def collect_report() -> dict[str, Any]:
     gpu = _nvidia_query()
     return {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-        "project_root": str(PROJECT_ROOT),
+        "project_root": ".",
         "operating_system": {
             "system": platform.system(),
             "release": platform.release(),
@@ -55,7 +55,7 @@ def collect_report() -> dict[str, Any]:
         },
         "python": {
             "version": platform.python_version(),
-            "executable": sys.executable,
+            "executable": Path(sys.executable).name,
         },
         "pytorch": {
             "version": torch.__version__,
@@ -82,7 +82,7 @@ def collect_report() -> dict[str, Any]:
         else "fp16"
         if cuda_available
         else "fp32",
-        "hf_home": os.environ["HF_HOME"],
+        "hf_home": ".cache/huggingface",
     }
 
 

@@ -51,7 +51,8 @@ Phase 12-13: result integrity and Git preparation.
 - Attempt SDPA, then use logged eager fallback because this Idefics3 vision tower rejects it.
 - Resize images through the supported 512-pixel longest-edge processor option.
 - Train for two epochs because calibration projected completion well under 100 minutes.
-- Keep model caches, raw data, derived corruptions, and checkpoints out of Git.
+- Keep model caches, raw data, corruptions, and trainer checkpoints out of Git;
+  track only the minimal final adapter under `models/receipt-kie-lora/`.
 - Never push to GitHub until the user gives explicit final approval.
 
 ## Errors encountered and fixes
@@ -82,5 +83,6 @@ Phase 12-13: result integrity and Git preparation.
 
 ## Remaining tasks
 
+- Complete a real fresh-clone installation and inference test.
 - Show final Git status, repository size, large-file audit, and secret scan.
 - Request explicit user approval before any GitHub push.

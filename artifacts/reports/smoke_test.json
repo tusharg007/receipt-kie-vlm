@@ -1,7 +1,7 @@
 {
   "training": {
-    "config_path": "E:\\VLM-Receipt-OCR-main\\VLM-Receipt-OCR-main\\configs\\smoke_test.yaml",
-    "output_dir": "E:\\VLM-Receipt-OCR-main\\VLM-Receipt-OCR-main\\artifacts\\checkpoints\\smoke-test",
+    "config_path": "configs/smoke_test.yaml",
+    "output_dir": "artifacts/checkpoints/smoke-test",
     "runtime": {
       "device": "cuda",
       "dtype_name": "bf16",
