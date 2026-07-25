@@ -40,8 +40,8 @@ def main() -> int:
         "Python version",
         lambda: (
             f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-            if sys.version_info >= (3, 12)
-            else (_ for _ in ()).throw(RuntimeError("Python 3.12 or newer is required"))
+            if sys.version_info >= (3, 11)
+            else (_ for _ in ()).throw(RuntimeError("Python 3.11 or newer is required"))
         ),
     )
     for module_name in (

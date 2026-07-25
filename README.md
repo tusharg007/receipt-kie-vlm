@@ -241,7 +241,7 @@ descriptive rather than statistically definitive.
 
 ## Reproduction
 
-Python 3.12 and an NVIDIA CUDA environment are recommended on Windows.
+Python 3.11 or newer is supported. An NVIDIA CUDA environment is recommended on Windows for faster inference and training, but the demo also runs on CPU.
 
 ```powershell
 python -m venv .venv
