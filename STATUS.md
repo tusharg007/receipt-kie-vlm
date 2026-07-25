@@ -4,7 +4,7 @@ Last updated: 2026-07-26 (Asia/Calcutta)
 
 ## Current phase
 
-Phase 12-13: result integrity and Git preparation.
+Cloneability remediation and fresh-clone verification complete.
 
 ## Completed tasks
 
@@ -26,7 +26,10 @@ Phase 12-13: result integrity and Git preparation.
 - Completed a five-condition paired robustness pilot on 20 fixed receipts.
 - Rewrote the README and created the project report, interview guide, and resume bullets.
 - Generated `requirements-lock.txt` from the successful environment.
-- Passed 13 unit tests, Ruff, `pip check`, metric recomputation, and all integrity checks.
+- Passed 15 unit tests, Ruff, `pip check`, metric recomputation, and all integrity checks.
+- Committed the minimal 10.45 MiB LoRA adapter and recruiter-ready inference demo.
+- Passed a `git clone --no-local` test with a new Python 3.11 virtual environment,
+  isolated model cache, CPU model loading, adapter loading, and parsed-JSON inference.
 
 ## Commands executed
 
@@ -58,6 +61,8 @@ Phase 12-13: result integrity and Git preparation.
 ## Errors encountered and fixes
 
 - Broken Python 3.11 virtual environment: rebuilt with Python 3.12.13.
+- An overly strict Python 3.12 package declaration blocked the first clean-clone
+  verifier: confirmed the supported stack on Python 3.11 and declared Python 3.11+.
 - CPU-only Windows PyTorch wheel: replaced with CUDA 12.4 build.
 - System temporary drive exhausted during wheel install: redirected temporary storage.
 - NumPy 2 ABI drift: pinned NumPy below 2 and compatible SciPy/scikit-learn ranges.
@@ -83,6 +88,5 @@ Phase 12-13: result integrity and Git preparation.
 
 ## Remaining tasks
 
-- Complete a real fresh-clone installation and inference test.
-- Show final Git status, repository size, large-file audit, and secret scan.
-- Request explicit user approval before any GitHub push.
+- Show the final Git status, repository size, large-file audit, and secret scan.
+- Wait for explicit user approval before any GitHub push.
