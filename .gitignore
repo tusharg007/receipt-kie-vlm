@@ -51,6 +51,15 @@ coverage.xml
 .pytest_cache/
 cover/
 
+# Machine-learning caches and downloaded model weights
+.cache/
+**/models--*/
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.gguf
+
 # Translations
 *.mo
 *.pot
@@ -160,6 +169,12 @@ runs/
 wandb/
 *.zip
 
+# ReceiptKIE local data and transient trainer checkpoints
+data/raw/
+data/processed/
+artifacts/checkpoints/**/checkpoint-*/
+artifacts/logs/*.tmp
+
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -206,6 +221,7 @@ cython_debug/
 
 # Ruff stuff:
 .ruff_cache/
+.pytest-tmp/
 
 # PyPI configuration file
 .pypirc
