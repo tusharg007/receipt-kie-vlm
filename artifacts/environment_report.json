@@ -1,0 +1,42 @@
+{
+  "generated_at_utc": "2026-07-25T20:38:29.930020+00:00",
+  "project_root": "E:\\VLM-Receipt-OCR-main\\VLM-Receipt-OCR-main",
+  "operating_system": {
+    "system": "Windows",
+    "release": "11",
+    "version": "10.0.26100",
+    "machine": "AMD64"
+  },
+  "python": {
+    "version": "3.12.13",
+    "executable": "E:\\VLM-Receipt-OCR-main\\VLM-Receipt-OCR-main\\.venv\\Scripts\\python.exe"
+  },
+  "pytorch": {
+    "version": "2.5.1+cu124",
+    "cuda_available": true,
+    "cuda_version": "12.4",
+    "cudnn_version": 90100,
+    "bf16_supported": true,
+    "sdpa_available": true,
+    "flash_attention_2_installed": false
+  },
+  "gpu": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 3050 Laptop GPU",
+    "driver_version": "581.83",
+    "memory_total_mib": 4096,
+    "memory_free_mib": 3964
+  },
+  "system_memory": {
+    "total_gib": 15.68,
+    "available_gib": 2.53
+  },
+  "project_drive": {
+    "total_gib": 173.83,
+    "used_gib": 143.11,
+    "free_gib": 30.72
+  },
+  "attention_decision": "sdpa",
+  "precision_decision": "bf16",
+  "hf_home": "E:\\VLM-Receipt-OCR-main\\VLM-Receipt-OCR-main\\.cache\\huggingface"
+}

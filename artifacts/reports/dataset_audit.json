@@ -1,0 +1,62 @@
+{
+  "dataset_root": "E:\\VLM-Receipt-OCR-main\\VLM-Receipt-OCR-main\\data\\raw\\sroie\\SROIE2019",
+  "valid_pairs": 973,
+  "image_files": 973,
+  "annotation_files": 973,
+  "split_counts": {
+    "train": 626,
+    "test": 347
+  },
+  "excluded_count": 0,
+  "exclusion_reasons": {},
+  "exclusions": [],
+  "actual_annotation_key_frequency": {
+    "address": 972,
+    "company": 973,
+    "date": 973,
+    "total": 973
+  },
+  "canonical_field_frequency": {
+    "company": 973,
+    "address": 972,
+    "date": 973,
+    "total": 972
+  },
+  "empty_value_counts": {
+    "company": 0,
+    "address": 1,
+    "date": 0,
+    "total": 1
+  },
+  "image_dimensions": {
+    "width": {
+      "min": 435,
+      "max": 4961,
+      "mean": 1359.56,
+      "median": 825
+    },
+    "height": {
+      "min": 605,
+      "max": 7016,
+      "mean": 2401.24,
+      "median": 1697
+    }
+  },
+  "schema": [
+    "company",
+    "address",
+    "date",
+    "total"
+  ],
+  "canonicalization": {
+    "key_order": [
+      "company",
+      "address",
+      "date",
+      "total"
+    ],
+    "missing_value": "",
+    "value_type": "string",
+    "encoding": "UTF-8"
+  }
+}
