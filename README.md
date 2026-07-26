@@ -18,7 +18,7 @@ that SmolVLM was trained from scratch.
 ## Clone and Run the Trained Model
 
 ```bash
-git clone <REPOSITORY_URL_PLACEHOLDER>
+git clone https://github.com/tusharg007/receipt-kie-vlm.git
 cd receipt-kie-vlm
 python -m venv .venv
 ```
