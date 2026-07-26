@@ -1,0 +1,182 @@
+{
+  "experiment": "high_resolution_continued_training_smoke",
+  "config_path": "configs/highres_training_smoke_2048.yaml",
+  "resolution": 2048,
+  "status": "success",
+  "success": true,
+  "oom": false,
+  "safe_memory": false,
+  "runtime": {
+    "device": "cuda",
+    "dtype_name": "bf16",
+    "attention": "eager",
+    "bf16_supported": true,
+    "flash_attention_2_installed": false
+  },
+  "train_ids": [
+    "X51005361950",
+    "X51005676546",
+    "X51005685357",
+    "X51005719882",
+    "X51006388044",
+    "X51006414483",
+    "X51006466066",
+    "X51008164997"
+  ],
+  "validation_ids": [
+    "X51005361946",
+    "X51005711447"
+  ],
+  "train_sample_count": 8,
+  "validation_sample_count": 2,
+  "official_test_used": false,
+  "adapter_source": "models/receipt-kie-lora",
+  "adapter_source_sha256": "94ba0038153ea1aacb12dbcc80f1edf01d31a6309ea56919684e8cb8bbe90b28",
+  "adapter_structure": {
+    "rank": 16,
+    "alpha": 32,
+    "dropout": 0.05,
+    "target_modules": [
+      "k_proj",
+      "o_proj",
+      "q_proj",
+      "v_proj"
+    ]
+  },
+  "parameter_statistics": {
+    "total_parameters": 259212864,
+    "trainable_parameters": 2727936,
+    "trainable_percentage": 1.0523922146086082
+  },
+  "precision": "bf16",
+  "gradient_checkpointing": true,
+  "batch_size": 1,
+  "gradient_accumulation_steps": 8,
+  "optimization_steps": 5,
+  "duration_seconds": 435.3303337000543,
+  "seconds_per_optimization_step": 87.06606674001087,
+  "peak_allocated_gpu_memory_mib": 3943.083984375,
+  "peak_reserved_gpu_memory_mib": 5890.0,
+  "unsafe_allocated_threshold_mib": 3788.8,
+  "safe_memory_margin_mib": -154.28398437499982,
+  "data_profile": {
+    "records": [
+      {
+        "sample_id": "X51005361950",
+        "visual_tile_count": 13,
+        "assistant_token_count": 93
+      },
+      {
+        "sample_id": "X51005676546",
+        "visual_tile_count": 13,
+        "assistant_token_count": 83
+      },
+      {
+        "sample_id": "X51005685357",
+        "visual_tile_count": 9,
+        "assistant_token_count": 79
+      },
+      {
+        "sample_id": "X51005719882",
+        "visual_tile_count": 13,
+        "assistant_token_count": 99
+      },
+      {
+        "sample_id": "X51006388044",
+        "visual_tile_count": 9,
+        "assistant_token_count": 60
+      },
+      {
+        "sample_id": "X51006414483",
+        "visual_tile_count": 13,
+        "assistant_token_count": 91
+      },
+      {
+        "sample_id": "X51006466066",
+        "visual_tile_count": 9,
+        "assistant_token_count": 95
+      },
+      {
+        "sample_id": "X51008164997",
+        "visual_tile_count": 9,
+        "assistant_token_count": 90
+      },
+      {
+        "sample_id": "X51005361946",
+        "visual_tile_count": 13,
+        "assistant_token_count": 108
+      },
+      {
+        "sample_id": "X51005711447",
+        "visual_tile_count": 13,
+        "assistant_token_count": 94
+      }
+    ],
+    "average_visual_tiles": 11.4,
+    "median_visual_tiles": 13.0,
+    "total_assistant_tokens": 892,
+    "average_assistant_tokens": 89.2
+  },
+  "training_losses": [
+    {
+      "step": 1,
+      "loss": 0.2426
+    },
+    {
+      "step": 2,
+      "loss": 0.2154
+    },
+    {
+      "step": 3,
+      "loss": 0.1928
+    },
+    {
+      "step": 4,
+      "loss": 0.1807
+    },
+    {
+      "step": 5,
+      "loss": 0.1737
+    }
+  ],
+  "validation_losses": [
+    {
+      "step": 5,
+      "epoch": 5.0,
+      "eval_loss": 0.2313607633113861
+    }
+  ],
+  "final_training_loss": 0.1737,
+  "final_validation_loss": 0.2313607633113861,
+  "initial_lora_tensor_sha256": "f12271ab5607a10814d0f9ff2ce74996c53df55bb528b5c628f45fbb8be50ed4",
+  "final_lora_tensor_sha256": "a0dab4a851731381e12a7b4b29fec24faa1589b1aa46b6d4643fe94e195d11d6",
+  "lora_tensors_changed": true,
+  "train_metrics": {
+    "train_runtime": 435.1243,
+    "train_samples_per_second": 0.092,
+    "train_steps_per_second": 0.011,
+    "total_flos": 49481851795200.0,
+    "train_loss": 0.2010243147611618,
+    "epoch": 5.0
+  },
+  "output_dir": "artifacts/checkpoints/highres-training-v2-smoke-2048",
+  "package_versions": {
+    "torch": "2.5.1+cu124",
+    "torchvision": "0.20.1+cu124",
+    "transformers": "4.46.3",
+    "datasets": "3.1.0",
+    "accelerate": "1.1.1",
+    "peft": "0.13.2",
+    "trl": "0.12.1",
+    "pillow": "11.3.0",
+    "pandas": "2.3.3",
+    "numpy": "1.26.4",
+    "scikit-learn": "1.6.1",
+    "rapidfuzz": "3.14.5",
+    "matplotlib": "3.11.1",
+    "pyyaml": "6.0.3"
+  },
+  "adapter_reload_verified": true,
+  "saved_adapter_sha256": "79c015294d881734a5ae22656c67b2fca2ca005c9b08286116dd0ea72c4461d4",
+  "passed": true
+}

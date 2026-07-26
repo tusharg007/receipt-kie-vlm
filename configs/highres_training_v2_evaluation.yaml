@@ -1,0 +1,22 @@
+extends: highres_training_v2.yaml
+
+paths:
+  validation_results_path: artifacts/experiments/highres_training_v2/validation_results.json
+  validation_predictions_root: artifacts/experiments/highres_training_v2/validation_predictions
+  frozen_selection_path: artifacts/experiments/highres_training_v2/frozen_selection.json
+  final_adapter_path: models/receipt-kie-lora-v2-highres
+  selection_log_file: artifacts/logs/highres_training_v2_selection.log
+
+generation:
+  max_new_tokens: 256
+  repetition_penalty: 1.08
+  do_sample: false
+
+selection:
+  weights:
+    macro_normalized_exact_match: 0.35
+    macro_normalized_similarity: 0.20
+    complete_record_normalized_exact_match: 0.20
+    valid_json_rate: 0.15
+    generation_limit_rate: 0.05
+    repetition_failure_rate: 0.05

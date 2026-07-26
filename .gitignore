@@ -177,7 +177,7 @@ data/processed/
 artifacts/checkpoints/**/checkpoint-*/
 artifacts/logs/*.tmp
 
-# Publish only the minimal final inference adapter. Training checkpoints remain ignored.
+# Publish only the minimal inference adapters. Training checkpoints remain ignored.
 models/*
 !models/receipt-kie-lora/
 models/receipt-kie-lora/*
@@ -185,6 +185,11 @@ models/receipt-kie-lora/*
 !models/receipt-kie-lora/adapter_config.json
 !models/receipt-kie-lora/training_metadata.json
 !models/receipt-kie-lora/README.md
+!models/receipt-kie-lora-v2-highres/
+models/receipt-kie-lora-v2-highres/*
+!models/receipt-kie-lora-v2-highres/adapter_model.safetensors
+!models/receipt-kie-lora-v2-highres/adapter_config.json
+!models/receipt-kie-lora-v2-highres/training_metadata.json
 
 # Spyder project settings
 .spyderproject

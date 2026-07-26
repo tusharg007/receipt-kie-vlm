@@ -1,0 +1,10 @@
+extends: highres_training_smoke_2048.yaml
+
+paths:
+  output_dir: artifacts/checkpoints/highres-training-v2-smoke-1536
+  report_path: artifacts/experiments/highres_training_v2/smoke_1536.json
+  log_file: artifacts/logs/highres_training_smoke_1536.log
+  tensorboard_dir: artifacts/logs/tensorboard/highres_training_smoke_1536
+
+model:
+  image_longest_edge: 1536

@@ -9,6 +9,7 @@ from typing import Any
 
 import torch
 from peft import LoraConfig, TaskType, get_peft_model
+from PIL import Image
 from transformers import AutoModelForImageTextToText, AutoProcessor
 
 from receipt_kie.utils import project_path
@@ -114,6 +115,28 @@ def processor_image_configuration(image_processor: Any) -> dict[str, Any]:
         "max_image_size": dict(image_processor.max_image_size),
         "do_image_splitting": bool(image_processor.do_image_splitting),
     }
+
+
+def resize_to_longest_edge(image: Image.Image, longest_edge: int) -> Image.Image:
+    """Match Idefics3's explicit longest-edge LANCZOS resize deterministically."""
+    if longest_edge <= 0:
+        raise ValueError("longest_edge must be positive")
+    width, height = image.size
+    aspect_ratio = width / height
+    if width >= height:
+        output_width = longest_edge
+        output_height = int(output_width / aspect_ratio)
+        if output_height % 2:
+            output_height += 1
+    else:
+        output_height = longest_edge
+        output_width = int(output_height * aspect_ratio)
+        if output_width % 2:
+            output_width += 1
+    return image.resize(
+        (max(output_width, 1), max(output_height, 1)),
+        resample=Image.Resampling.LANCZOS,
+    )
 
 
 def load_base_model(

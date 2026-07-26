@@ -1,0 +1,62 @@
+{
+  "frozen": true,
+  "selection_source": "63 validation receipts from official train split",
+  "official_test_inspected_during_selection": false,
+  "resolution": 1536,
+  "max_image_patch_edge": 512,
+  "do_image_splitting": true,
+  "max_new_tokens": 256,
+  "checkpoint": "checkpoint-210",
+  "checkpoint_path": "artifacts/checkpoints/highres-training-v2-1536/checkpoint-210",
+  "checkpoint_adapter_sha256": "3e0e5a88c36f0d6a0db6baf2a3b521e40be4ef84b212ed2eafecab431604bf79",
+  "generation_policy": "always_repetition_penalty_1p08",
+  "repetition_penalty": 1.08,
+  "adaptive_retry_trigger": [],
+  "parsing_behavior": "receipt_kie.metrics.extract_json",
+  "selection_score_formula": "0.35 * macro_normalized_exact_match + 0.2 * macro_normalized_similarity + 0.2 * complete_record_normalized_exact_match + 0.15 * valid_json_rate - 0.05 * generation_limit_rate - 0.05 * repetition_failure_rate",
+  "selection_score": 0.6300511846663504,
+  "validation_metrics": {
+    "sample_count": 63,
+    "valid_json_rate": 1.0,
+    "per_field": {
+      "company": {
+        "raw_exact_match": 0.6507936507936508,
+        "normalized_exact_match": 0.6507936507936508,
+        "normalized_similarity": 0.9031039742395928
+      },
+      "address": {
+        "raw_exact_match": 0.2857142857142857,
+        "normalized_exact_match": 0.38095238095238093,
+        "normalized_similarity": 0.9024114967675982
+      },
+      "date": {
+        "raw_exact_match": 0.9206349206349206,
+        "normalized_exact_match": 0.9523809523809523,
+        "normalized_similarity": 0.9785369220151828
+      },
+      "total": {
+        "raw_exact_match": 0.6984126984126984,
+        "normalized_exact_match": 0.7301587301587301,
+        "normalized_similarity": 0.8606220939554273
+      }
+    },
+    "company_accuracy": 0.6507936507936508,
+    "address_similarity": 0.9024114967675982,
+    "date_accuracy": 0.9523809523809523,
+    "total_accuracy": 0.7301587301587301,
+    "complete_record_raw_exact_match": 0.25396825396825395,
+    "complete_record_normalized_exact_match": 0.30158730158730157,
+    "macro_normalized_exact_match": 0.6785714285714286,
+    "macro_normalized_similarity": 0.9111686217444503,
+    "average_inference_latency_seconds": 7.926532357143948,
+    "median_inference_latency_seconds": 7.570720199961215,
+    "peak_gpu_memory_mib": 1876.5546875,
+    "generation_limit_hit_count": 0,
+    "generation_limit_rate": 0.0,
+    "repetition_failure_count": 0,
+    "repetition_failure_rate": 0.0,
+    "retry_count": 0,
+    "retry_rate": 0.0,
+    "selection_score": 0.6300511846663504
+  }
+}

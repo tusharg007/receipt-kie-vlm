@@ -1,0 +1,54 @@
+project:
+  name: ReceiptKIE-VLM-highres-training-v2
+  seed: 42
+
+paths:
+  dataset_root: data/raw/sroie/SROIE2019
+  hf_cache: .cache/huggingface
+  v1_adapter_path: models/receipt-kie-lora
+  v1_split_manifest: artifacts/checkpoints/receipt-kie-lora/dataset_split_manifest.json
+  output_dir: artifacts/checkpoints/highres-training-v2-1536
+  training_summary_path: artifacts/experiments/highres_training_v2/training_summary.json
+  split_manifest_copy_path: artifacts/experiments/highres_training_v2/train_validation_manifest.json
+  log_file: artifacts/logs/highres_training_v2.log
+  tensorboard_dir: artifacts/logs/tensorboard/highres_training_v2
+
+model:
+  model_id: HuggingFaceTB/SmolVLM-256M-Instruct
+  trust_remote_code: false
+  attention: auto
+  precision: auto
+  image_longest_edge: 1536
+  max_image_patch_edge: 512
+  do_image_splitting: true
+  use_cache: false
+
+training:
+  num_train_epochs: 3
+  max_seq_length: 512
+  per_device_train_batch_size: 1
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 8
+  learning_rate: 0.00005
+  weight_decay: 0.01
+  warmup_ratio: 0.05
+  logging_steps: 5
+  eval_steps: 35
+  save_total_limit: 3
+  gradient_checkpointing: true
+  early_stopping_patience: 2
+  early_stopping_min_delta: 0.0
+
+lora:
+  rank: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+
+quantization:
+  enabled: false
+  reason: No bitsandbytes path is used; BF16 continuation passed the 1536 smoke gate.

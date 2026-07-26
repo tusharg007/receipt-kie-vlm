@@ -1,0 +1,54 @@
+project:
+  name: ReceiptKIE-VLM-highres-training-smoke
+  seed: 42
+
+paths:
+  dataset_root: data/raw/sroie/SROIE2019
+  hf_cache: .cache/huggingface
+  v1_adapter_path: models/receipt-kie-lora
+  v1_split_manifest: artifacts/checkpoints/receipt-kie-lora/dataset_split_manifest.json
+  output_dir: artifacts/checkpoints/highres-training-v2-smoke-2048
+  report_path: artifacts/experiments/highres_training_v2/smoke_2048.json
+  log_file: artifacts/logs/highres_training_smoke_2048.log
+  tensorboard_dir: artifacts/logs/tensorboard/highres_training_smoke_2048
+
+model:
+  model_id: HuggingFaceTB/SmolVLM-256M-Instruct
+  trust_remote_code: false
+  attention: auto
+  precision: auto
+  image_longest_edge: 2048
+  max_image_patch_edge: 512
+  do_image_splitting: true
+  use_cache: false
+
+smoke:
+  train_sample_count: 8
+  validation_sample_count: 2
+
+training:
+  num_train_epochs: 5
+  max_steps: 5
+  max_seq_length: 512
+  per_device_train_batch_size: 1
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 8
+  learning_rate: 0.00005
+  weight_decay: 0.01
+  warmup_ratio: 0.0
+  logging_steps: 1
+  eval_steps: 5
+  gradient_checkpointing: true
+
+lora:
+  rank: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+
+memory:
+  unsafe_allocated_mib: 3788.8

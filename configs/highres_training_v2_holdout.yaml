@@ -1,0 +1,23 @@
+extends: highres_training_v2_evaluation.yaml
+
+paths:
+  test_usage_manifest: artifacts/experiments/highres_training_v2/test_usage_manifest.json
+  final_holdout_ids_path: artifacts/experiments/highres_training_v2/final_holdout_ids.json
+  base_predictions_path: artifacts/experiments/highres_training_v2/base_predictions.jsonl
+  v1_predictions_path: artifacts/experiments/highres_training_v2/v1_predictions.jsonl
+  v2_predictions_path: artifacts/experiments/highres_training_v2/v2_predictions.jsonl
+  holdout_results_path: artifacts/experiments/highres_training_v2/results.json
+  holdout_results_csv_path: artifacts/experiments/highres_training_v2/results.csv
+  comparison_figure_path: artifacts/figures/highres_training_v2_comparison.png
+  qualitative_figure_root: artifacts/figures/highres_training_v2_qualitative
+  qualitative_manifest_path: artifacts/experiments/highres_training_v2/qualitative_manifest.json
+  holdout_log_file: artifacts/logs/highres_training_v2_holdout.log
+  report_path: HIGH_RESOLUTION_TRAINING_V2.md
+  smoke_2048_path: artifacts/experiments/highres_training_v2/smoke_2048.json
+  smoke_1536_path: artifacts/experiments/highres_training_v2/smoke_1536.json
+
+generation:
+  policy: always_repetition_penalty_1p08
+
+bootstrap:
+  resamples: 2000

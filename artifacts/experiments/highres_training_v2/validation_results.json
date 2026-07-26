@@ -1,0 +1,590 @@
+{
+  "experiment": "highres_training_v2_validation_selection",
+  "source_split": "official_train_validation",
+  "sample_count": 63,
+  "validation_ids": [
+    "X00016469672",
+    "X51005361900",
+    "X51005361946",
+    "X51005433492",
+    "X51005433514",
+    "X51005442327",
+    "X51005442338",
+    "X51005447860",
+    "X51005568881",
+    "X51005568884",
+    "X51005577192",
+    "X51005605286",
+    "X51005605333",
+    "X51005663273",
+    "X51005663279",
+    "X51005663280",
+    "X51005676538",
+    "X51005677332",
+    "X51005711447",
+    "X51005719864",
+    "X51005719883",
+    "X51005719896",
+    "X51005757243",
+    "X51005757323",
+    "X51005806702",
+    "X51006008074",
+    "X51006008091",
+    "X51006008197",
+    "X51006311767",
+    "X51006327978",
+    "X51006329399",
+    "X51006350763",
+    "X51006389963",
+    "X51006392299",
+    "X51006414392",
+    "X51006414431",
+    "X51006414674",
+    "X51006414680",
+    "X51006556815",
+    "X51006556825",
+    "X51006556838",
+    "X51006557170",
+    "X51006557185",
+    "X51006557195",
+    "X51006557202",
+    "X51006619343",
+    "X51006619696",
+    "X51006619698",
+    "X51006913024",
+    "X51006913031",
+    "X51007231336",
+    "X51007231370",
+    "X51007339095",
+    "X51007419197",
+    "X51008042782",
+    "X51008099044",
+    "X51008099081",
+    "X51008114260",
+    "X51008123604",
+    "X51008142059",
+    "X51008142060",
+    "X51008164525",
+    "X51008164991"
+  ],
+  "resolution": 1536,
+  "max_new_tokens": 256,
+  "deterministic_decoding": true,
+  "score_formula": "0.35 * macro_normalized_exact_match + 0.2 * macro_normalized_similarity + 0.2 * complete_record_normalized_exact_match + 0.15 * valid_json_rate - 0.05 * generation_limit_rate - 0.05 * repetition_failure_rate",
+  "score_weights": {
+    "macro_normalized_exact_match": 0.35,
+    "macro_normalized_similarity": 0.2,
+    "complete_record_normalized_exact_match": 0.2,
+    "valid_json_rate": 0.15,
+    "generation_limit_rate": 0.05,
+    "repetition_failure_rate": 0.05
+  },
+  "candidates": {
+    "checkpoint-70": {
+      "checkpoint": "checkpoint-70",
+      "checkpoint_path": "artifacts/checkpoints/highres-training-v2-1536/checkpoint-70",
+      "adapter_sha256": "190266e2d454f44f9de70ad78d74f19a0d9a9760501db237b00285f183afd7ae",
+      "policies": {
+        "no_repetition_penalty": {
+          "metrics": {
+            "sample_count": 63,
+            "valid_json_rate": 1.0,
+            "per_field": {
+              "company": {
+                "raw_exact_match": 0.6666666666666666,
+                "normalized_exact_match": 0.6666666666666666,
+                "normalized_similarity": 0.9049046274025794
+              },
+              "address": {
+                "raw_exact_match": 0.2222222222222222,
+                "normalized_exact_match": 0.31746031746031744,
+                "normalized_similarity": 0.8769265486170449
+              },
+              "date": {
+                "raw_exact_match": 0.873015873015873,
+                "normalized_exact_match": 0.9047619047619048,
+                "normalized_similarity": 0.9550052499632331
+              },
+              "total": {
+                "raw_exact_match": 0.6031746031746031,
+                "normalized_exact_match": 0.6507936507936508,
+                "normalized_similarity": 0.81329164662498
+              }
+            },
+            "company_accuracy": 0.6666666666666666,
+            "address_similarity": 0.8769265486170449,
+            "date_accuracy": 0.9047619047619048,
+            "total_accuracy": 0.6507936507936508,
+            "complete_record_raw_exact_match": 0.14285714285714285,
+            "complete_record_normalized_exact_match": 0.19047619047619047,
+            "macro_normalized_exact_match": 0.6349206349206349,
+            "macro_normalized_similarity": 0.8875320181519594,
+            "average_inference_latency_seconds": 8.043323376197515,
+            "median_inference_latency_seconds": 7.5730552999302745,
+            "peak_gpu_memory_mib": 1876.3046875,
+            "generation_limit_hit_count": 0,
+            "generation_limit_rate": 0.0,
+            "repetition_failure_count": 0,
+            "repetition_failure_rate": 0.0,
+            "retry_count": 0,
+            "retry_rate": 0.0,
+            "selection_score": 0.5878238639478521
+          },
+          "predictions_path": "artifacts/experiments/highres_training_v2/validation_predictions/checkpoint-70/no_repetition_penalty.jsonl"
+        },
+        "always_repetition_penalty_1p08": {
+          "metrics": {
+            "sample_count": 63,
+            "valid_json_rate": 0.9841269841269841,
+            "per_field": {
+              "company": {
+                "raw_exact_match": 0.6349206349206349,
+                "normalized_exact_match": 0.6349206349206349,
+                "normalized_similarity": 0.8805405589773684
+              },
+              "address": {
+                "raw_exact_match": 0.20634920634920634,
+                "normalized_exact_match": 0.31746031746031744,
+                "normalized_similarity": 0.8661886278197166
+              },
+              "date": {
+                "raw_exact_match": 0.8412698412698413,
+                "normalized_exact_match": 0.8888888888888888,
+                "normalized_similarity": 0.9493886443466275
+              },
+              "total": {
+                "raw_exact_match": 0.5873015873015873,
+                "normalized_exact_match": 0.6031746031746031,
+                "normalized_similarity": 0.7794933461600129
+              }
+            },
+            "company_accuracy": 0.6349206349206349,
+            "address_similarity": 0.8661886278197166,
+            "date_accuracy": 0.8888888888888888,
+            "total_accuracy": 0.6031746031746031,
+            "complete_record_raw_exact_match": 0.12698412698412698,
+            "complete_record_normalized_exact_match": 0.1746031746031746,
+            "macro_normalized_exact_match": 0.611111111111111,
+            "macro_normalized_similarity": 0.8689027943259313,
+            "average_inference_latency_seconds": 7.874678965081417,
+            "median_inference_latency_seconds": 7.53805889992509,
+            "peak_gpu_memory_mib": 1876.3046875,
+            "generation_limit_hit_count": 0,
+            "generation_limit_rate": 0.0,
+            "repetition_failure_count": 0,
+            "repetition_failure_rate": 0.0,
+            "retry_count": 0,
+            "retry_rate": 0.0,
+            "selection_score": 0.5702091302937576
+          },
+          "predictions_path": "artifacts/experiments/highres_training_v2/validation_predictions/checkpoint-70/always_repetition_penalty_1p08.jsonl"
+        },
+        "adaptive_retry_1p08": {
+          "metrics": {
+            "sample_count": 63,
+            "valid_json_rate": 1.0,
+            "per_field": {
+              "company": {
+                "raw_exact_match": 0.6666666666666666,
+                "normalized_exact_match": 0.6666666666666666,
+                "normalized_similarity": 0.9049046274025794
+              },
+              "address": {
+                "raw_exact_match": 0.2222222222222222,
+                "normalized_exact_match": 0.31746031746031744,
+                "normalized_similarity": 0.8769265486170449
+              },
+              "date": {
+                "raw_exact_match": 0.873015873015873,
+                "normalized_exact_match": 0.9047619047619048,
+                "normalized_similarity": 0.9550052499632331
+              },
+              "total": {
+                "raw_exact_match": 0.6031746031746031,
+                "normalized_exact_match": 0.6507936507936508,
+                "normalized_similarity": 0.81329164662498
+              }
+            },
+            "company_accuracy": 0.6666666666666666,
+            "address_similarity": 0.8769265486170449,
+            "date_accuracy": 0.9047619047619048,
+            "total_accuracy": 0.6507936507936508,
+            "complete_record_raw_exact_match": 0.14285714285714285,
+            "complete_record_normalized_exact_match": 0.19047619047619047,
+            "macro_normalized_exact_match": 0.6349206349206349,
+            "macro_normalized_similarity": 0.8875320181519594,
+            "average_inference_latency_seconds": 8.043323376197515,
+            "median_inference_latency_seconds": 7.5730552999302745,
+            "peak_gpu_memory_mib": 1876.3046875,
+            "generation_limit_hit_count": 0,
+            "generation_limit_rate": 0.0,
+            "repetition_failure_count": 0,
+            "repetition_failure_rate": 0.0,
+            "retry_count": 0,
+            "retry_rate": 0.0,
+            "selection_score": 0.5878238639478521
+          },
+          "predictions_path": "artifacts/experiments/highres_training_v2/validation_predictions/checkpoint-70/adaptive_retry_1p08.jsonl"
+        }
+      }
+    },
+    "checkpoint-140": {
+      "checkpoint": "checkpoint-140",
+      "checkpoint_path": "artifacts/checkpoints/highres-training-v2-1536/checkpoint-140",
+      "adapter_sha256": "73ddaa090370c9fbb54696e294a655691f75dcf86f0199a23e8fb7f399e174bc",
+      "policies": {
+        "no_repetition_penalty": {
+          "metrics": {
+            "sample_count": 63,
+            "valid_json_rate": 1.0,
+            "per_field": {
+              "company": {
+                "raw_exact_match": 0.6349206349206349,
+                "normalized_exact_match": 0.6349206349206349,
+                "normalized_similarity": 0.9020617612083278
+              },
+              "address": {
+                "raw_exact_match": 0.2698412698412698,
+                "normalized_exact_match": 0.3492063492063492,
+                "normalized_similarity": 0.8916949933427635
+              },
+              "date": {
+                "raw_exact_match": 0.9206349206349206,
+                "normalized_exact_match": 0.9523809523809523,
+                "normalized_similarity": 0.9888888888888889
+              },
+              "total": {
+                "raw_exact_match": 0.6349206349206349,
+                "normalized_exact_match": 0.6825396825396826,
+                "normalized_similarity": 0.840275773609107
+              }
+            },
+            "company_accuracy": 0.6349206349206349,
+            "address_similarity": 0.8916949933427635,
+            "date_accuracy": 0.9523809523809523,
+            "total_accuracy": 0.6825396825396826,
+            "complete_record_raw_exact_match": 0.15873015873015872,
+            "complete_record_normalized_exact_match": 0.20634920634920634,
+            "macro_normalized_exact_match": 0.6547619047619048,
+            "macro_normalized_similarity": 0.9057303542622718,
+            "average_inference_latency_seconds": 7.901552236511461,
+            "median_inference_latency_seconds": 7.613667899975553,
+            "peak_gpu_memory_mib": 1876.5546875,
+            "generation_limit_hit_count": 0,
+            "generation_limit_rate": 0.0,
+            "repetition_failure_count": 0,
+            "repetition_failure_rate": 0.0,
+            "retry_count": 0,
+            "retry_rate": 0.0,
+            "selection_score": 0.6015825787889623
+          },
+          "predictions_path": "artifacts/experiments/highres_training_v2/validation_predictions/checkpoint-140/no_repetition_penalty.jsonl"
+        },
+        "always_repetition_penalty_1p08": {
+          "metrics": {
+            "sample_count": 63,
+            "valid_json_rate": 1.0,
+            "per_field": {
+              "company": {
+                "raw_exact_match": 0.6190476190476191,
+                "normalized_exact_match": 0.6190476190476191,
+                "normalized_similarity": 0.8956568600665845
+              },
+              "address": {
+                "raw_exact_match": 0.2698412698412698,
+                "normalized_exact_match": 0.3492063492063492,
+                "normalized_similarity": 0.90166940184063
+              },
+              "date": {
+                "raw_exact_match": 0.9206349206349206,
+                "normalized_exact_match": 0.9523809523809523,
+                "normalized_similarity": 0.9801242236024845
+              },
+              "total": {
+                "raw_exact_match": 0.6507936507936508,
+                "normalized_exact_match": 0.6666666666666666,
+                "normalized_similarity": 0.8260541927208593
+              }
+            },
+            "company_accuracy": 0.6190476190476191,
+            "address_similarity": 0.90166940184063,
+            "date_accuracy": 0.9523809523809523,
+            "total_accuracy": 0.6666666666666666,
+            "complete_record_raw_exact_match": 0.19047619047619047,
+            "complete_record_normalized_exact_match": 0.23809523809523808,
+            "macro_normalized_exact_match": 0.6468253968253967,
+            "macro_normalized_similarity": 0.9008761695576396,
+            "average_inference_latency_seconds": 7.645451357148381,
+            "median_inference_latency_seconds": 7.582491699955426,
+            "peak_gpu_memory_mib": 1876.5546875,
+            "generation_limit_hit_count": 0,
+            "generation_limit_rate": 0.0,
+            "repetition_failure_count": 0,
+            "repetition_failure_rate": 0.0,
+            "retry_count": 0,
+            "retry_rate": 0.0,
+            "selection_score": 0.6041831704194643
+          },
+          "predictions_path": "artifacts/experiments/highres_training_v2/validation_predictions/checkpoint-140/always_repetition_penalty_1p08.jsonl"
+        },
+        "adaptive_retry_1p08": {
+          "metrics": {
+            "sample_count": 63,
+            "valid_json_rate": 1.0,
+            "per_field": {
+              "company": {
+                "raw_exact_match": 0.6349206349206349,
+                "normalized_exact_match": 0.6349206349206349,
+                "normalized_similarity": 0.9020617612083278
+              },
+              "address": {
+                "raw_exact_match": 0.2698412698412698,
+                "normalized_exact_match": 0.3492063492063492,
+                "normalized_similarity": 0.8916949933427635
+              },
+              "date": {
+                "raw_exact_match": 0.9206349206349206,
+                "normalized_exact_match": 0.9523809523809523,
+                "normalized_similarity": 0.9888888888888889
+              },
+              "total": {
+                "raw_exact_match": 0.6349206349206349,
+                "normalized_exact_match": 0.6825396825396826,
+                "normalized_similarity": 0.840275773609107
+              }
+            },
+            "company_accuracy": 0.6349206349206349,
+            "address_similarity": 0.8916949933427635,
+            "date_accuracy": 0.9523809523809523,
+            "total_accuracy": 0.6825396825396826,
+            "complete_record_raw_exact_match": 0.15873015873015872,
+            "complete_record_normalized_exact_match": 0.20634920634920634,
+            "macro_normalized_exact_match": 0.6547619047619048,
+            "macro_normalized_similarity": 0.9057303542622718,
+            "average_inference_latency_seconds": 7.901552236511461,
+            "median_inference_latency_seconds": 7.613667899975553,
+            "peak_gpu_memory_mib": 1876.5546875,
+            "generation_limit_hit_count": 0,
+            "generation_limit_rate": 0.0,
+            "repetition_failure_count": 0,
+            "repetition_failure_rate": 0.0,
+            "retry_count": 0,
+            "retry_rate": 0.0,
+            "selection_score": 0.6015825787889623
+          },
+          "predictions_path": "artifacts/experiments/highres_training_v2/validation_predictions/checkpoint-140/adaptive_retry_1p08.jsonl"
+        }
+      }
+    },
+    "checkpoint-210": {
+      "checkpoint": "checkpoint-210",
+      "checkpoint_path": "artifacts/checkpoints/highres-training-v2-1536/checkpoint-210",
+      "adapter_sha256": "3e0e5a88c36f0d6a0db6baf2a3b521e40be4ef84b212ed2eafecab431604bf79",
+      "policies": {
+        "no_repetition_penalty": {
+          "metrics": {
+            "sample_count": 63,
+            "valid_json_rate": 0.9841269841269841,
+            "per_field": {
+              "company": {
+                "raw_exact_match": 0.6349206349206349,
+                "normalized_exact_match": 0.6349206349206349,
+                "normalized_similarity": 0.8875308534033141
+              },
+              "address": {
+                "raw_exact_match": 0.2698412698412698,
+                "normalized_exact_match": 0.3492063492063492,
+                "normalized_similarity": 0.8788166929658547
+              },
+              "date": {
+                "raw_exact_match": 0.9206349206349206,
+                "normalized_exact_match": 0.9365079365079365,
+                "normalized_similarity": 0.9714285714285714
+              },
+              "total": {
+                "raw_exact_match": 0.6984126984126984,
+                "normalized_exact_match": 0.7301587301587301,
+                "normalized_similarity": 0.8561487894821228
+              }
+            },
+            "company_accuracy": 0.6349206349206349,
+            "address_similarity": 0.8788166929658547,
+            "date_accuracy": 0.9365079365079365,
+            "total_accuracy": 0.7301587301587301,
+            "complete_record_raw_exact_match": 0.20634920634920634,
+            "complete_record_normalized_exact_match": 0.25396825396825395,
+            "macro_normalized_exact_match": 0.6626984126984127,
+            "macro_normalized_similarity": 0.8984812268199658,
+            "average_inference_latency_seconds": 8.008854692064537,
+            "median_inference_latency_seconds": 7.651457900064997,
+            "peak_gpu_memory_mib": 1876.5546875,
+            "generation_limit_hit_count": 1,
+            "generation_limit_rate": 0.015873015873015872,
+            "repetition_failure_count": 1,
+            "repetition_failure_rate": 0.015873015873015872,
+            "retry_count": 0,
+            "retry_rate": 0.0,
+            "selection_score": 0.6084660866338344
+          },
+          "predictions_path": "artifacts/experiments/highres_training_v2/validation_predictions/checkpoint-210/no_repetition_penalty.jsonl"
+        },
+        "always_repetition_penalty_1p08": {
+          "metrics": {
+            "sample_count": 63,
+            "valid_json_rate": 1.0,
+            "per_field": {
+              "company": {
+                "raw_exact_match": 0.6507936507936508,
+                "normalized_exact_match": 0.6507936507936508,
+                "normalized_similarity": 0.9031039742395928
+              },
+              "address": {
+                "raw_exact_match": 0.2857142857142857,
+                "normalized_exact_match": 0.38095238095238093,
+                "normalized_similarity": 0.9024114967675982
+              },
+              "date": {
+                "raw_exact_match": 0.9206349206349206,
+                "normalized_exact_match": 0.9523809523809523,
+                "normalized_similarity": 0.9785369220151828
+              },
+              "total": {
+                "raw_exact_match": 0.6984126984126984,
+                "normalized_exact_match": 0.7301587301587301,
+                "normalized_similarity": 0.8606220939554273
+              }
+            },
+            "company_accuracy": 0.6507936507936508,
+            "address_similarity": 0.9024114967675982,
+            "date_accuracy": 0.9523809523809523,
+            "total_accuracy": 0.7301587301587301,
+            "complete_record_raw_exact_match": 0.25396825396825395,
+            "complete_record_normalized_exact_match": 0.30158730158730157,
+            "macro_normalized_exact_match": 0.6785714285714286,
+            "macro_normalized_similarity": 0.9111686217444503,
+            "average_inference_latency_seconds": 7.926532357143948,
+            "median_inference_latency_seconds": 7.570720199961215,
+            "peak_gpu_memory_mib": 1876.5546875,
+            "generation_limit_hit_count": 0,
+            "generation_limit_rate": 0.0,
+            "repetition_failure_count": 0,
+            "repetition_failure_rate": 0.0,
+            "retry_count": 0,
+            "retry_rate": 0.0,
+            "selection_score": 0.6300511846663504
+          },
+          "predictions_path": "artifacts/experiments/highres_training_v2/validation_predictions/checkpoint-210/always_repetition_penalty_1p08.jsonl"
+        },
+        "adaptive_retry_1p08": {
+          "metrics": {
+            "sample_count": 63,
+            "valid_json_rate": 1.0,
+            "per_field": {
+              "company": {
+                "raw_exact_match": 0.6507936507936508,
+                "normalized_exact_match": 0.6507936507936508,
+                "normalized_similarity": 0.9034038692763299
+              },
+              "address": {
+                "raw_exact_match": 0.2698412698412698,
+                "normalized_exact_match": 0.3492063492063492,
+                "normalized_similarity": 0.8930901025881016
+              },
+              "date": {
+                "raw_exact_match": 0.9206349206349206,
+                "normalized_exact_match": 0.9523809523809523,
+                "normalized_similarity": 0.9873015873015873
+              },
+              "total": {
+                "raw_exact_match": 0.6984126984126984,
+                "normalized_exact_match": 0.7301587301587301,
+                "normalized_similarity": 0.8656725990059323
+              }
+            },
+            "company_accuracy": 0.6507936507936508,
+            "address_similarity": 0.8930901025881016,
+            "date_accuracy": 0.9523809523809523,
+            "total_accuracy": 0.7301587301587301,
+            "complete_record_raw_exact_match": 0.20634920634920634,
+            "complete_record_normalized_exact_match": 0.25396825396825395,
+            "macro_normalized_exact_match": 0.6706349206349206,
+            "macro_normalized_similarity": 0.9123670395429878,
+            "average_inference_latency_seconds": 8.129108239684092,
+            "median_inference_latency_seconds": 7.651457900064997,
+            "peak_gpu_memory_mib": 1876.5546875,
+            "generation_limit_hit_count": 0,
+            "generation_limit_rate": 0.0,
+            "repetition_failure_count": 0,
+            "repetition_failure_rate": 0.0,
+            "retry_count": 1,
+            "retry_rate": 0.015873015873015872,
+            "selection_score": 0.6179892809244705
+          },
+          "predictions_path": "artifacts/experiments/highres_training_v2/validation_predictions/checkpoint-210/adaptive_retry_1p08.jsonl"
+        }
+      }
+    }
+  },
+  "selection": {
+    "frozen": true,
+    "selection_source": "63 validation receipts from official train split",
+    "official_test_inspected_during_selection": false,
+    "resolution": 1536,
+    "max_image_patch_edge": 512,
+    "do_image_splitting": true,
+    "max_new_tokens": 256,
+    "checkpoint": "checkpoint-210",
+    "checkpoint_path": "artifacts/checkpoints/highres-training-v2-1536/checkpoint-210",
+    "checkpoint_adapter_sha256": "3e0e5a88c36f0d6a0db6baf2a3b521e40be4ef84b212ed2eafecab431604bf79",
+    "generation_policy": "always_repetition_penalty_1p08",
+    "repetition_penalty": 1.08,
+    "adaptive_retry_trigger": [],
+    "parsing_behavior": "receipt_kie.metrics.extract_json",
+    "selection_score_formula": "0.35 * macro_normalized_exact_match + 0.2 * macro_normalized_similarity + 0.2 * complete_record_normalized_exact_match + 0.15 * valid_json_rate - 0.05 * generation_limit_rate - 0.05 * repetition_failure_rate",
+    "selection_score": 0.6300511846663504,
+    "validation_metrics": {
+      "sample_count": 63,
+      "valid_json_rate": 1.0,
+      "per_field": {
+        "company": {
+          "raw_exact_match": 0.6507936507936508,
+          "normalized_exact_match": 0.6507936507936508,
+          "normalized_similarity": 0.9031039742395928
+        },
+        "address": {
+          "raw_exact_match": 0.2857142857142857,
+          "normalized_exact_match": 0.38095238095238093,
+          "normalized_similarity": 0.9024114967675982
+        },
+        "date": {
+          "raw_exact_match": 0.9206349206349206,
+          "normalized_exact_match": 0.9523809523809523,
+          "normalized_similarity": 0.9785369220151828
+        },
+        "total": {
+          "raw_exact_match": 0.6984126984126984,
+          "normalized_exact_match": 0.7301587301587301,
+          "normalized_similarity": 0.8606220939554273
+        }
+      },
+      "company_accuracy": 0.6507936507936508,
+      "address_similarity": 0.9024114967675982,
+      "date_accuracy": 0.9523809523809523,
+      "total_accuracy": 0.7301587301587301,
+      "complete_record_raw_exact_match": 0.25396825396825395,
+      "complete_record_normalized_exact_match": 0.30158730158730157,
+      "macro_normalized_exact_match": 0.6785714285714286,
+      "macro_normalized_similarity": 0.9111686217444503,
+      "average_inference_latency_seconds": 7.926532357143948,
+      "median_inference_latency_seconds": 7.570720199961215,
+      "peak_gpu_memory_mib": 1876.5546875,
+      "generation_limit_hit_count": 0,
+      "generation_limit_rate": 0.0,
+      "repetition_failure_count": 0,
+      "repetition_failure_rate": 0.0,
+      "retry_count": 0,
+      "retry_rate": 0.0,
+      "selection_score": 0.6300511846663504
+    }
+  }
+}

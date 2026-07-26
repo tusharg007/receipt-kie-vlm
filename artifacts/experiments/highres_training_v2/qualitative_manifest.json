@@ -1,0 +1,26 @@
+{
+  "v2_complete_record_success": {
+    "sample_id": "X00016469671",
+    "selection_rule": "First sample ID in frozen holdout order satisfying category.",
+    "figure_path": "artifacts/figures/highres_training_v2_qualitative/v2_complete_record_success.png",
+    "figure_sha256": "ab080d3d46f9aaa0a9100c27a6f4141d55ae6c2333d611e45c122ad0f137bc94",
+    "v1_exact_field_count": 4,
+    "v2_exact_field_count": 4
+  },
+  "v2_improvement_over_v1": {
+    "sample_id": "X51005230621",
+    "selection_rule": "First sample ID in frozen holdout order satisfying category.",
+    "figure_path": "artifacts/figures/highres_training_v2_qualitative/v2_improvement_over_v1.png",
+    "figure_sha256": "d7e6329af0c99f2cba31dc425c8fd96c47a093065d92a49d0fbf084f393c344e",
+    "v1_exact_field_count": 2,
+    "v2_exact_field_count": 3
+  },
+  "v2_failure_or_regression": {
+    "sample_id": "X51005230616",
+    "selection_rule": "First sample ID in frozen holdout order satisfying category.",
+    "figure_path": "artifacts/figures/highres_training_v2_qualitative/v2_failure_or_regression.png",
+    "figure_sha256": "b4ace98d9ba0221426328b71e77963e3beb3260196f3355f4a743245875f6da1",
+    "v1_exact_field_count": 2,
+    "v2_exact_field_count": 1
+  }
+}
