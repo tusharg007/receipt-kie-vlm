@@ -1,0 +1,29 @@
+paths:
+  dataset_root: data/raw/sroie/SROIE2019
+  hf_cache: .cache/huggingface
+  adapter_path: models/receipt-kie-lora
+  output_root: artifacts/experiments/highres_ablation
+  figure_path: artifacts/figures/highres_ablation.png
+
+model:
+  model_id: HuggingFaceTB/SmolVLM-256M-Instruct
+  attention: auto
+  precision: auto
+  trust_remote_code: false
+
+evaluation:
+  split: test
+  sample_limit: 30
+  seed: 42
+
+processor:
+  max_image_patch_edge: 512
+  do_image_splitting: true
+
+generation:
+  do_sample: false
+  repetition_penalty: 1.08
+
+two_pass:
+  top_fraction: 0.55
+  lower_fraction: 0.70

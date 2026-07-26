@@ -7,6 +7,7 @@ import json
 import re
 import statistics
 import unicodedata
+from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
@@ -192,6 +193,12 @@ def evaluate_predictions(rows: list[dict[str, Any]]) -> dict[str, Any]:
         }
         for field in CANONICAL_FIELDS
     }
+    macro_normalized_exact_match = statistics.mean(
+        per_field[field]["normalized_exact_match"] for field in CANONICAL_FIELDS
+    )
+    macro_normalized_similarity = statistics.mean(
+        per_field[field]["normalized_similarity"] for field in CANONICAL_FIELDS
+    )
     return {
         "sample_count": len(rows),
         "valid_json_rate": valid_count / len(rows),
@@ -202,7 +209,24 @@ def evaluate_predictions(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "total_accuracy": per_field["total"]["normalized_exact_match"],
         "complete_record_raw_exact_match": statistics.mean(complete_raw),
         "complete_record_normalized_exact_match": statistics.mean(complete_normalized),
+        "macro_normalized_exact_match": macro_normalized_exact_match,
+        "macro_normalized_similarity": macro_normalized_similarity,
         "average_inference_latency_seconds": statistics.mean(latencies) if latencies else None,
         "median_inference_latency_seconds": statistics.median(latencies) if latencies else None,
         "peak_gpu_memory_mib": max(peak_memory) if peak_memory else None,
     }
+
+
+def has_repetition_failure(raw_output: str) -> bool:
+    """Flag a repeated 3-6-token phrase appearing at least three times."""
+    tokens = re.findall(r"[\w.]+", raw_output.casefold())
+    for ngram_size in range(3, 7):
+        if len(tokens) < ngram_size * 3:
+            continue
+        ngrams = Counter(
+            tuple(tokens[index : index + ngram_size])
+            for index in range(len(tokens) - ngram_size + 1)
+        )
+        if any(count >= 3 for count in ngrams.values()):
+            return True
+    return False

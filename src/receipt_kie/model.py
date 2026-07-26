@@ -67,23 +67,53 @@ def choose_runtime(model_config: dict[str, Any]) -> RuntimeDecision:
 
 
 def load_processor(model_config: dict[str, Any], hf_cache: str) -> Any:
-    """Load the Idefics3 processor and apply its supported longest-edge option."""
+    """Load Idefics3 and apply only explicitly configured image overrides."""
     processor = AutoProcessor.from_pretrained(
         model_config["model_id"],
         cache_dir=str(project_path(hf_cache)),
         trust_remote_code=bool(model_config.get("trust_remote_code", False)),
     )
-    longest_edge = int(model_config.get("image_longest_edge", 512))
-    current_size = dict(processor.image_processor.size)
-    current_size["longest_edge"] = longest_edge
-    processor.image_processor.size = current_size
+    configure_image_processor(processor.image_processor, model_config)
     processor.tokenizer.padding_side = "right"
+    configuration = processor_image_configuration(processor.image_processor)
     LOGGER.info(
-        "Loaded processor=%s image_size=%s",
+        "Loaded processor=%s image_size=%s max_image_size=%s "
+        "do_image_splitting=%s",
         type(processor).__name__,
-        processor.image_processor.size,
+        configuration["size"],
+        configuration["max_image_size"],
+        configuration["do_image_splitting"],
     )
     return processor
+
+
+def configure_image_processor(
+    image_processor: Any,
+    model_config: dict[str, Any],
+) -> dict[str, Any]:
+    """Apply independent image overrides without replacing unspecified defaults."""
+    if model_config.get("image_longest_edge") is not None:
+        image_processor.size = {
+            "longest_edge": int(model_config["image_longest_edge"])
+        }
+    if model_config.get("max_image_patch_edge") is not None:
+        image_processor.max_image_size = {
+            "longest_edge": int(model_config["max_image_patch_edge"])
+        }
+    if model_config.get("do_image_splitting") is not None:
+        image_processor.do_image_splitting = bool(
+            model_config["do_image_splitting"]
+        )
+    return processor_image_configuration(image_processor)
+
+
+def processor_image_configuration(image_processor: Any) -> dict[str, Any]:
+    """Return the effective processor settings in a JSON-serializable form."""
+    return {
+        "size": dict(image_processor.size),
+        "max_image_size": dict(image_processor.max_image_size),
+        "do_image_splitting": bool(image_processor.do_image_splitting),
+    }
 
 
 def load_base_model(
