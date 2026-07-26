@@ -105,6 +105,12 @@ def _verify_adapter(adapter_path: Path) -> tuple[str, dict[str, Any]]:
     return checksum, metadata
 
 
+def _format_peak_memory(value: float | None) -> str:
+    if value is None:
+        return "not available (CPU)"
+    return f"{float(value):.2f} MiB"
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--image", type=Path, default=DEFAULT_IMAGE)
@@ -164,7 +170,10 @@ def main() -> int:
     print(f"Visual tile count: {prediction['visual_tile_count']}")
     print(f"Decoding parameters: {json.dumps(decoding, sort_keys=True)}")
     print(f"Inference latency: {prediction['latency_seconds']:.3f} seconds")
-    print(f"Peak GPU memory: {prediction['peak_gpu_memory_mib']:.2f} MiB")
+    print(
+        "Peak GPU memory: "
+        f"{_format_peak_memory(prediction['peak_gpu_memory_mib'])}"
+    )
     print("Raw model output:")
     print(prediction["raw_output"])
     print("Parsed JSON:")

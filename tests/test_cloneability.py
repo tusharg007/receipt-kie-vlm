@@ -1,12 +1,22 @@
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import json
 
 from PIL import Image
 
 from receipt_kie.config import load_config
 from receipt_kie.utils import PROJECT_ROOT, repository_relative
+
+
+def _demo_module():
+    path = PROJECT_ROOT / "scripts" / "demo_inference.py"
+    spec = importlib.util.spec_from_file_location("demo_inference", path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def test_committed_adapters_match_training_metadata() -> None:
@@ -52,3 +62,9 @@ def test_synthetic_demo_is_dataset_independent() -> None:
     assert '"v1": {' in demo_source
     assert '"v2": {' in demo_source
     assert "refusing base-model fallback" in demo_source
+
+
+def test_demo_formats_cpu_and_gpu_memory() -> None:
+    demo = _demo_module()
+    assert demo._format_peak_memory(None) == "not available (CPU)"
+    assert demo._format_peak_memory(1877.3) == "1877.30 MiB"
