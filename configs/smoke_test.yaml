@@ -14,7 +14,7 @@ training:
   save_steps: 3
   eval_steps: 3
   train_limit: 12
-  eval_limit: 4
+  validation_size: 4
 
 lora:
   rank: 8

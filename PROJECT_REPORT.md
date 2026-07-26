@@ -4,11 +4,12 @@
 
 This experiment transformed a notebook-oriented full-receipt OCR repository into
 a reproducible structured key-information extraction project. A fresh LoRA
-adapter was trained on 626 SROIE receipt/entity pairs for the fields `company`,
-`address`, `date`, and `total`. On 100 held-out receipts, the adapter improved
-valid JSON from 19% to 85%, company accuracy from 1% to 23%, date accuracy from
-1% to 26%, total accuracy from 0% to 29%, and address similarity from 2.75% to
-51.74%. Complete-record exact match remained 0%.
+adapter was trained on 563 SROIE receipt/entity pairs for the fields `company`,
+`address`, `date`, and `total`, with 63 disjoint official-train receipts reserved
+for validation. On 100 untouched official-test receipts, the adapter improved
+valid JSON from 19% to 85%, company accuracy from 1% to 26%, date accuracy from
+1% to 18%, total accuracy from 0% to 25%, and address similarity from 2.75% to
+51.92%. Complete-record exact match remained 0%.
 
 ## Research question
 
@@ -78,22 +79,23 @@ optimization step and 827.29 MiB peak allocated VRAM.
 
 The final run used:
 
-- 626 training receipts
-- 64 held-out receipts for validation loss
-- two epochs, 156 optimizer steps
+- 563 training receipts from the official train split
+- 63 disjoint official-train receipts for validation loss
+- two epochs, 140 optimizer steps
 - batch size 1, gradient accumulation 8
 - AdamW fused, learning rate 2e-4, weight decay 0.01
 - 5% warmup, gradient checkpointing, seed 42
 - BF16 and 512 px longest-edge image processing
 
-Training took 1,583.45 seconds (26.39 minutes) and recorded 31 finite loss
-entries. Mean training loss was 1.2798. Validation loss progressed:
+Training took 1,084.19 seconds (18.07 minutes) and recorded 28 finite loss
+entries. Mean training loss was 1.3045. Validation loss progressed:
 
 | Step | Epoch | Validation loss |
 |---:|---:|---:|
-| 50 | 0.64 | 1.3492 |
-| 100 | 1.28 | 1.0984 |
-| 150 | 1.92 | 1.0282 |
+| 35 | 0.50 | 1.3650 |
+| 70 | 0.99 | 1.0618 |
+| 105 | 1.49 | 0.9373 |
+| 140 | 1.99 | 0.9034 |
 
 Peak allocated GPU memory was 827.32 MiB. A saved before/after checksum verified
 that the new adapter changed during this run.
@@ -118,22 +120,22 @@ decimals to two places.
 | Metric | Base | LoRA | Change |
 |---|---:|---:|---:|
 | Valid JSON | 19% | 85% | +66 pp |
-| Company raw exact | 0% | 22% | +22 pp |
-| Company normalized exact | 1% | 23% | +22 pp |
-| Company similarity | 7.48% | 66.57% | +59.09 pp |
-| Address raw exact | 0% | 0% | 0 pp |
-| Address normalized exact | 0% | 1% | +1 pp |
-| Address similarity | 2.75% | 51.74% | +48.99 pp |
-| Date raw exact | 1% | 25% | +24 pp |
-| Date normalized exact | 1% | 26% | +25 pp |
-| Date similarity | 4.64% | 69.39% | +64.75 pp |
-| Total raw exact | 0% | 26% | +26 pp |
-| Total normalized exact | 0% | 29% | +29 pp |
-| Total similarity | 1.77% | 59.16% | +57.39 pp |
+| Company raw exact | 0% | 24% | +24 pp |
+| Company normalized exact | 1% | 26% | +25 pp |
+| Company similarity | 7.48% | 68.58% | +61.10 pp |
+| Address raw exact | 0% | 1% | +1 pp |
+| Address normalized exact | 0% | 3% | +3 pp |
+| Address similarity | 2.75% | 51.92% | +49.17 pp |
+| Date raw exact | 1% | 17% | +16 pp |
+| Date normalized exact | 1% | 18% | +17 pp |
+| Date similarity | 4.64% | 66.96% | +62.32 pp |
+| Total raw exact | 0% | 25% | +25 pp |
+| Total normalized exact | 0% | 25% | +25 pp |
+| Total similarity | 1.77% | 59.10% | +57.32 pp |
 | Complete-record raw exact | 0% | 0% | 0 pp |
 | Complete-record normalized exact | 0% | 0% | 0 pp |
 
-LoRA average/median latency was 9.209/7.130 seconds versus 6.579/6.029 seconds
+LoRA average/median latency was 7.640/7.440 seconds versus 5.895/5.458 seconds
 for base. Inference peak allocated memory was 653.17 MiB for LoRA and
 642.70 MiB for base.
 
@@ -154,11 +156,11 @@ discards fine-print detail.
 ## Robustness pilot
 
 Twenty fixed receipts were evaluated clean and under four mild corruptions.
-Brightness reduction caused the clearest decline: valid JSON fell from 85% to
-75%, company accuracy from 25% to 20%, address similarity from 56.50% to 48.68%,
-and date accuracy from 25% to 15%. Rotation reduced company/date accuracy to
-15%/20%. Blur preserved exact scores but increased mean latency from 11.92 to
-19.54 seconds. JPEG quality 45 showed no degradation on this small subset.
+Gaussian blur reduced valid JSON from 85% to 80%, company accuracy from 25% to
+15%, and address similarity from 57.51% to 52.60%. Reduced brightness lowered
+company/date accuracy to 10%/20%, while rotation lowered date accuracy to 15%.
+JPEG quality 45 happened to score higher on several metrics in this small fixed
+sample, underscoring why these values are descriptive rather than definitive.
 
 These values are a pilot, not confidence-bounded robustness estimates.
 

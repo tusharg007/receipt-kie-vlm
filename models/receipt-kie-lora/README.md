@@ -14,7 +14,7 @@ duplicated here.
 Adapter SHA-256:
 
 ```text
-7fc369231dd37e064bb9a18777f66ba418d1dd7ae9720db71ba7d2183e6e4ba4
+94ba0038153ea1aacb12dbcc80f1edf01d31a6309ea56919684e8cb8bbe90b28
 ```
 
 Run from the repository root:
@@ -24,5 +24,7 @@ python scripts/verify_installation.py
 python scripts/demo_inference.py
 ```
 
-This adapter was trained on SROIE entity annotations. SmolVLM and SROIE are
+This adapter was trained on 563 SROIE official-train annotations and validated
+on a disjoint 63-receipt partition from that same official train split. The
+official test split was used only for final evaluation. SmolVLM and SROIE are
 external projects and are not owned by this repository.

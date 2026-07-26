@@ -150,6 +150,37 @@ def load_records(
     return sorted(selected, key=lambda row: row.sample_id)
 
 
+def partition_train_validation(
+    records: list[ReceiptRecord],
+    validation_size: int,
+    seed: int = 42,
+    train_limit: int | None = None,
+) -> tuple[list[ReceiptRecord], list[ReceiptRecord]]:
+    """Create deterministic, disjoint train/validation subsets from one source split."""
+    ordered = sorted(records, key=lambda row: row.sample_id)
+    if validation_size <= 0:
+        raise ValueError("validation_size must be positive")
+    if validation_size >= len(ordered):
+        raise ValueError(
+            f"validation_size={validation_size} must be smaller than "
+            f"the {len(ordered)} available records"
+        )
+    rng = random.Random(seed)
+    validation_ids = {
+        record.sample_id for record in rng.sample(ordered, validation_size)
+    }
+    validation = [record for record in ordered if record.sample_id in validation_ids]
+    training = [record for record in ordered if record.sample_id not in validation_ids]
+    if train_limit is not None and train_limit < len(training):
+        if train_limit <= 0:
+            raise ValueError("train_limit must be positive when provided")
+        training = random.Random(seed + 1).sample(training, train_limit)
+    return (
+        sorted(training, key=lambda row: row.sample_id),
+        sorted(validation, key=lambda row: row.sample_id),
+    )
+
+
 def build_audit(dataset_root: str | Path) -> dict[str, Any]:
     """Audit pairing, JSON validity, field completeness, and image dimensions."""
     all_records: list[ReceiptRecord] = []

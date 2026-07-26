@@ -62,6 +62,10 @@ def main() -> None:
         "artifacts/figures/training_loss.png",
         "artifacts/figures/base_vs_lora.png",
         "artifacts/figures/field_accuracy.png",
+        "artifacts/figures/robustness_results.png",
+        "artifacts/figures/qualitative_lora_improvement.png",
+        "artifacts/figures/qualitative_failure_analysis.png",
+        "artifacts/reports/qualitative_results_manifest.json",
         "README.md",
     )
     for relative in required:
@@ -109,6 +113,12 @@ def main() -> None:
     if (local_training_dir / "training_summary.json").is_file():
         training = _json("artifacts/checkpoints/receipt-kie-lora/training_summary.json")
         loss_history = _json("artifacts/checkpoints/receipt-kie-lora/loss_history.json")
+        validation_losses = _json(
+            "artifacts/checkpoints/receipt-kie-lora/validation_loss_history.json"
+        )
+        split_manifest = _json(
+            "artifacts/checkpoints/receipt-kie-lora/dataset_split_manifest.json"
+        )
         trainer_state = _json("artifacts/checkpoints/receipt-kie-lora/trainer_state.json")
         local_adapter = local_training_dir / "adapter_model.safetensors"
         optimization_rows = [row for row in trainer_state["log_history"] if "loss" in row]
@@ -134,6 +144,43 @@ def main() -> None:
                     bool(loss_history),
                     f"rows={len(loss_history)}",
                 ),
+                (
+                    "Validation loss history is non-empty and finite",
+                    bool(validation_losses)
+                    and all(math.isfinite(row["eval_loss"]) for row in validation_losses),
+                    f"rows={len(validation_losses)}",
+                ),
+                (
+                    "Training and validation both derive from official train split",
+                    split_manifest["train_source_split"] == "train"
+                    and split_manifest["validation_source_split"] == "train"
+                    and not split_manifest["official_test_used_during_training"],
+                    (
+                        f"train={split_manifest['train_source_split']}, "
+                        f"validation={split_manifest['validation_source_split']}"
+                    ),
+                ),
+                (
+                    "Training and validation IDs are disjoint",
+                    not (
+                        set(split_manifest["train_ids"])
+                        & set(split_manifest["validation_ids"])
+                    )
+                    and not split_manifest["overlap_ids"],
+                    (
+                        f"train={len(split_manifest['train_ids'])}, "
+                        f"validation={len(split_manifest['validation_ids'])}"
+                    ),
+                ),
+                (
+                    "Leakage-free split has expected 563/63 counts",
+                    len(split_manifest["train_ids"]) == 563
+                    and len(split_manifest["validation_ids"]) == 63,
+                    (
+                        f"train={len(split_manifest['train_ids'])}, "
+                        f"validation={len(split_manifest['validation_ids'])}"
+                    ),
+                ),
             )
         )
     else:
@@ -157,6 +204,16 @@ def main() -> None:
             f"count={len(lora_rows)}",
         )
     )
+    if (local_training_dir / "dataset_split_manifest.json").is_file():
+        validation_ids = set(split_manifest["validation_ids"])
+        test_ids = {row["sample_id"] for row in lora_rows}
+        checks.append(
+            (
+                "Training-time validation IDs do not overlap final test evaluation",
+                validation_ids.isdisjoint(test_ids),
+                f"overlap={len(validation_ids & test_ids)}",
+            )
+        )
     for name, rows, recorded in (
         ("base", base_rows, base_metrics),
         ("lora", lora_rows, lora_metrics),
@@ -174,6 +231,44 @@ def main() -> None:
             )
         )
         checks.append((f"{name.title()} metrics recompute from prediction JSONL", matching, ""))
+    qualitative = _json("artifacts/reports/qualitative_results_manifest.json")
+    base_by_id = {row["sample_id"]: row for row in base_rows}
+    lora_by_id = {row["sample_id"]: row for row in lora_rows}
+    improvement_id = qualitative["improvement"]["sample_id"]
+    failure_id = qualitative["failure"]["sample_id"]
+    qualitative_matches = (
+        qualitative["improvement"]["base"]["raw_output"]
+        == base_by_id[improvement_id]["raw_output"]
+        and qualitative["improvement"]["lora"]["raw_output"]
+        == lora_by_id[improvement_id]["raw_output"]
+        and qualitative["improvement"]["lora"]["ground_truth"]
+        == lora_by_id[improvement_id]["ground_truth"]
+        and qualitative["failure"]["lora"]["raw_output"]
+        == lora_by_id[failure_id]["raw_output"]
+        and qualitative["failure"]["lora"]["ground_truth"]
+        == lora_by_id[failure_id]["ground_truth"]
+    )
+    checks.append(
+        (
+            "Qualitative manifest values match prediction JSONL",
+            qualitative_matches,
+            f"improvement={improvement_id}, failure={failure_id}",
+        )
+    )
+    qualitative_hashes_match = all(
+        _sha256(PROJECT_ROOT / qualitative[category]["figure_path"])
+        == qualitative[category]["figure_sha256"]
+        and _sha256(PROJECT_ROOT / qualitative[category]["image_path"])
+        == qualitative[category]["image_sha256"]
+        for category in ("improvement", "failure")
+    )
+    checks.append(
+        (
+            "Qualitative figure and receipt hashes match manifest",
+            qualitative_hashes_match,
+            "",
+        )
+    )
     readme = (PROJECT_ROOT / "README.md").read_text(encoding="utf-8")
     expected_claims = (
         f"{base_metrics['valid_json_rate']:.0%}",

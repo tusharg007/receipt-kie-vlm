@@ -31,9 +31,10 @@ pair was excluded. One address and one total were empty and remained `""`.
 Targets use the fixed key order `company`, `address`, `date`, `total`, compact
 JSON separators, UTF-8, and string values.
 
-The training split never includes a test receipt. Sixty-four test receipts are
-used only for validation loss, while a fixed 100-receipt test subset is used for
-paired generation evaluation.
+The 626-receipt official train split is deterministically partitioned into 563
+training and 63 validation receipts with zero ID overlap. The official test split
+is never used during training or model selection; a fixed 100-receipt test subset
+is used only for the final paired generation evaluation.
 
 ## Multimodal SFT and the collator
 
@@ -64,9 +65,9 @@ Only 2,727,936 parameters were trainable—1.052% of 259,212,864 parameters with
 adapters. Training used batch size 1, eight-step gradient accumulation, BF16,
 gradient checkpointing, fused AdamW, 2e-4 learning rate, and seed 42.
 
-The final two-epoch run completed 156 optimizer steps in 26.39 minutes on an
-RTX 3050 Laptop GPU. Validation loss improved from 1.3492 at step 50 to 1.0282
-at step 150.
+The final two-epoch run completed 140 optimizer steps in 18.07 minutes on an
+RTX 3050 Laptop GPU. Validation loss improved from 1.3650 at step 35 to 0.9034
+at step 140.
 
 ## Evaluation and main results
 
@@ -76,10 +77,10 @@ decoding, and 128-token limit.
 | Metric | Base | LoRA |
 |---|---:|---:|
 | Valid JSON | 19% | 85% |
-| Company normalized exact match | 1% | 23% |
-| Address similarity | 2.75% | 51.74% |
-| Date normalized exact match | 1% | 26% |
-| Total normalized exact match | 0% | 29% |
+| Company normalized exact match | 1% | 26% |
+| Address similarity | 2.75% | 51.92% |
+| Date normalized exact match | 1% | 18% |
+| Total normalized exact match | 0% | 25% |
 | Complete-record normalized exact match | 0% | 0% |
 
 The correct interpretation is that LoRA learned schema following and useful
@@ -89,11 +90,11 @@ partial extraction, but the model did not solve full-record extraction.
 
 - Fifteen LoRA outputs are invalid JSON because generation repeats long
   address-like spans until the token cap.
-- Address exact match is only 1%; long strings make one character error enough
+- Address normalized exact match is only 3%; long strings make one character error enough
   to fail exact match, so similarity is also reported.
 - Downscaling to 512 px makes training easy on 4 GiB VRAM but loses fine print.
-- LoRA latency is higher because outputs are longer: 9.209 s average versus
-  6.579 s for base.
+- LoRA latency is higher because outputs are longer: 7.640 s average versus
+  5.895 s for base.
 - Eager attention was used only after the installed Idefics3 vision
   implementation rejected SDPA.
 - I did not use bitsandbytes because native BF16 LoRA fit comfortably and a
@@ -168,8 +169,8 @@ replaced with ground truth.
 ### 10. What is the strongest result?
 
 Valid JSON rose from 19% to 85%, showing that SFT strongly changed schema
-following. Field metrics also rose materially: total accuracy reached 29% and
-address similarity 51.74%.
+following. Field metrics also rose materially: total accuracy reached 25% and
+address similarity 51.92%.
 
 ### 11. What is the biggest limitation?
 
@@ -184,16 +185,16 @@ attempts a full JSON object and sometimes repeats until the 128-token cap.
 
 ### 13. How did you validate that training really happened?
 
-The trainer state contains 156 optimization steps and finite loss history. A
+The trainer state contains 140 optimization steps and finite loss history. A
 fresh LoRA tensor checksum changed. Adapter and loss artifacts have matching run
 timestamps. Metrics recompute from saved JSONL predictions, and an automated
 integrity report checks these conditions.
 
 ### 14. What did the robustness pilot show?
 
-On 20 paired receipts, reduced brightness caused the clearest degradation:
-valid JSON fell from 85% to 75% and date accuracy from 25% to 15%. Small
-rotation also reduced company/date accuracy. The subset is too small for broad
+On 20 paired receipts, Gaussian blur reduced valid JSON from 85% to 80% and
+company accuracy from 25% to 15%. Reduced brightness and rotation also reduced
+field accuracy. The subset is too small for broad
 claims, so I label it a pilot.
 
 ### 15. What would you do next?
@@ -215,12 +216,13 @@ The model is SmolVLM-256M-Instruct. I attached rank-16 LoRA adapters to validate
 attention projections, so only 2.73 million parameters—1.052%—were trainable.
 The custom collator masks the entire system/user/image prompt and computes loss
 only on the assistant JSON. After a smoke test and timed calibration, I trained
-two epochs on an RTX 3050 Laptop GPU in 26.39 minutes.
+on 563 receipts, validated on 63 disjoint official-train receipts, and completed
+two epochs on an RTX 3050 Laptop GPU in 18.07 minutes.
 
 For evaluation, base and LoRA models generated on the exact same 100 held-out
 receipts. LoRA increased valid JSON from 19% to 85%, company accuracy from 1%
-to 23%, date from 1% to 26%, total from 0% to 29%, and address similarity from
-2.75% to 51.74%. The honest limitation is that complete-record exact match
+to 26%, date from 1% to 18%, total from 0% to 25%, and address similarity from
+2.75% to 51.92%. The honest limitation is that complete-record exact match
 remained 0%, mainly because long addresses and repetition failures are hard for
 this small model at 512 px. I retained every raw prediction and added an
 integrity check that recomputes metrics, so the result is reproducible and
@@ -258,9 +260,10 @@ dependencies.
 Before full training, a three-step smoke test proved forward/backward, finite
 loss, adapter modification, save/reload, and inference. A ten-step benchmark
 estimated runtime. The final two-epoch run used batch size one, accumulation
-eight, gradient checkpointing, and 2e-4 learning rate. It completed 156
-optimizer steps in 26.39 minutes. Validation loss fell from 1.3492 at step 50
-to 1.0282 at step 150.
+eight, gradient checkpointing, and 2e-4 learning rate. It trained on 563
+receipts, validated on 63 disjoint official-train receipts, and completed 140
+optimizer steps in 18.07 minutes. Validation loss fell from 1.3650 at step 35
+to 0.9034 at step 140.
 
 The evaluation is deliberately paired. Both variants see the same fixed 100
 test receipts with greedy decoding and a 128-token cap. The parser handles
@@ -269,10 +272,10 @@ dictionaries, but never replaces values from ground truth. I report raw exact,
 normalized exact, and similarity.
 
 LoRA improved valid JSON by 66 percentage points to 85%. Company accuracy rose
-to 23%, date to 26%, total to 29%, and address similarity to 51.74%. Those are
+to 26%, date to 18%, total to 25%, and address similarity to 51.92%. Those are
 real improvements, but complete-record exact match stayed at zero. Fifteen LoRA
 outputs repeat address fragments until truncation, and long addresses remain
-hard at 512 px. LoRA average latency is 9.209 seconds versus 6.579 seconds for
+hard at 512 px. LoRA average latency is 7.640 seconds versus 5.895 seconds for
 base because sequences are longer.
 
 Finally, I ran a paired 20-image robustness pilot. Brightness reduction hurt the

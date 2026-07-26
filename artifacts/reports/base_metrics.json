@@ -29,7 +29,7 @@
   "total_accuracy": 0.0,
   "complete_record_raw_exact_match": 0.0,
   "complete_record_normalized_exact_match": 0.0,
-  "average_inference_latency_seconds": 6.5789746729913166,
-  "median_inference_latency_seconds": 6.029455500014592,
+  "average_inference_latency_seconds": 5.895039003993151,
+  "median_inference_latency_seconds": 5.457945349975489,
   "peak_gpu_memory_mib": 642.6962890625
 }

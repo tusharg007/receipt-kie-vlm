@@ -152,35 +152,39 @@ attachment rather than assumed blindly.
 | Attention | Eager fallback; this Idefics3 vision tower rejected SDPA |
 | Image size | Processor-supported 512 px longest edge |
 | Batch / accumulation | 1 / 8 |
-| Epochs / optimizer steps | 2 / 156 |
+| Epochs / optimizer steps | 2 / 140 |
 | Learning rate / warmup | 2e-4 / 5% |
-| Training receipts | 626 |
-| Validation-loss receipts | 64 held-out test receipts |
+| Training receipts | 563 from the official train split |
+| Validation-loss receipts | 63 disjoint receipts from the official train split |
+| Final evaluation receipts | 100 sampled only from the official test split |
 | Seed | 42 |
-| Duration | 1,583.45 s (26.39 min) |
+| Duration | 1,084.19 s (18.07 min) |
 | Peak allocated training VRAM | 827.32 MiB |
 
-Validation loss decreased from **1.3492** at step 50 to **1.0984** at step 100
-and **1.0282** at step 150. The saved checksum confirms at least one LoRA tensor
-changed from its fresh initialization.
+Validation loss decreased from **1.3650** at step 35 to **1.0618** at step 70,
+**0.9373** at step 105, and **0.9034** at the completed step 140. Training and
+validation IDs are stored in the generated split manifest with zero overlap.
+The official test split was not used for model selection. The saved checksum
+confirms at least one LoRA tensor changed from its fresh initialization.
 
 ![Training loss](artifacts/figures/training_loss.png)
 
 ## Base versus LoRA results
 
-Both variants used the same fixed 100-receipt held-out subset, prompt, 512 px
-image processing, deterministic decoding, and 128-new-token limit.
+Both variants used the same fixed 100-receipt subset sampled from the untouched
+official test split, with the same prompt, 512 px image processing,
+deterministic decoding, and 128-new-token limit.
 
 | Metric | Base | LoRA | Absolute change |
 |---|---:|---:|---:|
 | Valid JSON | 19% | **85%** | +66 pp |
-| Company normalized exact match | 1% | **23%** | +22 pp |
-| Address normalized similarity | 2.75% | **51.74%** | +48.99 pp |
-| Date normalized exact match | 1% | **26%** | +25 pp |
-| Total normalized exact match | 0% | **29%** | +29 pp |
+| Company normalized exact match | 1% | **26%** | +25 pp |
+| Address normalized similarity | 2.75% | **51.92%** | +49.17 pp |
+| Date normalized exact match | 1% | **18%** | +17 pp |
+| Total normalized exact match | 0% | **25%** | +25 pp |
 | Complete-record normalized exact match | 0% | 0% | 0 pp |
-| Average latency | 6.579 s | 9.209 s | +2.630 s |
-| Median latency | 6.029 s | 7.130 s | +1.101 s |
+| Average latency | 5.895 s | 7.640 s | +1.745 s |
+| Median latency | 5.458 s | 7.440 s | +1.982 s |
 | Peak allocated inference VRAM | 642.70 MiB | 653.17 MiB | +10.47 MiB |
 
 Raw versus normalized field metrics are retained in
@@ -192,22 +196,22 @@ Raw versus normalized field metrics are retained in
 
 ![Field accuracy](artifacts/figures/field_accuracy.png)
 
-## Prediction examples
+## Qualitative Results
 
-“Success” here means valid JSON with at least one exactly correct normalized
-field; it does not imply a fully correct record.
+![Ground truth versus base and LoRA](artifacts/figures/qualitative_lora_improvement.png)
 
-| Category | Example |
-|---|---|
-| LoRA partial success | ![Partial success](artifacts/predictions/examples/lora_success__X51005230605.jpg) |
-| LoRA failure | ![Failure](artifacts/predictions/examples/lora_failure__X51005301666.jpg) |
-| Both models fail | ![Both fail](artifacts/predictions/examples/both_fail__X51005433556.jpg) |
+LoRA substantially improves schema adherence and JSON validity. The highlighted
+example is deliberately labelled a **partial success**: at least one normalized
+field is exact, but the receipt is not fully correct.
 
-Five partial successes, five failures, three LoRA improvements, and three cases
-where both variants fail are indexed in
-[`artifacts/predictions/examples/index.json`](artifacts/predictions/examples/index.json).
-The complete raw generations and parsed values are available as JSONL under
-`artifacts/predictions/`.
+![LoRA repetition failure analysis](artifacts/figures/qualitative_failure_analysis.png)
+
+The failure panel keeps the raw generation visible. Repetition and long-address
+generation can consume the 128-token budget and leave an incomplete JSON object.
+The exact source IDs and unedited prediction values used in both figures are
+recorded in
+[`qualitative_results_manifest.json`](artifacts/reports/qualitative_results_manifest.json).
+All predictions remain available as JSONL under `artifacts/predictions/`.
 
 ## Failure analysis
 
@@ -217,7 +221,7 @@ The complete raw generations and parsed values are available as JSONL under
   address-like text reaching the generation cap rather than a parser defect.
 - Address is the hardest exact-match field because it is long and sensitive to
   small OCR substitutions, ordering, and punctuation. Similarity improves
-  substantially even while exact match remains 1%.
+  substantially even while exact match remains 3%.
 - The adapter is slower than base because its outputs are more structured but
   often longer.
 - The 256M model and 512 px downscaling trade fine-print recognition for local
@@ -231,11 +235,11 @@ descriptive rather than statistically definitive.
 
 | Condition | Valid JSON | Company acc. | Address sim. | Date acc. | Total acc. |
 |---|---:|---:|---:|---:|---:|
-| Clean | 85% | 25% | 56.50% | 25% | 5% |
-| Gaussian blur (radius 1.2) | 85% | 25% | 55.79% | 25% | 5% |
-| JPEG quality 45 | 90% | 25% | 58.59% | 25% | 5% |
-| Brightness 0.65× | 75% | 20% | 48.68% | 15% | 5% |
-| Rotation up to ±3° | 85% | 15% | 51.12% | 20% | 10% |
+| Clean | 85% | 25% | 57.51% | 25% | 5% |
+| Gaussian blur (radius 1.2) | 80% | 15% | 52.60% | 25% | 5% |
+| JPEG quality 45 | 95% | 25% | 61.53% | 25% | 5% |
+| Brightness 0.65× | 85% | 10% | 53.69% | 20% | 5% |
+| Rotation up to ±3° | 90% | 25% | 55.81% | 15% | 5% |
 
 ![Robustness pilot](artifacts/figures/robustness_results.png)
 

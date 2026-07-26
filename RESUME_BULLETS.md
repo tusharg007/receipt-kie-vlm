@@ -2,15 +2,15 @@
 
 ## Truthful résumé bullets
 
-- Fine-tuned open-weight SmolVLM-256M with supervised multimodal LoRA on 626
-  SROIE receipts, updating 2.73M parameters (1.052%) in 26.39 minutes on a 4 GiB
-  RTX 3050 Laptop GPU.
+- Fine-tuned open-weight SmolVLM-256M with supervised multimodal LoRA on 563
+  SROIE receipts, using 63 disjoint official-train receipts for validation and
+  updating 2.73M parameters (1.052%) in 18.07 minutes on a 4 GiB RTX 3050 GPU.
 - Built a leakage-free structured receipt KIE pipeline with assistant-only label
   masking, deterministic JSON generation, conservative field normalization, and
   auditable base-versus-LoRA evaluation across 100 held-out receipts.
 - Improved valid JSON generation from 19% to 85%, company accuracy from 1% to
-  23%, date accuracy from 1% to 26%, total accuracy from 0% to 29%, and address
-  similarity from 2.75% to 51.74%; documented the remaining 0% complete-record
+  26%, date accuracy from 1% to 18%, total accuracy from 0% to 25%, and address
+  similarity from 2.75% to 51.92%; documented the remaining 0% complete-record
   exact-match limitation.
 
 ## Application-form description

@@ -19,7 +19,7 @@ from trl import SFTConfig, SFTTrainer
 
 from receipt_kie.collator import ReceiptKIECollator
 from receipt_kie.config import load_config
-from receipt_kie.dataset import load_records
+from receipt_kie.dataset import load_records, partition_train_validation
 from receipt_kie.model import attach_lora, load_base_model, load_processor
 from receipt_kie.utils import (
     ensure_artifact_directories,
@@ -47,9 +47,14 @@ def run_training(
     seed_everything(seed)
     dataset_root = config["paths"]["dataset_root"]
     train_limit = config["training"].get("train_limit")
-    eval_limit = config["training"].get("eval_limit")
-    train_records = load_records(dataset_root, "train", train_limit, seed)
-    eval_records = load_records(dataset_root, "test", eval_limit, seed)
+    validation_size = int(config["training"]["validation_size"])
+    source_records = load_records(dataset_root, "train", None, seed)
+    train_records, eval_records = partition_train_validation(
+        source_records,
+        validation_size=validation_size,
+        seed=seed,
+        train_limit=train_limit,
+    )
     train_dataset = Dataset.from_list([record.trainer_row() for record in train_records])
     eval_dataset = Dataset.from_list([record.trainer_row() for record in eval_records])
     processor = load_processor(config["model"], config["paths"]["hf_cache"])
@@ -86,6 +91,15 @@ def run_training(
         for row in log_history
         if "loss" in row and math.isfinite(float(row["loss"]))
     ]
+    validation_losses = [
+        {
+            "step": int(row["step"]),
+            "epoch": float(row["epoch"]),
+            "eval_loss": float(row["eval_loss"]),
+        }
+        for row in log_history
+        if "eval_loss" in row and math.isfinite(float(row["eval_loss"]))
+    ]
     summary = {
         "config_path": repository_relative(config_path),
         "output_dir": repository_relative(output_dir),
@@ -93,6 +107,10 @@ def run_training(
         "parameter_statistics": parameter_stats,
         "train_samples": len(train_records),
         "eval_samples": len(eval_records),
+        "validation_samples": len(eval_records),
+        "train_source_split": "train",
+        "validation_source_split": "train",
+        "official_test_used_during_training": False,
         "global_steps": trainer.state.global_step,
         "duration_seconds": duration,
         "seconds_per_optimization_step": duration / max(trainer.state.global_step, 1),
@@ -100,6 +118,10 @@ def run_training(
             torch.cuda.max_memory_allocated() / 2**20 if torch.cuda.is_available() else None
         ),
         "finite_loss_count": len(losses),
+        "finite_validation_loss_count": len(validation_losses),
+        "final_validation_loss": (
+            validation_losses[-1]["eval_loss"] if validation_losses else None
+        ),
         "lora_parameter_changed": not math.isclose(
             initial_checksum, final_checksum, rel_tol=0.0, abs_tol=1e-9
         ),
@@ -113,13 +135,22 @@ def run_training(
         output_dir / "dataset_split_manifest.json",
         {
             "train_ids": [record.sample_id for record in train_records],
+            "validation_ids": [record.sample_id for record in eval_records],
             "eval_ids": [record.sample_id for record in eval_records],
+            "train_source_split": "train",
+            "validation_source_split": "train",
+            "official_test_used_during_training": False,
+            "overlap_ids": sorted(
+                {record.sample_id for record in train_records}
+                & {record.sample_id for record in eval_records}
+            ),
             "seed": seed,
         },
     )
     write_json(output_dir / "loss_history.json", losses)
+    write_json(output_dir / "validation_loss_history.json", validation_losses)
     write_json(output_dir / "training_summary.json", summary)
-    _plot_losses(losses)
+    _plot_losses(losses, validation_losses)
     LOGGER.info("Training complete: %s", json.dumps(summary, default=str))
     return summary
 
@@ -165,17 +196,40 @@ def _training_arguments(
     )
 
 
-def _plot_losses(losses: list[dict[str, float]]) -> None:
+def _plot_losses(
+    losses: list[dict[str, float]],
+    validation_losses: list[dict[str, float]] | None = None,
+) -> None:
     if not losses:
         return
     output = project_path("artifacts/figures/training_loss.png")
     output.parent.mkdir(parents=True, exist_ok=True)
-    plt.figure(figsize=(7, 4))
-    plt.plot([row["step"] for row in losses], [row["loss"] for row in losses], marker="o")
+    plt.figure(figsize=(8, 4.8))
+    plt.plot(
+        [row["step"] for row in losses],
+        [row["loss"] for row in losses],
+        marker="o",
+        markersize=4,
+        linewidth=1.8,
+        label="Training loss",
+    )
+    if validation_losses:
+        plt.scatter(
+            [row["step"] for row in validation_losses],
+            [row["eval_loss"] for row in validation_losses],
+            marker="D",
+            s=58,
+            color="#d55e00",
+            edgecolor="white",
+            linewidth=0.7,
+            zorder=3,
+            label="Validation loss",
+        )
     plt.xlabel("Optimization step")
-    plt.ylabel("Training loss")
+    plt.ylabel("Loss")
     plt.title("ReceiptKIE-VLM LoRA training loss")
     plt.grid(alpha=0.3)
+    plt.legend()
     plt.tight_layout()
     plt.savefig(output, dpi=160)
     plt.close()

@@ -8,11 +8,16 @@ from typing import Any
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-from receipt_kie.evaluate import _copy_examples  # noqa: E402
+from receipt_kie.evaluate import (  # noqa: E402
+    _copy_examples,
+    _plot_comparison,
+    _plot_robustness,
+)
+from receipt_kie.train import _plot_losses  # noqa: E402
 from receipt_kie.utils import write_json  # noqa: E402
 
 
-def _read_json(relative_path: str) -> dict[str, Any]:
+def _read_json(relative_path: str) -> Any:
     with (PROJECT_ROOT / relative_path).open(encoding="utf-8") as handle:
         return json.load(handle)
 
@@ -28,13 +33,21 @@ def main() -> None:
     base = _read_json("artifacts/reports/base_metrics.json")
     lora = _read_json("artifacts/reports/lora_metrics.json")
     robustness = _read_json("artifacts/reports/robustness_metrics.json")
+    losses = _read_json("artifacts/checkpoints/receipt-kie-lora/loss_history.json")
+    validation_losses = _read_json(
+        "artifacts/checkpoints/receipt-kie-lora/validation_loss_history.json"
+    )
     base_rows = _read_jsonl("artifacts/predictions/base_predictions.jsonl")
     lora_rows = _read_jsonl("artifacts/predictions/lora_predictions.jsonl")
     _copy_examples({"base": base_rows, "lora": lora_rows})
+    _plot_losses(losses, validation_losses)
+    _plot_comparison({"base": base, "lora": lora})
+    _plot_robustness(robustness)
     summary = {
         "dataset": {
             "valid_pairs": audit["valid_pairs"],
             "train_samples": training["train_samples"],
+            "validation_samples": training["validation_samples"],
             "test_samples": lora["sample_count"],
             "excluded_samples": audit["excluded_count"],
         },
@@ -67,7 +80,7 @@ def main() -> None:
         "",
         "All values below were read from the current training and prediction artifacts.",
         "",
-        "| Metric | Base | LoRA | Absolute change |",
+        "| Metric | Base | LoRA | Absolute change (pp) |",
         "|---|---:|---:|---:|",
     ]
     for label, key in (
@@ -82,12 +95,13 @@ def main() -> None:
         lora_value = float(lora[key])
         lines.append(
             f"| {label} | {base_value:.1%} | {lora_value:.1%} | "
-            f"{lora_value - base_value:+.1%} |"
+            f"{(lora_value - base_value) * 100:+.1f} pp |"
         )
     lines.extend(
         [
             "",
             f"- Training receipts: {training['train_samples']}",
+            f"- Validation receipts: {training['validation_samples']}",
             f"- Held-out generation receipts: {lora['sample_count']}",
             f"- Optimizer steps: {training['global_steps']}",
             f"- Training duration: {training['duration_seconds'] / 60:.2f} minutes",

@@ -1,0 +1,61 @@
+{
+  "improvement": {
+    "sample_id": "X51005301666",
+    "image_path": "artifacts/predictions/examples/lora_improves__X51005301666.jpg",
+    "image_sha256": "177122548f177241b25024338de0f877b164614f4d5b26fecf649a488e95f9fc",
+    "base": {
+      "sample_id": "X51005301666",
+      "ground_truth": {
+        "company": "LIGHTROOM GALLERY SDN BHD",
+        "address": "NO: 28, JALAN ASTANA 1C, BANDAR BUKIT RAJA, 41050 KLANG SELANGOR D.E, MALAYSIA",
+        "date": "20/11/2017",
+        "total": "278.80"
+      },
+      "raw_output": "{\n    \"menu\": {\n        \"nm\": \"LIGHT\",\n        \"num\": \"1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+      "valid_json": false,
+      "parsed_prediction": null,
+      "latency_seconds": 6.5332023000810295
+    },
+    "lora": {
+      "sample_id": "X51005301666",
+      "ground_truth": {
+        "company": "LIGHTROOM GALLERY SDN BHD",
+        "address": "NO: 28, JALAN ASTANA 1C, BANDAR BUKIT RAJA, 41050 KLANG SELANGOR D.E, MALAYSIA",
+        "date": "20/11/2017",
+        "total": "278.80"
+      },
+      "raw_output": "{\"company\": \"LIGHTROOM GALLERY SDN BHD\", \"address\": \"KAMBAH BALA JATU 4105, KALAM BALA JATU 4105, JALAN BALA JATU 4105, KALAM BALA JATU 4105\", \"date\": \"28/11/2017\", \"total\": \"16.00\"}",
+      "valid_json": true,
+      "parsed_prediction": {
+        "company": "LIGHTROOM GALLERY SDN BHD",
+        "address": "KAMBAH BALA JATU 4105, KALAM BALA JATU 4105, JALAN BALA JATU 4105, KALAM BALA JATU 4105",
+        "date": "28/11/2017",
+        "total": "16.00"
+      },
+      "latency_seconds": 7.304124300018884
+    },
+    "figure_path": "artifacts/figures/qualitative_lora_improvement.png",
+    "figure_sha256": "9f2798b634bc8ae9e1f14d34441fe2b1d85f9bf2876be038da29c26911e8022f"
+  },
+  "failure": {
+    "sample_id": "X51005433556",
+    "image_path": "artifacts/predictions/examples/lora_failure__X51005433556.jpg",
+    "image_sha256": "4dcd77e390ff90bf9992f5ca4fce6c9a40172b2ddcdef1e61bb1bd5f4eb18a44",
+    "lora": {
+      "sample_id": "X51005433556",
+      "ground_truth": {
+        "company": "YHM AEON TEBRAU CITY",
+        "address": "S117, SECOND FLOOR, AEON TEBRAU CITY, 1, JALAN DESA TEBRAU, TAMAN DESA TEBRAU, 81100 JOHOR BAHRU, JOHOR.",
+        "date": "11/03/2018",
+        "total": "49.70"
+      },
+      "raw_output": "{\"company\": \"WN JALAN STATE\", \"address\": \"17, JALAN JALAN SENATE, 11, JALAN JALAN SENATE, 12, JALAN JALAN SENATE, 13, JALAN JALAN SENATE, 14, JALAN JALAN SENATE, 15, JALAN JALAN SENATE, 16, JALAN JALAN SENATE, 17, JALAN JALAN SENATE,",
+      "valid_json": false,
+      "parsed_prediction": null,
+      "latency_seconds": 8.450542900012806
+    },
+    "generation_max_new_tokens": 128,
+    "figure_path": "artifacts/figures/qualitative_failure_analysis.png",
+    "figure_sha256": "83bd707ebd6c802ecea361e152e07899a9553553d658c5d6a864e47108cceaaf"
+  }
+}

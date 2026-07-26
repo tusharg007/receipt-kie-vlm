@@ -19,7 +19,7 @@ def main() -> None:
     parser.add_argument("--config", default="configs/train_lora.yaml")
     parser.add_argument("--max-steps", type=int)
     parser.add_argument("--train-limit", type=int)
-    parser.add_argument("--eval-limit", type=int)
+    parser.add_argument("--validation-size", type=int)
     parser.add_argument("--output-dir")
     args = parser.parse_args()
     overrides = {
@@ -27,7 +27,7 @@ def main() -> None:
         for key, value in {
             "training.max_steps": args.max_steps,
             "training.train_limit": args.train_limit,
-            "training.eval_limit": args.eval_limit,
+            "training.validation_size": args.validation_size,
             "paths.output_dir": args.output_dir,
         }.items()
         if value is not None

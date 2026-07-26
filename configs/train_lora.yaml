@@ -28,14 +28,14 @@ training:
   warmup_ratio: 0.05
   logging_steps: 5
   save_strategy: steps
-  save_steps: 50
+  save_steps: 35
   eval_strategy: steps
-  eval_steps: 50
+  eval_steps: 35
   save_total_limit: 2
   gradient_checkpointing: true
   dataloader_num_workers: 0
   train_limit: null
-  eval_limit: 64
+  validation_size: 63
 
 lora:
   rank: 16

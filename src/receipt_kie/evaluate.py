@@ -170,36 +170,97 @@ def _write_comparison(results: dict[str, Any]) -> None:
 
 def _plot_comparison(results: dict[str, Any]) -> None:
     fields = list(CANONICAL_FIELDS)
-    base = [results["base"]["per_field"][field]["normalized_exact_match"] for field in fields]
-    lora = [results["lora"]["per_field"][field]["normalized_exact_match"] for field in fields]
     x = list(range(len(fields)))
     figures = project_path("artifacts/figures")
     figures.mkdir(parents=True, exist_ok=True)
-    plt.figure(figsize=(8, 4.5))
-    plt.bar([value - 0.18 for value in x], base, width=0.36, label="Base")
-    plt.bar([value + 0.18 for value in x], lora, width=0.36, label="LoRA")
-    plt.xticks(x, fields)
-    plt.ylim(0, 1)
-    plt.ylabel("Normalized exact-match accuracy")
-    plt.title("Base vs LoRA field accuracy")
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(figures / "field_accuracy.png", dpi=160)
+    colors = {"base": "#6c8ebf", "lora": "#e69f00"}
+    fig, axes = plt.subplots(1, 2, figsize=(13, 5), sharey=True)
+    for axis, metric, title in (
+        (axes[0], "normalized_exact_match", "A. Normalized exact match"),
+        (axes[1], "normalized_similarity", "B. Normalized similarity"),
+    ):
+        base_values = [
+            results["base"]["per_field"][field][metric] for field in fields
+        ]
+        lora_values = [
+            results["lora"]["per_field"][field][metric] for field in fields
+        ]
+        base_bars = axis.bar(
+            [value - 0.18 for value in x],
+            base_values,
+            width=0.36,
+            label="Base",
+            color=colors["base"],
+        )
+        lora_bars = axis.bar(
+            [value + 0.18 for value in x],
+            lora_values,
+            width=0.36,
+            label="LoRA",
+            color=colors["lora"],
+        )
+        axis.set_xticks(x, [field.title() for field in fields])
+        axis.set_ylim(0, 1)
+        axis.set_title(title)
+        axis.grid(axis="y", alpha=0.25)
+        _label_percentage_bars(axis, [*base_bars, *lora_bars])
+    axes[0].set_ylabel("Score")
+    axes[1].legend(loc="upper left")
+    fig.suptitle("Base vs LoRA field-level extraction")
+    fig.tight_layout()
+    fig.savefig(figures / "field_accuracy.png", dpi=180)
     plt.close()
-    metrics = [
-        results["base"]["valid_json_rate"],
-        results["lora"]["valid_json_rate"],
-        results["base"]["complete_record_normalized_exact_match"],
-        results["lora"]["complete_record_normalized_exact_match"],
+    metric_labels = [
+        "Valid JSON",
+        "Macro exact match",
+        "Macro similarity",
     ]
-    plt.figure(figsize=(7, 4.5))
-    plt.bar(["Base JSON", "LoRA JSON", "Base record", "LoRA record"], metrics)
-    plt.ylim(0, 1)
-    plt.ylabel("Rate")
-    plt.title("ReceiptKIE-VLM base vs LoRA")
-    plt.xticks(rotation=15)
-    plt.tight_layout()
-    plt.savefig(figures / "base_vs_lora.png", dpi=160)
+    base_values = [
+        results["base"]["valid_json_rate"],
+        _macro_field_metric(results["base"], "normalized_exact_match"),
+        _macro_field_metric(results["base"], "normalized_similarity"),
+    ]
+    lora_values = [
+        results["lora"]["valid_json_rate"],
+        _macro_field_metric(results["lora"], "normalized_exact_match"),
+        _macro_field_metric(results["lora"], "normalized_similarity"),
+    ]
+    metric_x = list(range(len(metric_labels)))
+    fig, axis = plt.subplots(figsize=(9, 5.4))
+    base_bars = axis.bar(
+        [value - 0.19 for value in metric_x],
+        base_values,
+        width=0.38,
+        label="Base",
+        color=colors["base"],
+    )
+    lora_bars = axis.bar(
+        [value + 0.19 for value in metric_x],
+        lora_values,
+        width=0.38,
+        label="LoRA",
+        color=colors["lora"],
+    )
+    axis.set_xticks(metric_x, metric_labels)
+    axis.set_ylim(0, 1)
+    axis.set_ylabel("Score")
+    axis.set_title("Structured receipt extraction: base vs LoRA")
+    axis.grid(axis="y", alpha=0.25)
+    axis.legend()
+    _label_percentage_bars(axis, [*base_bars, *lora_bars])
+    base_complete = results["base"]["complete_record_normalized_exact_match"]
+    lora_complete = results["lora"]["complete_record_normalized_exact_match"]
+    fig.text(
+        0.5,
+        0.02,
+        "Complete-record normalized exact match: "
+        f"Base = {base_complete:.1%}, LoRA = {lora_complete:.1%}",
+        ha="center",
+        fontsize=10,
+        fontweight="bold",
+    )
+    fig.tight_layout(rect=(0, 0.07, 1, 1))
+    fig.savefig(figures / "base_vs_lora.png", dpi=180)
     plt.close()
 
 
@@ -230,6 +291,9 @@ def _copy_examples(rows: dict[str, list[dict[str, Any]]]) -> None:
     }
     output_dir = project_path("artifacts/predictions/examples")
     output_dir.mkdir(parents=True, exist_ok=True)
+    for existing in output_dir.glob("*__*"):
+        if existing.is_file():
+            existing.unlink()
     for category, sample_ids in selected.items():
         for sample_id in sample_ids:
             source = project_path(lora_by_id[sample_id]["image_path"])
@@ -272,19 +336,15 @@ def _write_robustness_csv(results: dict[str, Any]) -> None:
         "complete_record_normalized_exact_match",
         "average_inference_latency_seconds",
     )
-    clean = results["clean"]
     with output.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.writer(handle)
-        writer.writerow(["variant", "sample_count", *columns, "mean_field_score_delta"])
+        writer.writerow(["variant", "sample_count", *columns])
         for variant, metrics in results.items():
-            mean_score = sum(float(metrics[name]) for name in columns[1:5]) / 4
-            clean_mean = sum(float(clean[name]) for name in columns[1:5]) / 4
             writer.writerow(
                 [
                     variant,
                     metrics["sample_count"],
                     *(metrics[name] for name in columns),
-                    mean_score - clean_mean,
                 ]
             )
 
@@ -292,27 +352,70 @@ def _write_robustness_csv(results: dict[str, Any]) -> None:
 def _plot_robustness(results: dict[str, Any]) -> None:
     variants = list(results)
     labels = [name.replace("_", " ").title() for name in variants]
-    values = [
-        sum(
-            (
-                results[name]["company_accuracy"],
-                results[name]["address_similarity"],
-                results[name]["date_accuracy"],
-                results[name]["total_accuracy"],
-            )
-        )
-        / 4
-        for name in variants
+    metrics = [
+        ("Valid JSON", "valid_json_rate"),
+        ("Company exact", "company_accuracy"),
+        ("Address similarity", "address_similarity"),
+        ("Date exact", "date_accuracy"),
+        ("Total exact", "total_accuracy"),
     ]
-    plt.figure(figsize=(9, 4.8))
-    plt.bar(labels, values)
-    plt.ylim(0, 1)
-    plt.ylabel("Mean field score")
-    plt.title("Pilot robustness benchmark (20 fixed receipts)")
-    plt.xticks(rotation=18)
-    plt.tight_layout()
-    plt.savefig(project_path("artifacts/figures/robustness_results.png"), dpi=160)
+    values = [
+        [float(results[variant][key]) for _, key in metrics]
+        for variant in variants
+    ]
+    fig, axis = plt.subplots(figsize=(10.5, 5.8))
+    image = axis.imshow(values, cmap="YlGnBu", vmin=0, vmax=1, aspect="auto")
+    axis.set_xticks(range(len(metrics)), [label for label, _ in metrics])
+    axis.set_yticks(range(len(labels)), labels)
+    axis.set_title(
+        "LoRA robustness by metric — 20-receipt descriptive pilot"
+    )
+    for row_index, row in enumerate(values):
+        for column_index, value in enumerate(row):
+            axis.text(
+                column_index,
+                row_index,
+                f"{value:.0%}",
+                ha="center",
+                va="center",
+                color="white" if value >= 0.55 else "black",
+                fontweight="bold",
+            )
+    colorbar = fig.colorbar(image, ax=axis, fraction=0.035, pad=0.03)
+    colorbar.set_label("Metric value")
+    fig.text(
+        0.5,
+        0.01,
+        "Exact match is shown for company/date/total; normalized similarity for address.",
+        ha="center",
+        fontsize=9,
+    )
+    fig.tight_layout(rect=(0, 0.05, 1, 1))
+    fig.savefig(project_path("artifacts/figures/robustness_results.png"), dpi=180)
     plt.close()
+
+
+def _macro_field_metric(metrics: dict[str, Any], metric_name: str) -> float:
+    return sum(
+        float(metrics["per_field"][field][metric_name])
+        for field in CANONICAL_FIELDS
+    ) / len(CANONICAL_FIELDS)
+
+
+def _label_percentage_bars(axis: Any, bars: list[Any]) -> None:
+    for bar in bars:
+        height = float(bar.get_height())
+        if height <= 0:
+            continue
+        axis.annotate(
+            f"{height:.0%}",
+            (bar.get_x() + bar.get_width() / 2, height),
+            xytext=(0, 4),
+            textcoords="offset points",
+            ha="center",
+            va="bottom",
+            fontsize=8,
+        )
 
 
 def _record_score(row: dict[str, Any]) -> int:

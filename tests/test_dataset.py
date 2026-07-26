@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 from PIL import Image
 
-from receipt_kie.dataset import discover_split
+from receipt_kie.dataset import ReceiptRecord, discover_split, partition_train_validation
 
 
 def _write_sample(root: Path, sample_id: str = "receipt-1") -> None:
@@ -53,3 +53,33 @@ def test_dataset_reports_missing_pair(tmp_path: Path) -> None:
 def test_dataset_missing_directories_raise(tmp_path: Path) -> None:
     with pytest.raises(FileNotFoundError):
         discover_split(tmp_path, "train")
+
+
+def test_train_validation_partition_is_deterministic_and_disjoint() -> None:
+    records = [
+        ReceiptRecord(
+            sample_id=f"receipt-{index:03d}",
+            split="train",
+            image_path=Path(f"receipt-{index:03d}.jpg"),
+            entity_path=Path(f"receipt-{index:03d}.txt"),
+            target={"company": "", "address": "", "date": "", "total": ""},
+            width=10,
+            height=10,
+        )
+        for index in range(20)
+    ]
+    train, validation = partition_train_validation(records, validation_size=4, seed=42)
+    repeated_train, repeated_validation = partition_train_validation(
+        records, validation_size=4, seed=42
+    )
+    assert len(train) == 16
+    assert len(validation) == 4
+    assert {row.sample_id for row in train}.isdisjoint(
+        row.sample_id for row in validation
+    )
+    assert [row.sample_id for row in train] == [
+        row.sample_id for row in repeated_train
+    ]
+    assert [row.sample_id for row in validation] == [
+        row.sample_id for row in repeated_validation
+    ]

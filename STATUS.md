@@ -4,7 +4,8 @@ Last updated: 2026-07-26 (Asia/Calcutta)
 
 ## Current phase
 
-Cloneability remediation and fresh-clone verification complete.
+Leakage-free retraining, evaluation refresh, and recruiter-facing evidence
+upgrade complete.
 
 ## Completed tasks
 
@@ -19,14 +20,17 @@ Cloneability remediation and fresh-clone verification complete.
 - Implemented the package, YAML configs, CLIs, tests, logging, and deterministic seeds.
 - Passed a three-step real-model smoke test, including adapter save/reload and inference.
 - Timed ten full gradient-accumulated calibration steps at 14.82 seconds/step.
-- Trained a genuinely new rank-16 LoRA adapter for two epochs and 156 optimizer steps.
-- Verified 31 finite loss records and a changed LoRA parameter checksum.
+- Created a deterministic 563/63 train/validation partition entirely within the
+  official train split; the official test split is untouched until final evaluation.
+- Trained a genuinely new rank-16 LoRA adapter for two epochs and 140 optimizer steps.
+- Verified 28 finite training-loss records, four validation points, and a changed
+  LoRA parameter checksum.
 - Evaluated base and LoRA variants on the same 100 held-out test receipts.
 - Generated raw predictions, JSON/CSV metrics, figures, and curated examples.
 - Completed a five-condition paired robustness pilot on 20 fixed receipts.
 - Rewrote the README and created the project report, interview guide, and resume bullets.
 - Generated `requirements-lock.txt` from the successful environment.
-- Passed 15 unit tests, Ruff, `pip check`, metric recomputation, and all integrity checks.
+- Passed 16 unit tests, Ruff, `pip check`, metric recomputation, and all integrity checks.
 - Committed the minimal 10.45 MiB LoRA adapter and recruiter-ready inference demo.
 - Passed a `git clone --no-local` test with a new Python 3.11 virtual environment,
   isolated model cache, CPU model loading, adapter loading, and parsed-JSON inference.
@@ -75,18 +79,21 @@ Cloneability remediation and fresh-clone verification complete.
 
 ## Current training and evaluation state
 
-- Training complete: 626 samples, two epochs, 156 steps, 1,583.45 seconds.
-- Validation loss: 1.3492 (step 50), 1.0984 (step 100), 1.0282 (step 150).
+- Training complete: 563 training samples, 63 validation samples, two epochs,
+  140 steps, 1,084.19 seconds.
+- Validation loss: 1.3650 (step 35), 1.0618 (step 70), 0.9373 (step 105),
+  0.9034 (step 140).
 - Peak allocated training VRAM: 827.32 MiB.
 - Evaluation complete: 100 held-out receipts per variant.
 - Base/LoRA valid JSON: 19% / 85%.
-- Base/LoRA company accuracy: 1% / 23%.
-- Base/LoRA address similarity: 2.75% / 51.74%.
-- Base/LoRA date accuracy: 1% / 26%.
-- Base/LoRA total accuracy: 0% / 29%.
+- Base/LoRA company accuracy: 1% / 26%.
+- Base/LoRA address similarity: 2.75% / 51.92%.
+- Base/LoRA date accuracy: 1% / 18%.
+- Base/LoRA total accuracy: 0% / 25%.
 - Complete-record normalized exact match: 0% for both.
 
 ## Remaining tasks
 
-- Show the final Git status, repository size, large-file audit, and secret scan.
-- Wait for explicit user approval before any GitHub push.
+- No required implementation work remains for this evidence refresh.
+- Future research should evaluate the full test split, add confidence intervals,
+  and improve complete-record exact match beyond the current 0%.
