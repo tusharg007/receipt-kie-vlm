@@ -41,7 +41,7 @@ Both smoke runs changed the LoRA tensors and passed saved-adapter reload verific
 | Adapter | Size | SHA-256 | Independent reload |
 |---|---:|---|---|
 | V1 production | 10,956,944 bytes | `94ba0038153ea1aacb12dbcc80f1edf01d31a6309ea56919684e8cb8bbe90b28` | PASS |
-| V2 high-resolution candidate | 10,956,944 bytes | `3e0e5a88c36f0d6a0db6baf2a3b521e40be4ef84b212ed2eafecab431604bf79` | PASS |
+| V2 high-resolution recommended | 10,956,944 bytes | `3e0e5a88c36f0d6a0db6baf2a3b521e40be4ef84b212ed2eafecab431604bf79` | PASS |
 
 ## Frozen validation selection
 
@@ -90,7 +90,8 @@ Percentile 95% confidence intervals use 2,000 receipt-level bootstrap resamples.
 - Valid-JSON delta: +0.81 pp.
 - Gate result: **PASS**.
 
-V2 may remain a separate candidate; do not replace V1 or public README claims until this branch is reviewed.
+V2 passed release review and is the recommended adapter. V1 remains preserved
+as the historical reproducible baseline.
 
 ## Qualitative panels
 
@@ -119,7 +120,8 @@ Sample `X51005230616` selected by the documented first-match rule.
 - Windows WDDM reserved-memory readings can exceed dedicated physical VRAM.
 - Wall-clock inference included laptop GPU power-throttling intervals; use the
   medians alongside averages when comparing latency.
-- The public README and production V1 claims remain intentionally unchanged.
+- The original V1 adapter, metrics, predictions, and historical claims remain
+  preserved alongside the V2 release.
 
 ## Files created or modified
 

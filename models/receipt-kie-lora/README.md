@@ -1,7 +1,7 @@
-# ReceiptKIE-VLM LoRA Adapter
+# ReceiptKIE-VLM V1 LoRA Adapter
 
-This directory contains the minimum inference artifacts for the newly trained
-ReceiptKIE-VLM adapter:
+This directory preserves the original 512 px V1 historical baseline. V2 is the
+recommended adapter, but V1 remains committed for exact reproduction:
 
 - `adapter_model.safetensors`: LoRA weights.
 - `adapter_config.json`: PEFT configuration and base-model reference.
@@ -21,10 +21,12 @@ Run from the repository root:
 
 ```bash
 python scripts/verify_installation.py
-python scripts/demo_inference.py
+python scripts/demo_inference.py --model-version v1
 ```
 
 This adapter was trained on 563 SROIE official-train annotations and validated
 on a disjoint 63-receipt partition from that same official train split. The
 official test split was used only for final evaluation. SmolVLM and SROIE are
 external projects and are not owned by this repository.
+
+See [`MODEL_COMPARISON.md`](../../MODEL_COMPARISON.md) for V1/V2 versioning.

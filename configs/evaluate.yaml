@@ -1,7 +1,7 @@
 paths:
   dataset_root: data/raw/sroie/SROIE2019
   hf_cache: .cache/huggingface
-  adapter_path: models/receipt-kie-lora
+  adapter_path: models/receipt-kie-lora-v2-highres
   reports_dir: artifacts/reports
   predictions_dir: artifacts/predictions
   figures_dir: artifacts/figures
@@ -10,7 +10,7 @@ model:
   model_id: HuggingFaceTB/SmolVLM-256M-Instruct
   attention: auto
   precision: auto
-  image_longest_edge: 512
+  image_longest_edge: 1536
   max_image_patch_edge: 512
   do_image_splitting: true
 
@@ -21,5 +21,6 @@ evaluation:
   seed: 42
 
 generation:
-  max_new_tokens: 128
+  max_new_tokens: 256
   do_sample: false
+  repetition_penalty: 1.08

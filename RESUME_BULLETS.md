@@ -1,36 +1,44 @@
 # Resume and Application Materials
 
-## Truthful résumé bullets
+## Recommended future résumé bullet
 
-- Fine-tuned open-weight SmolVLM-256M with supervised multimodal LoRA on 563
-  SROIE receipts, using 63 disjoint official-train receipts for validation and
-  updating 2.73M parameters (1.052%) in 18.07 minutes on a 4 GiB RTX 3050 GPU.
-- Built a leakage-free structured receipt KIE pipeline with assistant-only label
-  masking, deterministic JSON generation, conservative field normalization, and
-  auditable base-versus-LoRA evaluation across 100 held-out receipts.
-- Improved valid JSON generation from 19% to 85%, company accuracy from 1% to
-  26%, date accuracy from 1% to 18%, total accuracy from 0% to 25%, and address
-  similarity from 2.75% to 51.92%; documented the remaining 0% complete-record
-  exact-match limitation.
+- Continued high-resolution LoRA adaptation of SmolVLM at 1536 px and evaluated
+  on 246 previously unseen receipts; achieved 99.2% valid JSON, 69.1% company,
+  85.8% date and 64.6% total exact match, 90.7% address similarity and 18.3%
+  complete-record accuracy, improving macro exact match by 19.4 percentage
+  points over V1.
+
+## Supporting bullets
+
+- Built a leakage-controlled multimodal KIE pipeline with assistant-only label
+  masking, deterministic JSON generation, test-usage accounting, validation-only
+  checkpoint selection, paired bootstrap intervals, and auditable predictions.
+- Continued a rank-16 q/k/v/o LoRA adapter for three epochs and 210 optimizer
+  steps at 1536 px on a 4 GiB RTX 3050 GPU, completing in 84.37 minutes with
+  3.17 GiB peak allocated training memory.
+- Preserved the original 512 px V1 baseline while improving V2 macro exact match
+  from 43.9% to 63.3% and complete-record exact match from 4.1% to 18.3% under
+  identical high-resolution inference controls.
 
 ## Application-form description
 
 ReceiptKIE-VLM is a reproducible vision-language research project for extracting
-merchant, address, date, and total fields from receipt images. I implemented the
-SROIE pairing/audit pipeline, multimodal chat formulation, assistant-only loss
-masking, PEFT LoRA training, robust JSON parsing, field-aware metrics, paired
-base-model evaluation, and a small corruption benchmark. I trained a new adapter
-locally on an RTX 3050 and retained raw predictions, trainer state, plots, and
-integrity checks so every reported metric is auditable.
+company, address, date, and total fields from receipt images. I implemented
+dataset auditing, multimodal assistant-only SFT, PEFT LoRA training, configurable
+tiled preprocessing, validation-controlled selection, conservative parsing,
+field-aware metrics, seeded confidence intervals, failure analysis, and
+fresh-clone verification. V2 remains a research prototype rather than a
+production financial extractor.
 
 ## GitHub repository description
 
-Structured receipt KIE with SmolVLM-256M + LoRA: reproducible multimodal SFT,
-base-vs-adapter metrics, raw predictions, robustness pilot, tests, and reports.
+Structured receipt KIE with SmolVLM-256M and versioned LoRA adapters:
+leakage-controlled training, high-resolution tiling, auditable Base/V1/V2
+evaluation, confidence intervals, tests, and reproducible demos.
 
 ## Technology keywords
 
 Python, PyTorch, Transformers, SmolVLM, vision-language models, multimodal
-learning, PEFT, LoRA, TRL SFTTrainer, supervised fine-tuning, Idefics3, SROIE,
-document AI, key-information extraction, JSON generation, CUDA, BF16, gradient
-checkpointing, experiment tracking, evaluation, pytest, Ruff.
+learning, PEFT, LoRA, supervised fine-tuning, Idefics3, SROIE, document AI,
+key-information extraction, JSON generation, CUDA, BF16, gradient checkpointing,
+bootstrap evaluation, pytest, Ruff.

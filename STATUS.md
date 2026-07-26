@@ -4,96 +4,86 @@ Last updated: 2026-07-26 (Asia/Calcutta)
 
 ## Current phase
 
-Leakage-free retraining, evaluation refresh, and recruiter-facing evidence
-upgrade complete.
+V2 release promotion and public-clone verification.
 
-## Completed tasks
+## Version status
 
-- Inspected every legacy notebook and preserved it under `research_notebooks/`.
-- Sanitized a legacy Kaggle credential before baseline commit `a39fc0f`.
-- Verified GitHub, Hugging Face, and Kaggle authentication.
-- Rebuilt `.venv` with Python 3.12 and CUDA-enabled PyTorch 2.5.1+cu124.
-- Verified CUDA, BF16, SDPA availability, and the RTX 3050 Laptop GPU with 4 GiB VRAM.
-- Downloaded SROIE2019 into the ignored `data/raw/sroie/` directory.
-- Validated all 973 image/entity pairs: 626 train and 347 test, no exclusions.
-- Generated the environment report and complete dataset audit.
-- Implemented the package, YAML configs, CLIs, tests, logging, and deterministic seeds.
-- Passed a three-step real-model smoke test, including adapter save/reload and inference.
-- Timed ten full gradient-accumulated calibration steps at 14.82 seconds/step.
-- Created a deterministic 563/63 train/validation partition entirely within the
-  official train split; the official test split is untouched until final evaluation.
-- Trained a genuinely new rank-16 LoRA adapter for two epochs and 140 optimizer steps.
-- Verified 28 finite training-loss records, four validation points, and a changed
-  LoRA parameter checksum.
-- Evaluated base and LoRA variants on the same 100 held-out test receipts.
-- Generated raw predictions, JSON/CSV metrics, figures, and curated examples.
-- Completed a five-condition paired robustness pilot on 20 fixed receipts.
-- Rewrote the README and created the project report, interview guide, and resume bullets.
-- Generated `requirements-lock.txt` from the successful environment.
-- Passed 16 unit tests, Ruff, `pip check`, metric recomputation, and all integrity checks.
-- Committed the minimal 10.45 MiB LoRA adapter and recruiter-ready inference demo.
-- Passed a `git clone --no-local` test with a new Python 3.11 virtual environment,
-  isolated model cache, CPU model loading, adapter loading, and parsed-JSON inference.
+- **V1 historical baseline:** preserved at `models/receipt-kie-lora`.
+- **V2 recommended model:** preserved at
+  `models/receipt-kie-lora-v2-highres`.
+- **Main README:** retains V1 results and adds the V2 research progression.
+- **Raw dataset:** ignored and not required for either demo.
 
-## Commands executed
+## Completed research
 
-- `git init`, local baseline and phase commits
-- `.venv\Scripts\python.exe scripts\preflight.py`
-- `.venv\Scripts\python.exe scripts\prepare_dataset.py`
-- `.venv\Scripts\python.exe -m pytest -q`
-- `.venv\Scripts\ruff.exe check src\receipt_kie scripts tests`
-- `.venv\Scripts\python.exe scripts\run_smoke_test.py`
-- `.venv\Scripts\python.exe scripts\run_training.py --config configs\train_lora.yaml`
-- `.venv\Scripts\python.exe scripts\run_evaluation.py --config configs\evaluate.yaml`
-- `.venv\Scripts\python.exe scripts\run_robustness.py --config configs\evaluate.yaml`
-- `.venv\Scripts\python.exe scripts\build_report.py`
+- Leakage-free 563/63 official-train split with zero overlap.
+- V1: 512 px, two epochs, 140 optimizer steps.
+- Fixed 30-receipt resolution-development ablation.
+- 2048/1536 training-memory smoke tests with a predefined safety gate.
+- V2: continued from V1 at 1536 px for three epochs and 210 steps.
+- Validation-only checkpoint and decoding-policy selection.
+- One-time Base/V1/V2 comparison on 246 previously unevaluated test receipts.
+- Seeded 2,000-resample confidence intervals and three honest qualitative panels.
+- Exact metric recomputation from all committed prediction JSONL files.
 
-## Important decisions
+## Recommended V2 result
 
-- Preserve the MIT licence and explicitly acknowledge adapted upstream ideas.
-- Train a new adapter; do not use an upstream checkpoint for reported results.
-- Use SmolVLM-256M-Instruct and SROIE `company`, `address`, `date`, and `total`.
-- Apply loss only to assistant JSON tokens.
-- Use native BF16 LoRA; avoid mandatory bitsandbytes and FlashAttention.
-- Attempt SDPA, then use logged eager fallback because this Idefics3 vision tower rejects it.
-- Resize images through the supported 512-pixel longest-edge processor option.
-- Train for two epochs because calibration projected completion well under 100 minutes.
-- Keep model caches, raw data, corruptions, and trainer checkpoints out of Git;
-  track only the minimal final adapter under `models/receipt-kie-lora/`.
-- Never push to GitHub until the user gives explicit final approval.
+| Metric | V1 | V2 | Change |
+|---|---:|---:|---:|
+| Valid JSON | 98.4% | 99.2% | +0.8 pp |
+| Company exact | 52.4% | 69.1% | +16.7 pp |
+| Address similarity | 82.2% | 90.7% | +8.5 pp |
+| Date exact | 63.4% | 85.8% | +22.4 pp |
+| Total exact | 43.9% | 64.6% | +20.7 pp |
+| Complete-record exact | 4.1% | 18.3% | +14.2 pp |
+| Macro exact | 43.9% | 63.3% | +19.4 pp |
 
-## Errors encountered and fixes
+These are paired results on 246 previously unseen SROIE test receipts at the
+same frozen high-resolution inference setting. Address is normalized similarity;
+other reported fields are normalized exact match.
 
-- Broken Python 3.11 virtual environment: rebuilt with Python 3.12.13.
-- An overly strict Python 3.12 package declaration blocked the first clean-clone
-  verifier: confirmed the supported stack on Python 3.11 and declared Python 3.11+.
-- CPU-only Windows PyTorch wheel: replaced with CUDA 12.4 build.
-- System temporary drive exhausted during wheel install: redirected temporary storage.
-- NumPy 2 ABI drift: pinned NumPy below 2 and compatible SciPy/scikit-learn ranges.
-- System pytest temp access denied: moved pytest temp files into the project.
-- Matplotlib attempted a Tk GUI: selected the headless Agg backend.
-- Idefics3 vision SDPA unsupported: automatically and transparently fell back to eager.
-- Initial smoke generation produced invalid JSON: accepted as a three-step quality limitation;
-  full training was required before quality evaluation.
-- Fifteen final LoRA predictions repeat until truncation: retained as invalid failures.
+## V2 runtime
 
-## Current training and evaluation state
+- Training resolution: 1536 px with 512 px patches and image splitting.
+- Duration: 84.37 minutes.
+- Peak allocated training VRAM: 3,174.26 MiB.
+- Selected checkpoint: 210.
+- Generation: deterministic, 256 new tokens, repetition penalty 1.08.
+- V2 average/median holdout latency: 12.46/10.74 seconds.
+- V2 peak inference memory: 1,876.55 MiB.
 
-- Training complete: 563 training samples, 63 validation samples, two epochs,
-  140 steps, 1,084.19 seconds.
-- Validation loss: 1.3650 (step 35), 1.0618 (step 70), 0.9373 (step 105),
-  0.9034 (step 140).
-- Peak allocated training VRAM: 827.32 MiB.
-- Evaluation complete: 100 held-out receipts per variant.
-- Base/LoRA valid JSON: 19% / 85%.
-- Base/LoRA company accuracy: 1% / 26%.
-- Base/LoRA address similarity: 2.75% / 51.92%.
-- Base/LoRA date accuracy: 1% / 18%.
-- Base/LoRA total accuracy: 0% / 25%.
-- Complete-record normalized exact match: 0% for both.
+## Verification commands
 
-## Remaining tasks
+```text
+python -m pytest -q
+python -m ruff check src scripts tests
+python -m pip check
+python scripts/integrity_check.py
+python scripts/verify_installation.py
+python scripts/demo_inference.py --model-version v1
+python scripts/demo_inference.py --model-version v2
+git diff --check
+```
 
-- No required implementation work remains for this evidence refresh.
-- Future research should evaluate the full test split, add confidence intervals,
-  and improve complete-record exact match beyond the current 0%.
+## Local verification result
+
+- Pytest: 25 passed.
+- Ruff: passed.
+- `pip check`: no broken requirements.
+- Integrity verification: PASS.
+- Installation verification: PASS for both exact adapter checksums.
+- V1 synthetic demo: parsed JSON, 9.721 s, 651.92 MiB peak, one visual tile.
+- V2 synthetic demo: parsed JSON, 9.512 s, 1,877.30 MiB peak, ten visual tiles.
+- Adapter loading: both versions confirmed as active PEFT models; no base-only
+  fallback.
+
+The final public-clone result and exact environment details are recorded in
+`CLONE_VERIFICATION.md`.
+
+## Limitations
+
+- V2 is a research prototype, not a production financial extractor.
+- Complete-record exact match is 18.3%, so most receipts still contain at least
+  one incorrect field.
+- Bootstrap intervals measure sampling uncertainty, not dataset shift.
+- SROIE does not establish performance on private or multilingual receipts.

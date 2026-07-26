@@ -13,6 +13,15 @@
   "checkpoint_selected": "checkpoint-210",
   "checkpoint_selection_source": "63 validation receipts from official train split",
   "generation_policy_selected": "always_repetition_penalty_1p08",
+  "recommended_for_inference": true,
+  "inference_configuration": {
+    "image_longest_edge": 1536,
+    "max_image_patch_edge": 512,
+    "do_image_splitting": true,
+    "max_new_tokens": 256,
+    "do_sample": false,
+    "repetition_penalty": 1.08
+  },
   "selection_score": 0.6300511846663504,
   "selection_score_formula": "0.35 * macro_normalized_exact_match + 0.2 * macro_normalized_similarity + 0.2 * complete_record_normalized_exact_match + 0.15 * valid_json_rate - 0.05 * generation_limit_rate - 0.05 * repetition_failure_rate",
   "lora_rank": 16,
@@ -23,5 +32,44 @@
     "o_proj",
     "q_proj",
     "v_proj"
-  ]
+  ],
+  "final_holdout": {
+    "source": "official_test",
+    "previously_unseen_receipts": 246,
+    "valid_json_rate": 0.991869918699187,
+    "company_normalized_exact_match": 0.6910569105691057,
+    "address_normalized_similarity": 0.9068344558626299,
+    "date_normalized_exact_match": 0.8577235772357723,
+    "total_normalized_exact_match": 0.6463414634146342,
+    "complete_record_normalized_exact_match": 0.18292682926829268,
+    "macro_normalized_exact_match": 0.6331300813008129
+  },
+  "paired_v2_minus_v1": {
+    "macro_exact_point_delta": 0.1941056910569105,
+    "macro_exact_bootstrap_95_ci": [
+      0.16260162601626021,
+      0.2276422764227642
+    ],
+    "complete_record_point_delta": 0.14227642276422764,
+    "complete_record_bootstrap_95_ci": [
+      0.1016260162601626,
+      0.19105691056910568
+    ],
+    "address_similarity_point_delta": 0.0852045083545192,
+    "address_similarity_bootstrap_95_ci": [
+      0.060056753347310546,
+      0.11014046757996102
+    ],
+    "valid_json_point_delta": 0.008130081300812941,
+    "valid_json_bootstrap_95_ci": [
+      -0.012195121951219523,
+      0.028455284552845517
+    ]
+  },
+  "verification": {
+    "metrics_recomputed_from_prediction_jsonl": true,
+    "bootstrap_resamples": 2000,
+    "release_gate_passed": true,
+    "adapter_reload_verified": true
+  }
 }

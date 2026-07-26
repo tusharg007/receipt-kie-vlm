@@ -64,6 +64,9 @@ def run_evaluation(config_path: str | Path) -> dict[str, Any]:
                 record.image_path,
                 max_new_tokens=int(config["generation"]["max_new_tokens"]),
                 do_sample=bool(config["generation"]["do_sample"]),
+                repetition_penalty=config["generation"].get(
+                    "repetition_penalty"
+                ),
             )
             rows.append(
                 {
@@ -122,6 +125,9 @@ def run_robustness_evaluation(config_path: str | Path) -> dict[str, Any]:
                 prediction_path,
                 max_new_tokens=int(config["generation"]["max_new_tokens"]),
                 do_sample=bool(config["generation"]["do_sample"]),
+                repetition_penalty=config["generation"].get(
+                    "repetition_penalty"
+                ),
             )
             rows.append(
                 {

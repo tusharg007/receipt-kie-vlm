@@ -1,4 +1,4 @@
-"""Verify a clone has everything required for ReceiptKIE-VLM inference."""
+"""Verify a clone has both ReceiptKIE-VLM adapters and inference dependencies."""
 
 from __future__ import annotations
 
@@ -13,8 +13,23 @@ from PIL import Image
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
-ADAPTER_DIR = PROJECT_ROOT / "models" / "receipt-kie-lora"
 DEMO_IMAGE = PROJECT_ROOT / "assets" / "demo" / "synthetic_receipt.png"
+ADAPTERS = {
+    "V1": {
+        "path": PROJECT_ROOT / "models" / "receipt-kie-lora",
+        "sha256": (
+            "94ba0038153ea1aacb12dbcc80f1edf01d31a6309ea56919684e8cb8bbe90b28"
+        ),
+        "size": 10_956_944,
+    },
+    "V2": {
+        "path": PROJECT_ROOT / "models" / "receipt-kie-lora-v2-highres",
+        "sha256": (
+            "3e0e5a88c36f0d6a0db6baf2a3b521e40be4ef84b212ed2eafecab431604bf79"
+        ),
+        "size": 10_956_944,
+    },
+}
 
 
 def _sha256(path: Path) -> str:
@@ -39,9 +54,12 @@ def main() -> int:
     check(
         "Python version",
         lambda: (
-            f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+            f"{sys.version_info.major}.{sys.version_info.minor}."
+            f"{sys.version_info.micro}"
             if sys.version_info >= (3, 11)
-            else (_ for _ in ()).throw(RuntimeError("Python 3.11 or newer is required"))
+            else (_ for _ in ()).throw(
+                RuntimeError("Python 3.11 or newer is required")
+            )
         ),
     )
     for module_name in (
@@ -58,9 +76,11 @@ def main() -> int:
     ):
         check(
             f"Import {module_name}",
-            lambda module_name=module_name: str(importlib.import_module(module_name).__version__)
-            if hasattr(importlib.import_module(module_name), "__version__")
-            else "available",
+            lambda module_name=module_name: (
+                str(importlib.import_module(module_name).__version__)
+                if hasattr(importlib.import_module(module_name), "__version__")
+                else "available"
+            ),
         )
 
     import torch
@@ -78,46 +98,86 @@ def main() -> int:
             ),
         )
     )
-    metadata_path = ADAPTER_DIR / "training_metadata.json"
-    adapter_path = ADAPTER_DIR / "adapter_model.safetensors"
-    config_path = ADAPTER_DIR / "adapter_config.json"
-    check("Training metadata exists", lambda: str(metadata_path.relative_to(PROJECT_ROOT)))
-    check("Adapter weights exist", lambda: str(adapter_path.relative_to(PROJECT_ROOT)))
-    check("Adapter config exists", lambda: str(config_path.relative_to(PROJECT_ROOT)))
-    metadata: dict[str, object] = {}
-    if metadata_path.is_file():
-        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
-    if adapter_path.is_file() and metadata:
+    for version, expected in ADAPTERS.items():
+        adapter_dir = expected["path"]
+        metadata_path = adapter_dir / "training_metadata.json"
+        adapter_path = adapter_dir / "adapter_model.safetensors"
+        config_path = adapter_dir / "adapter_config.json"
         check(
-            "Adapter checksum",
-            lambda: _sha256(adapter_path)
-            if _sha256(adapter_path) == metadata["adapter_sha256"]
-            else (_ for _ in ()).throw(RuntimeError("SHA-256 does not match training metadata")),
+            f"{version} training metadata",
+            lambda path=metadata_path: str(path.relative_to(PROJECT_ROOT))
+            if path.is_file()
+            else (_ for _ in ()).throw(FileNotFoundError(path)),
         )
         check(
-            "Adapter is a real binary",
-            lambda: "safetensors binary"
-            if not adapter_path.read_bytes()[:128].startswith(
-                b"version https://git-lfs.github.com/spec/v1"
+            f"{version} adapter files",
+            lambda weights=adapter_path, config=config_path: (
+                f"{weights.relative_to(PROJECT_ROOT)}, "
+                f"{config.relative_to(PROJECT_ROOT)}"
+                if weights.is_file() and config.is_file()
+                else (_ for _ in ()).throw(
+                    FileNotFoundError(f"{weights} or {config}")
+                )
+            ),
+        )
+        if metadata_path.is_file() and adapter_path.is_file():
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            check(
+                f"{version} adapter checksum",
+                lambda path=adapter_path, metadata=metadata, expected=expected: (
+                    _sha256(path)
+                    if _sha256(path)
+                    == metadata["adapter_sha256"]
+                    == expected["sha256"]
+                    else (_ for _ in ()).throw(
+                        RuntimeError("SHA-256 does not match metadata/release value")
+                    )
+                ),
             )
-            else (_ for _ in ()).throw(RuntimeError("Adapter is a Git LFS pointer")),
+            check(
+                f"{version} adapter size",
+                lambda path=adapter_path, metadata=metadata, expected=expected: (
+                    f"{path.stat().st_size} bytes"
+                    if path.stat().st_size
+                    == metadata["adapter_size_bytes"]
+                    == expected["size"]
+                    else (_ for _ in ()).throw(
+                        RuntimeError("Size does not match metadata/release value")
+                    )
+                ),
+            )
+            check(
+                f"{version} adapter binary",
+                lambda path=adapter_path: (
+                    "safetensors binary"
+                    if not path.read_bytes()[:128].startswith(
+                        b"version https://git-lfs.github.com/spec/v1"
+                    )
+                    else (_ for _ in ()).throw(
+                        RuntimeError("Adapter is a Git LFS pointer")
+                    )
+                ),
+            )
+        check(
+            f"{version} PEFT configuration",
+            lambda path=adapter_dir: (
+                f"{PeftConfig.from_pretrained(path).peft_type.value} for "
+                f"{PeftConfig.from_pretrained(path).base_model_name_or_path}"
+            ),
         )
-    check(
-        "PEFT adapter configuration",
-        lambda: (
-            f"{PeftConfig.from_pretrained(ADAPTER_DIR).peft_type.value} for "
-            f"{PeftConfig.from_pretrained(ADAPTER_DIR).base_model_name_or_path}"
-        ),
-    )
-    check(
-        "Synthetic demo image",
-        lambda: _verify_image(DEMO_IMAGE),
-    )
-    results.append(
+    check("Synthetic demo image", lambda: _verify_image(DEMO_IMAGE))
+    results.extend(
         (
-            "Raw dataset requirement",
-            True,
-            "not required for inference; the demo uses assets/demo/synthetic_receipt.png",
+            (
+                "Raw dataset requirement",
+                True,
+                "not required; demo uses assets/demo/synthetic_receipt.png",
+            ),
+            (
+                "Kaggle credential requirement",
+                True,
+                "not required for installation or demo inference",
+            ),
         )
     )
     print("ReceiptKIE-VLM installation verification")

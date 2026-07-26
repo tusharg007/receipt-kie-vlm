@@ -2,287 +2,161 @@
 
 ## The project in one sentence
 
-I fine-tuned an open-weight SmolVLM with multimodal supervised fine-tuning and
-LoRA to extract `company`, `address`, `date`, and `total` as canonical JSON from
-receipt images, then compared the new adapter against the unchanged base model
-on the same held-out receipts.
+I built a leakage-controlled receipt KIE system with SmolVLM and versioned LoRA
+adapters, then showed that validation-selected 1536 px continued adaptation
+materially improved V1 on 246 previously unseen receipts.
 
-## Problem and architecture
+## Research progression
 
-The original repository focused on full-receipt transcription. I changed the
-learning objective to structured key-information extraction using SROIE entity
-annotations. The pipeline is:
+### V1 baseline
 
-1. Discover and validate receipt image/entity pairs.
-2. Canonicalize four string fields into deterministic JSON.
-3. Build an Idefics3 multimodal chat with image, instruction, and assistant
-   target.
-4. Mask all labels except assistant answer tokens.
-5. Attach LoRA to validated attention projections in SmolVLM-256M.
-6. Train a fresh adapter with BF16 and gradient checkpointing.
-7. Generate deterministically with base and LoRA models on identical samples.
-8. Parse conservatively and calculate raw, normalized, similarity, latency, and
-   memory metrics.
+V1 was trained from a fresh rank-16 LoRA initialization at 512 px for two epochs
+and 140 optimizer steps. It established the assistant-only structured-JSON
+pipeline and remains committed as a historical baseline.
 
-## Data pipeline
+### Resolution development
 
-The audit found 973 valid SROIE image/entity pairs: 626 train and 347 test. No
-pair was excluded. One address and one total were empty and remained `""`.
-Targets use the fixed key order `company`, `address`, `date`, `total`, compact
-JSON separators, UTF-8, and string values.
+A deterministic 30-receipt development ablation showed strong gains at 2048 px.
+I did not present it as untouched-test evidence. A 2048 px training smoke test
+then exceeded the predefined 3.7 GiB allocated-memory threshold, while 1536 px
+retained a 657 MiB margin, so full continued training used 1536 px.
 
-The 626-receipt official train split is deterministically partitioned into 563
-training and 63 validation receipts with zero ID overlap. The official test split
-is never used during training or model selection; a fixed 100-receipt test subset
-is used only for the final paired generation evaluation.
+### V2 continued adaptation
 
-## Multimodal SFT and the collator
+V2 continued from V1 for three epochs and 210 steps using 1536 px images,
+512 px tiles, image splitting, and the same 563/63 training/validation IDs.
+Checkpoint 210 and repetition penalty 1.08 were selected on validation only.
+The final comparison used 246 test IDs absent from every prior experiment.
 
-The processor receives a system message, a user message containing one image
-and an extraction instruction, and an assistant message containing ground-truth
-JSON. The custom collator processes the prompt-only and full conversations,
-finds their common token prefix, and masks that prefix. It also masks padding
-and image placeholder IDs.
+## Main result
 
-This matters because causal-language-model loss otherwise teaches the model to
-reproduce the user prompt or special tokens. The desired objective is:
+| Metric | Base | V1 | V2 |
+|---|---:|---:|---:|
+| Valid JSON | 41.5% | 98.4% | 99.2% |
+| Company exact | 8.1% | 52.4% | 69.1% |
+| Address similarity | 12.2% | 82.2% | 90.7% |
+| Date exact | 15.4% | 63.4% | 85.8% |
+| Total exact | 0.4% | 43.9% | 64.6% |
+| Complete-record exact | 0.0% | 4.1% | 18.3% |
+| Macro exact | 6.2% | 43.9% | 63.3% |
 
-```text
-loss = cross_entropy(model tokens, ground-truth JSON tokens only)
-```
+Address is normalized similarity. Other reported fields are normalized exact
+match. V2 improved macro exact by 19.41 percentage points, with a paired
+bootstrap 95% interval of +16.26 to +22.76 points.
 
-The smoke test inspected real token counts and confirmed that assistant tokens
-remain unmasked.
+## Fifteen likely interview questions
 
-## LoRA and training loop
+### 1. Why a VLM rather than OCR plus rules?
 
-LoRA represents a weight update as a product of low-rank matrices while the
-original matrix remains frozen. I used rank 16, alpha 32, dropout 0.05 on
-`q_proj`, `k_proj`, `v_proj`, and `o_proj`. The loaded architecture was inspected
-first to verify these module suffixes.
+A VLM can jointly use visual layout and language to select semantic fields.
+OCR plus rules remains a strong production baseline and should be compared on
+accuracy, latency, explainability, and maintenance. This project tests the
+end-to-end VLM approach rather than claiming it is always preferable.
 
-Only 2,727,936 parameters were trainable—1.052% of 259,212,864 parameters with
-adapters. Training used batch size 1, eight-step gradient accumulation, BF16,
-gradient checkpointing, fused AdamW, 2e-4 learning rate, and seed 42.
+### 2. What did you train?
 
-The final two-epoch run completed 140 optimizer steps in 18.07 minutes on an
-RTX 3050 Laptop GPU. Validation loss improved from 1.3650 at step 35 to 0.9034
-at step 140.
+The base is `HuggingFaceTB/SmolVLM-256M-Instruct`. V1 trained a new PEFT LoRA;
+V2 continued that adapter. The base weights remained frozen.
 
-## Evaluation and main results
+### 3. How did you prevent leakage?
 
-Base and LoRA models used the same 100 receipts, prompt, preprocessing, greedy
-decoding, and 128-token limit.
+Training and validation use only the official train split. A manifest unions
+every historical test artifact. Selection used 63 validation receipts, and the
+final 246 IDs were disjoint from all 101 previously evaluated test IDs.
 
-| Metric | Base | LoRA |
-|---|---:|---:|
-| Valid JSON | 19% | 85% |
-| Company normalized exact match | 1% | 26% |
-| Address similarity | 2.75% | 51.92% |
-| Date normalized exact match | 1% | 18% |
-| Total normalized exact match | 0% | 25% |
-| Complete-record normalized exact match | 0% | 0% |
+### 4. What is assistant-only masking?
 
-The correct interpretation is that LoRA learned schema following and useful
-partial extraction, but the model did not solve full-record extraction.
+The collator processes prompt-only and full conversations, finds the assistant
+boundary, and sets system, user, image, and padding labels to `-100`. Loss
+therefore applies only to target JSON tokens.
 
-## Failure cases and design decisions
+### 5. Why LoRA?
 
-- Fifteen LoRA outputs are invalid JSON because generation repeats long
-  address-like spans until the token cap.
-- Address normalized exact match is only 3%; long strings make one character error enough
-  to fail exact match, so similarity is also reported.
-- Downscaling to 512 px makes training easy on 4 GiB VRAM but loses fine print.
-- LoRA latency is higher because outputs are longer: 7.640 s average versus
-  5.895 s for base.
-- Eager attention was used only after the installed Idefics3 vision
-  implementation rejected SDPA.
-- I did not use bitsandbytes because native BF16 LoRA fit comfortably and a
-  Windows dependency was unnecessary.
-- I retained invalid predictions as failures and never repaired field values
-  from ground truth.
+Rank-16 LoRA updates 2.73 million parameters—about 1.05% of the model with
+adapters—making training and versioned 10.96 MB checkpoints practical on a
+4 GiB GPU.
 
-## Fifteen likely interview questions and answers
+### 6. Why 1536 px rather than 2048 px?
 
-### 1. Why use a VLM instead of OCR followed by rules?
+2048 px improved inference but allocated 3,943 MiB during the training smoke
+test, above the 3.7 GiB safety gate. The 1536 px run allocated 3,132 MiB and was
+about 3.5 times faster per optimizer step.
 
-A VLM can jointly use layout, visual context, and language to select semantic
-fields and serialize them. OCR-plus-rules is often faster and easier to debug,
-and it may be the better production baseline. This experiment asks whether a
-small open-weight VLM can learn the end-to-end structured mapping. A production
-study should compare both approaches on accuracy, latency, and maintenance cost.
+### 7. How was the V2 checkpoint selected?
 
-### 2. What exactly did you train?
+Checkpoints 70, 140, and 210 were evaluated on all 63 validation receipts under
+no penalty, penalty 1.08, and adaptive retry. A frozen score combined macro
+exact/similarity, complete exact, valid JSON, limit hits, and repetition.
+Checkpoint 210 with always-on penalty 1.08 won.
 
-I started from SmolVLM-256M-Instruct and trained a newly initialized PEFT LoRA
-adapter on four SROIE entity fields. I did not train SmolVLM from scratch and did
-not reuse an upstream adapter for the reported results.
+### 8. Why exact match and address similarity?
 
-### 3. Why LoRA?
-
-LoRA reduces memory and checkpoint size by freezing base weights and learning
-low-rank updates. It let me train only 1.052% of the parameters on a 4 GiB GPU
-while preserving a standard base checkpoint.
-
-### 4. How did you choose LoRA target modules?
-
-I inspected the upstream working approach, enumerated actual linear-module
-suffixes in the loaded model, and validated the requested q/k/v/o projections
-before attachment. The code fails clearly if a configured target does not
-exist.
-
-### 5. How did you prevent target leakage?
-
-Training records come only from the SROIE train split. Generation evaluation
-uses the test split. Base and LoRA use identical sample IDs and settings.
-Ground truth is passed only to metric calculation, never to generation or parser
-repair.
-
-### 6. Explain assistant-only label masking.
-
-The full chat input contains system, user, image, and assistant tokens. I
-process both prompt-only and full forms, find the common prefix, and set prefix,
-padding, and image-token labels to `-100`. Cross-entropy then applies only to
-the assistant JSON.
-
-### 7. How did you know image tokens were not truncated?
-
-The processor call explicitly disables truncation in the collator. Real smoke
-batches had roughly 237–244 total tokens, with a 512-token configured ceiling,
-and the image placeholder was present and masked. The processor itself performs
-supported image resizing to a 512 px longest edge.
-
-### 8. Why use both exact match and similarity?
-
-Exact match measures operational correctness, but it is harsh for long
-addresses. Similarity shows partial reading progress. I report raw exact,
-normalized exact, and normalized similarity so improvements cannot hide behind
-one forgiving metric.
+Exact match measures operational correctness. Long addresses are especially
+sensitive to minor punctuation or character differences, so normalized
+similarity exposes partial reading progress without relabeling it as exact.
 
 ### 9. What normalization is allowed?
 
 Company/address normalization handles Unicode, case, punctuation, and
-whitespace. Dates use a limited set of explicit formats. Totals remove currency
-and grouping symbols and quantize safely parsed decimals. No fuzzy value is
-replaced with ground truth.
+whitespace. Dates use explicit formats. Totals remove currency/grouping symbols
+and quantize parsed decimals. Ground truth is never used to repair predictions.
 
 ### 10. What is the strongest result?
 
-Valid JSON rose from 19% to 85%, showing that SFT strongly changed schema
-following. Field metrics also rose materially: total accuracy reached 25% and
-address similarity 51.92%.
+On the 246-receipt unseen holdout, V2 reached 63.3% macro exact versus 43.9% for
+V1 and 18.3% complete-record exact versus 4.1%. The paired confidence intervals
+for both gains exclude zero.
 
 ### 11. What is the biggest limitation?
 
-Complete-record normalized exact match is still 0%. The model produces useful
-partial extraction but is not reliable enough for automated financial use.
+Complete-record exact is still only 18.3%, so most receipts contain at least one
+wrong field. Results are SROIE-specific and do not establish reliability under
+private, multilingual, or shifted data.
 
-### 12. Why did inference get slower after LoRA?
+### 12. What are the latency and memory costs?
 
-The adapter itself adds little compute, but the generated sequences are longer.
-The base often terminates early with irrelevant output, while LoRA more often
-attempts a full JSON object and sometimes repeats until the 128-token cap.
+At identical high-resolution inference, V1 and V2 both peaked near 1,877 MiB.
+Median latency was 10.27 s for V1 and 10.74 s for V2. V2 training took 84.37
+minutes and peaked at 3,174 MiB allocated.
 
-### 13. How did you validate that training really happened?
+### 13. How do you know training and evaluation are real?
 
-The trainer state contains 140 optimization steps and finite loss history. A
-fresh LoRA tensor checksum changed. Adapter and loss artifacts have matching run
-timestamps. Metrics recompute from saved JSONL predictions, and an automated
-integrity report checks these conditions.
+Trainer history records 210 optimizer steps and six improving validation
+losses. LoRA tensor hashes changed, adapters reload as active PEFT models,
+metrics recompute exactly from committed JSONL, and seeded bootstrap values
+reproduce exactly.
 
-### 14. What did the robustness pilot show?
+### 14. Did you hide failures?
 
-On 20 paired receipts, Gaussian blur reduced valid JSON from 85% to 80% and
-company accuracy from 25% to 15%. Reduced brightness and rotation also reduced
-field accuracy. The subset is too small for broad
-claims, so I label it a pilot.
+No. Invalid outputs remain failures. The qualitative release set uses the first
+holdout example satisfying each documented category and includes a V2 date
+regression alongside success and improvement panels.
 
 ### 15. What would you do next?
 
-I would test higher-resolution tiling, repetition penalties or constrained JSON
-decoding, a larger open VLM, field-balanced augmentation, and the full test set
-with confidence intervals. I would also build an OCR-plus-layout baseline to
-quantify whether end-to-end VLM complexity is justified.
+I would compare an OCR-plus-layout KIE baseline, evaluate dataset shift and
+multilingual receipts, improve constrained generation, and investigate
+field-balanced or OCR-plus-KIE multi-task curricula. I would not promote the
+current model to financial automation without substantially stronger
+complete-record performance and external validation.
 
 ## Two-minute explanation
 
-ReceiptKIE-VLM converts receipt images directly into JSON with company, address,
-date, and total. I began with a repository focused on full OCR, preserved its
-MIT licence and research notebooks, and rebuilt the project as a tested Python
-package. I audited all 973 SROIE image/entity pairs and used the 626-receipt
-training split for structured multimodal SFT.
+ReceiptKIE-VLM extracts company, address, date, and total into canonical JSON. I
+started with a leakage-free 512 px LoRA baseline and retained all of its results.
+A controlled resolution ablation showed that visual resolution was a primary
+bottleneck, but 2048 px training exceeded a predefined memory threshold on the
+4 GiB GPU. I therefore continued V1 at 1536 px with 512 px tiles.
 
-The model is SmolVLM-256M-Instruct. I attached rank-16 LoRA adapters to validated
-attention projections, so only 2.73 million parameters—1.052%—were trainable.
-The custom collator masks the entire system/user/image prompt and computes loss
-only on the assistant JSON. After a smoke test and timed calibration, I trained
-on 563 receipts, validated on 63 disjoint official-train receipts, and completed
-two epochs on an RTX 3050 Laptop GPU in 18.07 minutes.
+The custom collator masks everything except assistant JSON tokens. V2 used the
+same 563 training and 63 validation IDs, trained for three additional epochs,
+and selected checkpoint 210 plus deterministic repetition penalty 1.08 using
+validation only. A test-usage manifest identified 246 official-test receipts
+absent from every earlier evaluation.
 
-For evaluation, base and LoRA models generated on the exact same 100 held-out
-receipts. LoRA increased valid JSON from 19% to 85%, company accuracy from 1%
-to 26%, date from 1% to 18%, total from 0% to 25%, and address similarity from
-2.75% to 51.92%. The honest limitation is that complete-record exact match
-remained 0%, mainly because long addresses and repetition failures are hard for
-this small model at 512 px. I retained every raw prediction and added an
-integrity check that recomputes metrics, so the result is reproducible and
-auditable rather than a demo-only claim.
-
-## Five-minute explanation
-
-The problem I chose is structured receipt understanding. Traditional OCR gives
-all text, but downstream systems need named values. I reformulated the original
-repository's transcription objective into four-field JSON extraction using
-SROIE's entity annotations.
-
-First, I built a discovery and audit layer instead of hardcoding one dataset
-path. It pairs image and entity stems, validates JSON and images, logs every
-exclusion, and produces field and dimension statistics. The dataset had 973
-valid pairs with 626 train and 347 test samples. I kept missing values as empty
-strings and canonicalized targets with a fixed schema.
-
-Second, I designed the multimodal SFT representation using the installed
-Idefics3 chat template. The user content contains the receipt image and an
-instruction to return exactly four JSON keys. The assistant target is canonical
-ground truth. The subtle part is label masking: I process prompt-only and full
-versions, calculate their token prefix boundary, and mask prompt, padding, and
-image placeholders. That makes the loss focus only on target JSON.
-
-Third, I loaded SmolVLM-256M-Instruct and inspected its real module names before
-attaching LoRA to q, k, v, and output attention projections. Rank 16 produced
-2.73 million trainable parameters, only 1.052% of the model with adapters.
-Hardware preflight detected BF16 support on a 4 GiB RTX 3050. SDPA was attempted
-but the Idefics3 vision tower in this Transformers version rejected it, so the
-loader safely fell back to eager attention. Native BF16 fit under one GiB of
-allocated training memory, so I avoided fragile Windows quantization
-dependencies.
-
-Before full training, a three-step smoke test proved forward/backward, finite
-loss, adapter modification, save/reload, and inference. A ten-step benchmark
-estimated runtime. The final two-epoch run used batch size one, accumulation
-eight, gradient checkpointing, and 2e-4 learning rate. It trained on 563
-receipts, validated on 63 disjoint official-train receipts, and completed 140
-optimizer steps in 18.07 minutes. Validation loss fell from 1.3650 at step 35
-to 0.9034 at step 140.
-
-The evaluation is deliberately paired. Both variants see the same fixed 100
-test receipts with greedy decoding and a 128-token cap. The parser handles
-direct JSON, fences, balanced objects, trailing commas, and safe literal
-dictionaries, but never replaces values from ground truth. I report raw exact,
-normalized exact, and similarity.
-
-LoRA improved valid JSON by 66 percentage points to 85%. Company accuracy rose
-to 26%, date to 18%, total to 25%, and address similarity to 51.92%. Those are
-real improvements, but complete-record exact match stayed at zero. Fifteen LoRA
-outputs repeat address fragments until truncation, and long addresses remain
-hard at 512 px. LoRA average latency is 7.640 seconds versus 5.895 seconds for
-base because sequences are longer.
-
-Finally, I ran a paired 20-image robustness pilot. Brightness reduction hurt the
-most, and small rotation also reduced field accuracy. Every raw prediction,
-metric file, loss record, plot, package version, and sample manifest is stored
-locally. An integrity script verifies adapter timestamps and updates, recomputes
-metrics from JSONL, checks README values, and scans tracked text for likely
-secrets. My conclusion is that parameter-efficient SFT clearly teaches
-structured behavior on consumer hardware, but accuracy is not yet sufficient
-for production financial automation.
+On those receipts, V2 reached 99.2% valid JSON, 69.1% company exact, 90.7%
+address similarity, 85.8% date exact, 64.6% total exact, and 18.3%
+complete-record exact. Macro exact improved 19.4 points over V1, with a paired
+95% interval of +16.3 to +22.8. The model is still a research prototype because
+complete-record exact remains low, but the experiment provides an auditable
+example of validation-controlled iteration on consumer hardware.

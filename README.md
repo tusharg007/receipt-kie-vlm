@@ -10,10 +10,11 @@ entities:
 {"company":"...","address":"...","date":"...","total":"..."}
 ```
 
-This repository contains a newly implemented structured-KIE pipeline, a newly
-trained LoRA adapter, and evaluation artifacts produced locally from that adapter.
-The final adapter is included under `models/receipt-kie-lora/`. It does not claim
-that SmolVLM was trained from scratch.
+This repository contains a structured-KIE pipeline, two versioned LoRA adapters,
+and auditable evaluation artifacts. V2 is the recommended high-resolution model
+under `models/receipt-kie-lora-v2-highres/`; the original V1 adapter remains
+under `models/receipt-kie-lora/` as a reproducible historical baseline. SmolVLM
+was not trained from scratch.
 
 ## Clone and Run the Trained Model
 
@@ -41,16 +42,17 @@ Then install and run:
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 python scripts/verify_installation.py
-python scripts/demo_inference.py
+python scripts/demo_inference.py --model-version v2
 ```
 
-To use another image:
+V2 is the default. To reproduce V1 or use another image:
 
 ```bash
+python scripts/demo_inference.py --model-version v1
 python scripts/demo_inference.py --image path/to/receipt.png
 ```
 
-The trained LoRA adapter is stored directly in this repository. On first use,
+Both trained LoRA adapters are stored directly in this repository. On first use,
 the public `HuggingFaceTB/SmolVLM-256M-Instruct` base model and processor download
 automatically, so internet access is required for that initial run. GPU inference
 is recommended but optional; the demo falls back to CPU. Inference uses the
@@ -59,6 +61,91 @@ Training and evaluation require the separately obtained SROIE dataset.
 `assets/demo/expected_output.json` documents the fictional text rendered in the
 image; it is not a promise that this small research model predicts every field
 exactly.
+
+## Research Progression
+
+### Iteration 1 — Low-resolution LoRA baseline
+
+V1 used leakage-free training at a 512 px longest edge with rank-16 LoRA on the
+attention projections. Its original 563/63 official-train split, 100-receipt
+official-test evaluation, raw predictions, plots, and limitations are retained
+unchanged so the development path remains reproducible. Those historical V1
+results appear later in this README.
+
+### Resolution Ablation
+
+A fixed 30-receipt inference-development subset compared 512, 1024, 1536, and
+2048 px processing plus token-budget and two-pass variants. It showed strong
+2048 px inference gains, but it was explicitly a development experiment rather
+than final untouched-test evidence. A subsequent 2048 px training smoke test
+completed but reached 3,943 MiB allocated VRAM, exceeding the predefined
+3.7 GiB safety threshold on the 4 GiB GPU. The 1536 px smoke test used 3,132 MiB
+and retained a 657 MiB safety margin, so 1536 px was frozen for continued
+training. Repetition penalty was selected later on validation data, not on the
+ablation subset.
+
+![Resolution ablation](artifacts/figures/highres_ablation.png)
+
+### Iteration 2 — High-resolution continued adaptation
+
+V2 continued from V1 for three additional epochs and 210 optimizer steps using
+1536 px tiled images, a 512 px maximum patch edge, image splitting, and the same
+four-field JSON target. Checkpoint 210 and deterministic 256-token generation
+with repetition penalty 1.08 were selected using only 63 official-train
+validation receipts. The final comparison used all 246 official-test receipts
+absent from every prior V1, robustness, qualitative, and ablation artifact.
+
+| Metric | Base | V1 | V2 | V2 − V1 |
+|---|---:|---:|---:|---:|
+| Valid JSON | 41.5% | 98.4% | **99.2%** | +0.8 pp |
+| Company exact | 8.1% | 52.4% | **69.1%** | +16.7 pp |
+| Address similarity | 12.2% | 82.2% | **90.7%** | +8.5 pp |
+| Date exact | 15.4% | 63.4% | **85.8%** | +22.4 pp |
+| Total exact | 0.4% | 43.9% | **64.6%** | +20.7 pp |
+| Complete-record exact | 0.0% | 4.1% | **18.3%** | +14.2 pp |
+| Macro exact | 6.2% | 43.9% | **63.3%** | +19.4 pp |
+
+Address uses normalized similarity. Company, date, total, and macro field
+results use normalized exact match. Complete-record exact requires all four
+fields to be correct after normalization.
+
+High-resolution V2 continued adaptation achieved 99.2% valid JSON, 69.1%
+company exact match, 90.7% address similarity, 85.8% date exact match, 64.6%
+total exact match and 18.3% complete-record exact match on 246 previously unseen
+SROIE test receipts.
+
+Paired 2,000-resample bootstrap intervals support the main gains:
+
+| V2 − V1 metric | Point change | 95% CI |
+|---|---:|---:|
+| Macro exact | +19.41 pp | +16.26 to +22.76 pp |
+| Complete-record exact | +14.23 pp | +10.16 to +19.11 pp |
+| Address similarity | +8.52 pp | +6.01 to +11.01 pp |
+| Valid JSON | +0.81 pp | −1.22 to +2.85 pp |
+
+The equal-setting inference comparison used about 1,877 MiB peak allocated VRAM
+for both adapters. Median latency increased from 10.27 s for V1 to 10.74 s for
+V2; averages were affected by laptop power-throttling intervals. Training used
+3,174 MiB peak allocated VRAM and completed in 84.37 minutes.
+
+![Base, V1, and V2](artifacts/figures/highres_training_v2_comparison.png)
+
+![V2 training and validation loss](artifacts/figures/highres_training_v2_loss.png)
+
+The qualitative panels follow documented first-match selection rules and include
+both gains and a regression:
+
+![V2 complete-record success](artifacts/figures/highres_training_v2_qualitative/v2_complete_record_success.png)
+
+![V2 improvement over V1](artifacts/figures/highres_training_v2_qualitative/v2_improvement_over_v1.png)
+
+![V2 failure or regression](artifacts/figures/highres_training_v2_qualitative/v2_failure_or_regression.png)
+
+V2 remains a research prototype rather than a production financial extractor.
+See [`MODEL_COMPARISON.md`](MODEL_COMPARISON.md),
+[`HIGH_RESOLUTION_ABLATION.md`](HIGH_RESOLUTION_ABLATION.md), and
+[`HIGH_RESOLUTION_TRAINING_V2.md`](HIGH_RESOLUTION_TRAINING_V2.md) for the
+versioning, development evidence, and full release analysis.
 
 ## Problem statement
 
@@ -73,7 +160,7 @@ serialization in one model while retaining auditable raw predictions.
 
 ```mermaid
 flowchart LR
-    A["SROIE receipt image"] --> B["Idefics3 processor<br/>longest edge: 512 px"]
+    A["SROIE receipt image"] --> B["Idefics3 processor<br/>V2 longest edge: 1536 px<br/>512 px tiles"]
     C["Extraction instruction"] --> B
     B --> D["SmolVLM-256M-Instruct"]
     E["LoRA adapters<br/>q/k/v/o projections"] --> D
@@ -142,7 +229,7 @@ attachment rather than assumed blindly.
 | Total parameters with adapters | 259,212,864 |
 | Estimated FP32 adapter size | 10.41 MiB |
 
-## Hardware and training
+## Historical V1 hardware and training
 
 | Setting | Value |
 |---|---|
@@ -169,9 +256,9 @@ confirms at least one LoRA tensor changed from its fresh initialization.
 
 ![Training loss](artifacts/figures/training_loss.png)
 
-## Base versus LoRA results
+## Historical V1 base versus LoRA results
 
-Both variants used the same fixed 100-receipt subset sampled from the untouched
+These retained Iteration 1 results used the same fixed 100-receipt subset from the
 official test split, with the same prompt, 512 px image processing,
 deterministic decoding, and 128-new-token limit.
 
@@ -215,8 +302,9 @@ All predictions remain available as JSONL under `artifacts/predictions/`.
 
 ## Failure analysis
 
-- No test receipt had all four normalized fields exactly correct. The model is a
-  research prototype, not a production extractor.
+- In the historical V1 100-receipt evaluation, no receipt had all four
+  normalized fields exactly correct. V2 improves this substantially but remains
+  a research prototype, not a production extractor.
 - Fifteen LoRA generations were invalid JSON. Inspection shows long repeated
   address-like text reaching the generation cap rather than a parser defect.
 - Address is the hardest exact-match field because it is long and sensitive to
@@ -265,6 +353,7 @@ and evaluate:
 .\.venv\Scripts\python.exe scripts\run_smoke_test.py
 .\.venv\Scripts\python.exe scripts\run_training.py --config configs\train_lora.yaml
 .\.venv\Scripts\python.exe scripts\run_evaluation.py --config configs\evaluate.yaml
+.\.venv\Scripts\python.exe scripts\run_evaluation.py --config configs\evaluate_v1.yaml
 .\.venv\Scripts\python.exe scripts\run_robustness.py --config configs\evaluate.yaml
 .\.venv\Scripts\python.exe scripts\build_report.py
 ```
@@ -282,7 +371,8 @@ scripts/                    Preflight, audit, train, evaluate, report, integrity
 tests/                      Focused unit tests
 research_notebooks/         Preserved upstream research notebooks
 data/                       Git-ignored raw and derived datasets
-models/receipt-kie-lora/    Committed minimal LoRA inference adapter
+models/receipt-kie-lora/    Preserved V1 historical adapter
+models/receipt-kie-lora-v2-highres/  Recommended V2 adapter
 artifacts/
   checkpoints/              Local trainer state and intermediate checkpoints (Git-ignored)
   figures/                  Generated plots

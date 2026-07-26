@@ -1,0 +1,14 @@
+extends: evaluate.yaml
+
+paths:
+  adapter_path: models/receipt-kie-lora
+
+model:
+  image_longest_edge: 512
+  max_image_patch_edge: 512
+  do_image_splitting: true
+
+generation:
+  max_new_tokens: 128
+  do_sample: false
+  repetition_penalty: null

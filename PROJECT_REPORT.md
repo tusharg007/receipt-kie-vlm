@@ -2,181 +2,193 @@
 
 ## Executive summary
 
-This experiment transformed a notebook-oriented full-receipt OCR repository into
-a reproducible structured key-information extraction project. A fresh LoRA
-adapter was trained on 563 SROIE receipt/entity pairs for the fields `company`,
-`address`, `date`, and `total`, with 63 disjoint official-train receipts reserved
-for validation. On 100 untouched official-test receipts, the adapter improved
-valid JSON from 19% to 85%, company accuracy from 1% to 26%, date accuracy from
-1% to 18%, total accuracy from 0% to 25%, and address similarity from 2.75% to
-51.92%. Complete-record exact match remained 0%.
+ReceiptKIE-VLM is a reproducible structured key-information extraction project
+for receipt images. It produces canonical JSON containing `company`, `address`,
+`date`, and `total` using SmolVLM-256M-Instruct plus parameter-efficient LoRA.
+
+The research progressed from a leakage-free 512 px baseline (V1), through a
+controlled resolution ablation, to validation-selected 1536 px continued
+adaptation (V2). High-resolution V2 continued adaptation achieved 99.2% valid
+JSON, 69.1% company exact match, 90.7% address similarity, 85.8% date exact
+match, 64.6% total exact match and 18.3% complete-record exact match on 246
+previously unseen SROIE test receipts.
+
+V2 is recommended within this repository, while V1 and all original results are
+retained for historical reproducibility. Neither version is a production
+financial extractor.
 
 ## Research question
 
-Can parameter-efficient supervised fine-tuning turn a small general
-vision-language instruction model into a structured receipt KIE model on a
-4 GiB consumer GPU?
+Can a small open-weight VLM learn structured receipt extraction on a 4 GiB
+consumer GPU, and does continued training at higher image resolution materially
+improve an otherwise identical LoRA system?
 
-The experiment tests format following and field extraction, not unrestricted
-transcription. Base and adapted models are compared on the same held-out images
-and deterministic generation settings.
+## Data and leakage controls
 
-## Repository and data provenance
+The external SROIE mirror contains 626 official-train and 347 official-test
+receipts. The training split is deterministically partitioned into 563 training
+and 63 validation receipts. Both V1 and V2 use the same disjoint IDs and the
+same four-field targets.
 
-The original MIT licence is preserved. Its notebooks were inspected, sanitized
-of an embedded legacy credential, and moved intact to `research_notebooks/` after
-useful model-processing ideas were reimplemented and tested.
+The test-usage audit found 101 test IDs used by historical evaluation,
+robustness, qualitative selection, or the 30-receipt high-resolution
+inference-development ablation. All 30 ablation IDs were already within those
+101. The remaining 246 test IDs had never been evaluated and became the
+one-time V2 release holdout. No holdout result influenced resolution,
+checkpoint, generation, or parsing choices.
 
-SROIE is an external dataset. The public mirror contained 626 train and 347 test
-receipts. Automated discovery validated 973 image/entity pairs and found no
-missing or invalid pairs. One address and one total were empty; these were
-retained as empty strings rather than silently discarded.
+## Task and model
 
-## Task formulation
-
-Input:
-
-1. A receipt image.
-2. A concise extraction instruction.
-
-Target:
+Input is a receipt image plus an instruction. The assistant target is:
 
 ```json
 {"company":"value","address":"value","date":"value","total":"value"}
 ```
 
-Targets use stable ordering and compact JSON. The collator invokes the native
-Idefics3 processor twice—prompt-only and complete conversation—to locate the
-assistant boundary. Prompt, padding, and image placeholder labels are set to
-`-100`, leaving only the assistant JSON under loss.
+The collator masks system, user, image-placeholder, and padding tokens, leaving
+loss only on assistant JSON tokens. Both adapters use rank-16 LoRA with alpha
+32 and dropout 0.05 on `q_proj`, `k_proj`, `v_proj`, and `o_proj`.
 
-## Model and adaptation
+The runtime used BF16 on an RTX 3050 Laptop GPU. The installed Idefics3 vision
+tower rejected SDPA, so the loader logged the reason and used eager attention.
+No quantization was required.
 
-- Base: `HuggingFaceTB/SmolVLM-256M-Instruct`
-- Processor: Idefics3, longest image edge 512 px
-- LoRA targets: `q_proj`, `k_proj`, `v_proj`, `o_proj`
-- Rank 16, alpha 32, dropout 0.05
-- 2,727,936 trainable parameters (1.052%)
-- 259,212,864 total parameters with adapters
+## Iteration 1: V1 baseline
 
-Target modules were validated against loaded linear-module suffixes. The full
-model was not trained.
+V1 trained from a new LoRA initialization for two epochs and 140 optimizer steps
+at a 512 px longest edge. It used deterministic generation with a 128-new-token
+limit.
 
-## Runtime decisions
+The retained 100-receipt historical results are:
 
-The environment used Python 3.12.13, PyTorch 2.5.1+cu124, CUDA 12.4, and an
-NVIDIA GeForce RTX 3050 Laptop GPU with 4 GiB VRAM. BF16 was supported and used.
-FlashAttention 2 was absent. PyTorch SDPA was attempted, but the installed
-Transformers Idefics3 vision implementation rejected it; the loader logged the
-reason and fell back to eager attention.
+| Metric | Base | V1 |
+|---|---:|---:|
+| Valid JSON | 19% | 85% |
+| Company normalized exact | 1% | 26% |
+| Address normalized similarity | 2.75% | 51.92% |
+| Date normalized exact | 1% | 18% |
+| Total normalized exact | 0% | 25% |
+| Complete-record normalized exact | 0% | 0% |
 
-The smoke test completed three optimizer steps, produced finite loss, changed a
-LoRA tensor checksum, saved and reloaded the adapter, and generated inference
-without parser failure. A ten-step calibration measured 14.82 seconds per
-optimization step and 827.29 MiB peak allocated VRAM.
+These values remain useful as the original low-resolution baseline; they are
+not mixed with the later 246-receipt V2 release holdout.
 
-## Training
+## Resolution ablation and memory gate
 
-The final run used:
+The 30-receipt development ablation found that 2048 px inference produced the
+largest gains. It was explicitly not treated as final test evidence. Training
+smoke tests then applied a predefined 3.7 GiB allocated-memory threshold:
 
-- 563 training receipts from the official train split
-- 63 disjoint official-train receipts for validation loss
-- two epochs, 140 optimizer steps
-- batch size 1, gradient accumulation 8
-- AdamW fused, learning rate 2e-4, weight decay 0.01
-- 5% warmup, gradient checkpointing, seed 42
-- BF16 and 512 px longest-edge image processing
+| Resolution | Peak allocated | Seconds/step | Average tiles | Decision |
+|---:|---:|---:|---:|---|
+| 2048 px | 3,943 MiB | 87.07 | 11.4 | Unsafe |
+| 1536 px | 3,132 MiB | 24.78 | 7.9 | Selected |
 
-Training took 1,084.19 seconds (18.07 minutes) and recorded 28 finite loss
-entries. Mean training loss was 1.3045. Validation loss progressed:
+Both smoke runs completed, changed LoRA tensors, and reloaded their saved
+adapters. The 2048 run exceeded the safety threshold, so full training used
+1536 px rather than reducing data integrity or label masking.
 
-| Step | Epoch | Validation loss |
-|---:|---:|---:|
-| 35 | 0.50 | 1.3650 |
-| 70 | 0.99 | 1.0618 |
-| 105 | 1.49 | 0.9373 |
-| 140 | 1.99 | 0.9034 |
+## Iteration 2: V2 continued adaptation
 
-Peak allocated GPU memory was 827.32 MiB. A saved before/after checksum verified
-that the new adapter changed during this run.
+V2 continued from the exact committed V1 adapter for three additional epochs:
 
-## Evaluation design
+| Setting | Value |
+|---|---|
+| Longest image edge | 1536 px |
+| Maximum patch edge | 512 px |
+| Image splitting | enabled |
+| Train / validation IDs | same 563 / 63 as V1 |
+| Optimizer steps | 210 |
+| Learning rate | 5e-5 |
+| Batch / accumulation | 1 / 8 |
+| Duration | 5,062.12 s (84.37 min) |
+| Peak allocated training VRAM | 3,174.26 MiB |
 
-The base and LoRA variants used the same 100 samples selected deterministically
-from the 347-receipt test split. Generation used identical prompts, 512 px image
-processing, greedy decoding, and a 128-new-token maximum.
+Validation loss decreased at every evaluation from 0.213363 at step 35 to
+0.167716 at step 210. Early stopping therefore did not trigger.
 
-The parser attempts direct JSON, code-fence removal, first balanced-object
-extraction, trailing-comma repair, and safe Python-literal dictionaries. It never
-substitutes ground truth. Unparseable outputs receive empty predictions.
+![V2 training and validation loss](artifacts/figures/highres_training_v2_loss.png)
 
-Company/address normalization applies Unicode normalization, case folding,
-punctuation removal, and whitespace collapse. Dates use a conservative list of
-known formats. Totals remove currency/grouping symbols and quantize parseable
-decimals to two places.
+## Validation-controlled selection
 
-## Results
+Checkpoints 70, 140, and 210 were evaluated on all 63 validation receipts under
+three decoding policies. The frozen score combined macro exact, macro
+similarity, complete-record exact, valid JSON, limit hits, and repetition
+failures. Checkpoint 210 with deterministic 256-token generation and repetition
+penalty 1.08 won before the unseen holdout was opened.
 
-| Metric | Base | LoRA | Change |
-|---|---:|---:|---:|
-| Valid JSON | 19% | 85% | +66 pp |
-| Company raw exact | 0% | 24% | +24 pp |
-| Company normalized exact | 1% | 26% | +25 pp |
-| Company similarity | 7.48% | 68.58% | +61.10 pp |
-| Address raw exact | 0% | 1% | +1 pp |
-| Address normalized exact | 0% | 3% | +3 pp |
-| Address similarity | 2.75% | 51.92% | +49.17 pp |
-| Date raw exact | 1% | 17% | +16 pp |
-| Date normalized exact | 1% | 18% | +17 pp |
-| Date similarity | 4.64% | 66.96% | +62.32 pp |
-| Total raw exact | 0% | 25% | +25 pp |
-| Total normalized exact | 0% | 25% | +25 pp |
-| Total similarity | 1.77% | 59.10% | +57.32 pp |
-| Complete-record raw exact | 0% | 0% | 0 pp |
-| Complete-record normalized exact | 0% | 0% | 0 pp |
+Selected validation metrics:
 
-LoRA average/median latency was 7.640/7.440 seconds versus 5.895/5.458 seconds
-for base. Inference peak allocated memory was 653.17 MiB for LoRA and
-642.70 MiB for base.
+| Metric | Result |
+|---|---:|
+| Valid JSON | 100.0% |
+| Company exact | 65.1% |
+| Address similarity | 90.2% |
+| Date exact | 95.2% |
+| Total exact | 73.0% |
+| Complete-record exact | 30.2% |
+| Macro exact / similarity | 67.9% / 91.1% |
 
-## Failure analysis
+## Final unseen comparison
 
-The main result is improved structure and partial field extraction, not solved
-receipt understanding. No sample had all four normalized fields exactly correct.
-Long addresses amplify small character errors, making exact match severe. Fifteen
-LoRA outputs were invalid; manual inspection shows repeated address fragments
-that reach the generation cap. The conservative parser correctly marks these
-invalid rather than inventing a closing object.
+Base, V1, and V2 used identical 246 IDs, 1536 px processing, 512 px tiles,
+image splitting, prompts, parser, 256-token budget, deterministic decoding, and
+repetition penalty 1.08.
 
-The model is also limited by its 256M parameter scale and by resizing receipts
-whose original dimensions reach 4,961×7,016 pixels to a 512 px longest edge.
-This configuration was necessary for a reproducible consumer-GPU experiment but
-discards fine-print detail.
+| Metric | Base | V1 | V2 | V2 − V1 |
+|---|---:|---:|---:|---:|
+| Valid JSON | 41.5% | 98.4% | **99.2%** | +0.8 pp |
+| Company exact | 8.1% | 52.4% | **69.1%** | +16.7 pp |
+| Address similarity | 12.2% | 82.2% | **90.7%** | +8.5 pp |
+| Date exact | 15.4% | 63.4% | **85.8%** | +22.4 pp |
+| Total exact | 0.4% | 43.9% | **64.6%** | +20.7 pp |
+| Complete-record exact | 0.0% | 4.1% | **18.3%** | +14.2 pp |
+| Macro exact | 6.2% | 43.9% | **63.3%** | +19.4 pp |
 
-## Robustness pilot
+Address uses normalized similarity. Other reported field metrics use normalized
+exact match. Complete-record exact requires all four normalized fields.
 
-Twenty fixed receipts were evaluated clean and under four mild corruptions.
-Gaussian blur reduced valid JSON from 85% to 80%, company accuracy from 25% to
-15%, and address similarity from 57.51% to 52.60%. Reduced brightness lowered
-company/date accuracy to 10%/20%, while rotation lowered date accuracy to 15%.
-JPEG quality 45 happened to score higher on several metrics in this small fixed
-sample, underscoring why these values are descriptive rather than definitive.
+Paired 2,000-resample bootstrap intervals:
 
-These values are a pilot, not confidence-bounded robustness estimates.
+| V2 − V1 metric | Point change | 95% CI |
+|---|---:|---:|
+| Macro exact | +19.41 pp | +16.26 to +22.76 pp |
+| Complete-record exact | +14.23 pp | +10.16 to +19.11 pp |
+| Address similarity | +8.52 pp | +6.01 to +11.01 pp |
+| Valid JSON | +0.81 pp | −1.22 to +2.85 pp |
 
-## Conclusions and next experiments
+The predefined release gate required a material gain in macro exact,
+complete-record exact, or address similarity without more than a two-point
+valid-JSON regression. V2 passed all three improvement thresholds and the
+validity constraint.
 
-LoRA substantially improved schema following and field-level extraction with
-only 1.052% trainable parameters on a 4 GiB GPU. The zero complete-record score
-shows that the project is not production ready. Highest-value follow-ups are:
+![Base versus V1 versus V2](artifacts/figures/highres_training_v2_comparison.png)
 
-1. Increase supported image resolution or use tiling/crops for fine print.
-2. Add constrained JSON decoding and repetition controls.
-3. Train longer or test a larger VLM with the same leakage-free split.
-4. Use field-aware loss/evaluation and targeted address augmentation.
-5. Evaluate all 347 test receipts with confidence intervals.
-6. Test multilingual and private-receipt distributions under explicit data
-   governance.
+## Latency, memory, and failures
 
-All claims in this report derive from local JSONL, JSON, CSV, and trainer-state
-artifacts. `artifacts/reports/integrity_check.md` records the final verification.
+V1 and V2 peak inference memory was approximately 1,877 MiB. V1 average/median
+latency was 9.95/10.27 s; V2 was 12.46/10.74 s. Laptop power-throttling produced
+wall-clock outliers, so medians should accompany averages.
+
+The qualitative set uses the first holdout sample satisfying each documented
+category rather than maximizing visual impact. It includes a complete success,
+an improvement, and a date regression.
+
+![V2 improvement](artifacts/figures/highres_training_v2_qualitative/v2_improvement_over_v1.png)
+
+![V2 regression](artifacts/figures/highres_training_v2_qualitative/v2_failure_or_regression.png)
+
+Complete-record exact remains 18.3%, and errors still occur in every field.
+Results are specific to SROIE and do not establish reliability on private,
+multilingual, or shifted receipt distributions.
+
+## Reproducibility
+
+The two adapters, predictions, split/test-usage manifests, seeded bootstrap
+results, figures, and reports are tracked. Metrics recompute exactly from the
+JSONL predictions. Raw SROIE data, caches, logs, virtual environments, and
+intermediate checkpoints are not tracked.
+
+See [`MODEL_COMPARISON.md`](MODEL_COMPARISON.md),
+[`HIGH_RESOLUTION_ABLATION.md`](HIGH_RESOLUTION_ABLATION.md), and
+[`HIGH_RESOLUTION_TRAINING_V2.md`](HIGH_RESOLUTION_TRAINING_V2.md).
