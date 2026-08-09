@@ -389,11 +389,3 @@ languages, layouts, scan quality, and merchant types before any consequential
 use. Generated values can be wrong and should not drive payment, accounting, or
 compliance decisions without validation.
 
-## Acknowledgement and licence
-
-Selected SmolVLM processor, fine-tuning, and LoRA ideas were adapted from the
-original MIT-licensed receipt-OCR repository by Omkar Oak. The legacy notebooks
-are preserved in `research_notebooks/`. This work does not claim authorship of
-SmolVLM or SROIE.
-
-The original [MIT licence](LICENSE) and copyright notice are preserved.
