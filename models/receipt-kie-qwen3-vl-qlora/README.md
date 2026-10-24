@@ -1,7 +1,8 @@
-# ReceiptOps Qwen3-VL receipt adapter
+# ReceiptOps Qwen3-VL QLoRA: latest trained receipt adapter
 
-This is the selected PEFT LoRA adapter for the experimental Qwen3-VL receipt
-extractor. Load it with the pinned base model and the repository's
+This is the latest trained extractor and the best measured adapter in the
+project's 239-record retrospective comparison. Load it with the pinned base
+model and the repository's
 `scripts/qwen_inference.py` command. The adapter does not contain the base model
 or image processor.
 

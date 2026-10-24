@@ -1,8 +1,9 @@
-# Bill-by-bill Qwen comparison
+# Before and after QLoRA fine-tuning
 
 Selection: first three distinct normalized merchants in lexicographic evaluation-ID order, independent of model outcomes. These examples are not an accuracy estimate.
 
-Before = pinned NF4 base; after = selected QLoRA adapter. The image, prompt, pixel cap and decoding are identical. Colors compare normalized values with dataset annotations; annotations can contain errors.
+Before = pinned NF4 base; after = selected QLoRA adapter. The image, prompt, pixel cap and decoding are identical.
+Colors compare normalized values with dataset annotations; annotations can contain errors.
 
 ## Bill 1: X00016469670
 

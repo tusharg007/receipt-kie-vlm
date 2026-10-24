@@ -1,8 +1,9 @@
 # Qwen3-VL training on Kaggle
 
-This is a separate vision-model challenger, not a replacement for the shipped V2
-adapter until accuracy and operational measurements support promotion. Training
-uses the official `Qwen/Qwen3-VL-2B-Instruct` vision-language checkpoint, revision
+This protocol produced the project's latest trained extractor, Qwen3-VL QLoRA.
+Its standalone inference CLI and exported adapter are available; the existing
+FastAPI backend still uses the legacy V2 adapter. Training uses the official
+`Qwen/Qwen3-VL-2B-Instruct` vision-language checkpoint, revision
 `89644892e4d85e24eaac8bacfd4f463576704203`, with NF4 QLoRA on one CUDA device.
 
 ## Protocol

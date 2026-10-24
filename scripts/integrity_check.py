@@ -57,6 +57,13 @@ def main() -> None:
         "models/receipt-kie-lora-v2-highres/adapter_config.json",
         "models/receipt-kie-lora-v2-highres/training_metadata.json",
         "models/receipt-kie-lora-v2-highres/README.md",
+        "models/receipt-kie-qwen3-vl-qlora/adapter_model.safetensors",
+        "models/receipt-kie-qwen3-vl-qlora/adapter_config.json",
+        "models/receipt-kie-qwen3-vl-qlora/training_metadata.json",
+        "models/receipt-kie-qwen3-vl-qlora/README.md",
+        "models/receipt-kie-qwen3-vl-qlora/LICENSE",
+        "QWEN3_VL_RESULTS.md",
+        "HISTORICAL_V1_V2.md",
         "MODEL_COMPARISON.md",
         "assets/demo/synthetic_receipt.png",
         "assets/demo/expected_output.json",
@@ -108,6 +115,11 @@ def main() -> None:
             ),
             "size": 10_956_944,
         },
+        "Qwen QLoRA": {
+            "directory": "models/receipt-kie-qwen3-vl-qlora",
+            "sha256": "90583f801f2668c931732c9e3a8a25f0ee76c9c34d3c6f41441d65e66fe433a5",
+            "size": 69_788_264,
+        },
     }
     adapter_hash = ""
     for version, release in release_adapters.items():
@@ -127,7 +139,7 @@ def main() -> None:
                 (
                     f"{version} adapter size matches metadata and release",
                     adapter.stat().st_size
-                    == metadata["adapter_size_bytes"]
+                    == metadata.get("adapter_size_bytes", metadata.get("adapter_bytes"))
                     == release["size"],
                     f"{adapter.stat().st_size} bytes",
                 ),
@@ -392,7 +404,7 @@ def main() -> None:
             "",
         )
     )
-    readme = (PROJECT_ROOT / "README.md").read_text(encoding="utf-8")
+    historical = (PROJECT_ROOT / "HISTORICAL_V1_V2.md").read_text(encoding="utf-8")
     expected_claims = (
         f"{base_metrics['valid_json_rate']:.0%}",
         f"{lora_metrics['valid_json_rate']:.0%}",
@@ -409,9 +421,31 @@ def main() -> None:
     )
     checks.append(
         (
-            "README contains current metric values",
-            all(claim in readme for claim in expected_claims),
+            "Historical archive retains V1/V2 reported metric values",
+            all(claim in historical for claim in expected_claims),
             ", ".join(expected_claims),
+        )
+    )
+    readme = (PROJECT_ROOT / "README.md").read_text(encoding="utf-8")
+    qwen_report = _json("artifacts/experiments/qwen3_vl/full_run/verified_comparison.json")
+    current_rows = []
+    for label, key in (
+        ("Macro field exact match", "macro_normalized_exact_match"),
+        ("Complete-record exact match", "complete_record_normalized_exact_match"),
+        ("Company exact match", "company_accuracy"),
+        ("Date exact match", "date_accuracy"),
+        ("Total exact match", "total_accuracy"),
+        ("Address similarity", "address_similarity"),
+    ):
+        values = [qwen_report["metrics"][name][key] for name in ("v2", "qwen_base", "qwen_qlora")]
+        current_rows.append(
+            f"| {label} | {values[0]:.1%} | {values[1]:.1%} | **{values[2]:.1%}** |"
+        )
+    checks.append(
+        (
+            "README latest comparison matches verified V2/Qwen results",
+            all(row in readme for row in current_rows),
+            "same 239 records; latest Qwen adapter included",
         )
     )
     checks.append(

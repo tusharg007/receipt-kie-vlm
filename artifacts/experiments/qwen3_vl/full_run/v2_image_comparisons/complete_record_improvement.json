@@ -1,0 +1,44 @@
+{
+  "sample_id": "X51005230648",
+  "image_path": "data/raw/sroie/SROIE2019/test/img/X51005230648.jpg",
+  "image_sha256": "7f2d2cd7cfd47948f12e3f711d8d6926724c78cb174dfbf48b9ed6b9fe4d62f0",
+  "figure": "qwen_complete_record_improvement.png",
+  "before": {
+    "company": "CROSS CHANNEL NETWORK SDN. BHD.",
+    "address": "47, JALAN MERANTI 1, SEK.3, BANDAR UTAMA BATANG KALI, 44300 BATANG KALI, SELANGOR.",
+    "date": "29/01/2018",
+    "total": "6.36"
+  },
+  "after": {
+    "company": "CROSS CHANNEL NETWORK SDN. BHD.",
+    "address": "47, JALAN MERANTI 1, SEK. 3, BANDAR UTAMA BATANG KALI, 44300 BATANG KALI, SELANGOR.",
+    "date": "29/01/2018",
+    "total": "6.35"
+  },
+  "reference": {
+    "company": "CROSS CHANNEL NETWORK SDN. BHD.",
+    "address": "47, JALAN MERANTI 1, SEK. 3, BANDAR UTAMA BATANG KALI, 44300 BATANG KALI, SELANGOR.",
+    "date": "29/01/2018",
+    "total": "6.35"
+  },
+  "matched_fields_before": [
+    "company",
+    "address",
+    "date"
+  ],
+  "matched_fields_after": [
+    "company",
+    "address",
+    "date",
+    "total"
+  ],
+  "changed_fields": [
+    "address",
+    "total"
+  ],
+  "normalized_changed_fields": [
+    "total"
+  ],
+  "before_schema_valid": true,
+  "after_schema_valid": true
+}

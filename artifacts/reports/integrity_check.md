@@ -1,6 +1,6 @@
 # Result Integrity Check
 
-Generated: 2026-10-24T10:24:22.778604+00:00
+Generated: 2026-10-24T10:41:03.446472+00:00
 
 | Check | Status | Evidence |
 |---|---|---|
@@ -12,6 +12,13 @@ Generated: 2026-10-24T10:24:22.778604+00:00
 | Artifact exists: `models/receipt-kie-lora-v2-highres/adapter_config.json` | PASS |  |
 | Artifact exists: `models/receipt-kie-lora-v2-highres/training_metadata.json` | PASS |  |
 | Artifact exists: `models/receipt-kie-lora-v2-highres/README.md` | PASS |  |
+| Artifact exists: `models/receipt-kie-qwen3-vl-qlora/adapter_model.safetensors` | PASS |  |
+| Artifact exists: `models/receipt-kie-qwen3-vl-qlora/adapter_config.json` | PASS |  |
+| Artifact exists: `models/receipt-kie-qwen3-vl-qlora/training_metadata.json` | PASS |  |
+| Artifact exists: `models/receipt-kie-qwen3-vl-qlora/README.md` | PASS |  |
+| Artifact exists: `models/receipt-kie-qwen3-vl-qlora/LICENSE` | PASS |  |
+| Artifact exists: `QWEN3_VL_RESULTS.md` | PASS |  |
+| Artifact exists: `HISTORICAL_V1_V2.md` | PASS |  |
 | Artifact exists: `MODEL_COMPARISON.md` | PASS |  |
 | Artifact exists: `assets/demo/synthetic_receipt.png` | PASS |  |
 | Artifact exists: `assets/demo/expected_output.json` | PASS |  |
@@ -45,6 +52,10 @@ Generated: 2026-10-24T10:24:22.778604+00:00
 | V2 adapter size matches metadata and release | PASS | 10956944 bytes |
 | V2 adapter is a real safetensors binary | PASS |  |
 | V2 adapter is tracked by normal Git | PASS |  |
+| Qwen QLoRA adapter checksum matches metadata and release | PASS | 90583f801f2668c931732c9e3a8a25f0ee76c9c34d3c6f41441d65e66fe433a5 |
+| Qwen QLoRA adapter size matches metadata and release | PASS | 69788264 bytes |
+| Qwen QLoRA adapter is a real safetensors binary | PASS |  |
+| Qwen QLoRA adapter is tracked by normal Git | PASS |  |
 | Local training adapter matches committed adapter | PASS |  |
 | A newly initialized LoRA parameter changed | PASS | steps=140 |
 | Trainer state contains real optimization steps | PASS |  |
@@ -65,11 +76,12 @@ Generated: 2026-10-24T10:24:22.778604+00:00
 | V2 paired bootstrap values match the seeded release result | PASS | 2,000 resamples; release gate PASS |
 | Qualitative manifest values match prediction JSONL | PASS | improvement=X51005301666, failure=X51005433556 |
 | Qualitative figure and receipt hashes match manifest | PASS |  |
-| README contains current metric values | PASS | 19%, 85%, 26%, 18%, 25%, 51.92%, 99.2%, 69.1%, 90.7%, 85.8%, 64.6%, 18.3% |
+| Historical archive retains V1/V2 reported metric values | PASS | 19%, 85%, 26%, 18%, 25%, 51.92%, 99.2%, 69.1%, 90.7%, 85.8%, 64.6%, 18.3% |
+| README latest comparison matches verified V2/Qwen results | PASS | same 239 records; latest Qwen adapter included |
 | No raw dataset is tracked | PASS |  |
 | No intermediate checkpoints, caches, environments, or logs tracked | PASS |  |
 | No tracked file exceeds 100 MiB | PASS |  |
-| All local Markdown links and images exist | PASS | checked=100 |
+| All local Markdown links and images exist | PASS | checked=122 |
 | No credential-like strings in tracked text | PASS |  |
 | No local absolute paths in tracked text | PASS |  |
 

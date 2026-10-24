@@ -48,14 +48,11 @@ Equal-merchant-weighted macro exact (each observed merchant gets equal weight):
 
 ## Fresh export reload check
 
-The committed adapter was loaded from disk in a fresh Kaggle T4 process. On one
-fixed validation image, the fresh base and adapter raw outputs exactly matched
-the training-process outputs under the recorded package versions. The adapter
-SHA-256 matched the committed weight file. Both results retained
-`review_required=true` and `deployment_allowed=false`. This is a reproducibility
-smoke check on one image, not an accuracy estimate or a general GPU-memory claim.
-See [the machine-readable verification](artifacts/experiments/qwen3_vl/full_run/export_reload_verification.json).
+A fresh Kaggle T4 process reloaded the saved adapter and reproduced the exact base and adapter raw outputs on one fixed validation image. The adapter checksum matched and both outputs required review. This is a one-image reproducibility check, not an accuracy estimate or a general GPU-memory claim.
+[Machine-readable reload verification](artifacts/experiments/qwen3_vl/full_run/export_reload_verification.json).
 
 ![Retrospective accuracy comparison](artifacts/experiments/qwen3_vl/full_run/accuracy_comparison.png)
 
 [Bill-by-bill before/after examples](artifacts/experiments/qwen3_vl/full_run/image_comparisons/README.md)
+
+[Legacy V2 versus latest Qwen examples](artifacts/experiments/qwen3_vl/full_run/v2_image_comparisons/README.md)

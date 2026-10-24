@@ -154,7 +154,9 @@ def plot_metrics(metrics: dict, output: Path) -> None:
     plt.close(figure)
 
 
-def render_examples(variants: dict, ids: list[str], destination: Path) -> Path:
+def render_examples(
+    variants: dict, ids: list[str], destination: Path, *, before_name: str = "qwen_base"
+) -> Path:
     from build_structured_comparison import render_pair
 
     indexed = {name: {row["sample_id"]: row for row in rows} for name, rows in variants.items()}
@@ -167,23 +169,38 @@ def render_examples(variants: dict, ids: list[str], destination: Path) -> Path:
         if len(selected) == 3:
             break
     destination.mkdir(parents=True, exist_ok=True)
+    legacy = before_name == "v2"
+    title = "Legacy V2 versus latest Qwen QLoRA" if legacy else "Before and after QLoRA fine-tuning"
+    context = (
+        "Same receipt and reference; V2 tiled preprocessing differs from Qwen"
+        if legacy
+        else "Same image, NF4, prompt, pixel cap and greedy decoding"
+    )
     gallery = [
-        "# Bill-by-bill Qwen comparison",
+        f"# {title}",
         "",
         "Selection: first three distinct normalized merchants in lexicographic evaluation-ID "
         "order, independent of model outcomes. These examples are not an accuracy estimate.",
         "",
-        "Before = pinned NF4 base; after = selected QLoRA adapter. The image, prompt, "
-        "pixel cap and decoding are identical. Colors compare normalized "
-        "values with dataset annotations; annotations can contain errors.",
+        (
+            "Before = saved historical SmolVLM V2; after = the latest Qwen3-VL QLoRA adapter. "
+            "Receipt bytes and normalized references are aligned. Model architecture, "
+            "preprocessing and prompts differ; this compares project versions, not an "
+            "isolated fine-tuning effect."
+            if legacy
+            else "Before = pinned NF4 base; after = selected QLoRA adapter. The image, prompt, "
+            "pixel cap and decoding are identical."
+        ),
+        "Colors compare normalized values with dataset annotations; "
+        "annotations can contain errors.",
         "",
     ]
     manifest = []
     for number, sample_id in enumerate(selected, 1):
         image_path = indexed["v2"][sample_id]["image_path"]
-        before = {**indexed["qwen_base"][sample_id], "image_path": image_path}
+        before = {**indexed[before_name][sample_id], "image_path": image_path}
         after = {**indexed["qwen_qlora"][sample_id], "image_path": image_path}
-        if hashlib.sha256((ROOT / image_path).read_bytes()).hexdigest() != before["image_sha256"]:
+        if hashlib.sha256((ROOT / image_path).read_bytes()).hexdigest() != after["image_sha256"]:
             raise ValueError(f"Comparison image changed: {sample_id}")
         output = destination / f"{number:02d}_{sample_id}.png"
         manifest.append(
@@ -193,16 +210,54 @@ def render_examples(variants: dict, ids: list[str], destination: Path) -> Path:
                 output,
                 number,
                 len(selected),
-                comparison_title="Before and after QLoRA fine-tuning",
-                context="Same image, NF4, prompt, pixel cap and greedy decoding",
-                before_heading="BEFORE\nQwen3-VL NF4 base",
-                after_heading="AFTER\nQwen3-VL QLoRA",
+                comparison_title=title,
+                context=context,
+                before_heading=(
+                    "BEFORE\nLegacy SmolVLM V2" if legacy else "BEFORE\nQwen3-VL NF4 base"
+                ),
+                after_heading="AFTER\nLatest Qwen3-VL QLoRA",
                 note="Selected validation-loss checkpoint; examples chosen by merchant/ID "
                 "order, independently of whether fine-tuning helped.",
             )
         )
         gallery.extend([f"## Bill {number}: {sample_id}", "", f"![Comparison]({output.name})", ""])
     (destination / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", "utf-8")
+    if legacy:
+        before_scores, _ = correct_vectors(variants[before_name], ids)
+        _, after_complete = correct_vectors(variants["qwen_qlora"], ids)
+        success_id = next(
+            sample_id
+            for sample_id, score, complete in zip(ids, before_scores, after_complete, strict=True)
+            if complete and score < 1
+        )
+        before = indexed[before_name][success_id]
+        after = {**indexed["qwen_qlora"][success_id], "image_path": before["image_path"]}
+        if hashlib.sha256((ROOT / before["image_path"]).read_bytes()).hexdigest() != after[
+            "image_sha256"
+        ]:
+            raise ValueError(f"Comparison image changed: {success_id}")
+        output = destination / "qwen_complete_record_improvement.png"
+        success = render_pair(
+            before, after, output, 1, 1,
+            comparison_title="Latest Qwen: complete-record improvement over V2",
+            context=context,
+            before_heading="BEFORE\nLegacy SmolVLM V2",
+            after_heading="AFTER\nLatest Qwen3-VL QLoRA",
+            note="Outcome-selected example: first sorted ID with Qwen 4/4 and V2 below 4/4. "
+            "This illustrates a gain; it does not estimate how often gains occur.",
+        )
+        (destination / "complete_record_improvement.json").write_text(
+            json.dumps(success, indent=2) + "\n", "utf-8"
+        )
+        gallery.extend(
+            [
+                "## Additional outcome-selected success", "",
+                "Separate from the three examples above: first sorted evaluation ID with "
+                "Qwen 4/4 normalized field matches and V2 below 4/4. This is illustrative, "
+                "not a frequency estimate.", "",
+                f"![Complete-record improvement]({output.name})", "",
+            ]
+        )
     report = destination / "README.md"
     report.write_text("\n".join(gallery), "utf-8")
     return report
@@ -432,6 +487,29 @@ def main() -> int:
             f"methods: {details['parse_methods']}."
         )
     lines.extend(["", "## Limits", ""] + [f"- {item}." for item in report["limitations"]])
+    reload_path = args.output_dir / "export_reload_verification.json"
+    if reload_path.is_file():
+        reload_record = json.loads(reload_path.read_text("utf-8"))
+        if reload_record["status"] != "export_reload_passed" or any(
+            not check["raw_output_matches_training_process"]
+            or not check["review_required"]
+            or check["deployment_allowed"] is not False
+            for check in reload_record["checks"].values()
+        ):
+            raise ValueError(
+                "Export reload record does not establish reproducible review-only outputs"
+            )
+        reload_link = Path(os.path.relpath(reload_path, args.report.parent)).as_posix()
+        lines.extend(
+            [
+                "", "## Fresh export reload check", "",
+                "A fresh Kaggle T4 process reloaded the saved adapter and reproduced the exact "
+                "base and adapter raw outputs on one fixed validation image. The adapter checksum "
+                "matched and both outputs required review. This is a one-image reproducibility "
+                "check, not an accuracy estimate or a general GPU-memory claim.",
+                f"[Machine-readable reload verification]({reload_link}).",
+            ]
+        )
     chart_link = Path(
         os.path.relpath(args.output_dir / "accuracy_comparison.png", args.report.parent)
     ).as_posix()
@@ -440,7 +518,12 @@ def main() -> int:
         gallery = render_examples(comparison, ids, args.output_dir / "image_comparisons")
         gallery_link = Path(os.path.relpath(gallery, args.report.parent)).as_posix()
         lines.extend([f"[Bill-by-bill before/after examples]({gallery_link})", ""])
-    args.report.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        legacy_gallery = render_examples(
+            comparison, ids, args.output_dir / "v2_image_comparisons", before_name="v2"
+        )
+        legacy_link = Path(os.path.relpath(legacy_gallery, args.report.parent)).as_posix()
+        lines.extend([f"[Legacy V2 versus latest Qwen examples]({legacy_link})", ""])
+    args.report.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
     print(json.dumps({"metrics": metrics, "paired_bootstrap": intervals}, indent=2))
     return 0
 

@@ -40,6 +40,12 @@ def _matches(prediction: dict, truth: dict) -> list[str]:
     ]
 
 
+def _schema_valid(row: dict) -> bool:
+    return bool(
+        row.get("strict_schema_valid", row.get("schema_valid", row.get("valid_json", False)))
+    )
+
+
 def render_pair(
     before: dict,
     after: dict,
@@ -106,7 +112,7 @@ def render_pair(
             column, 0.84, heading, fontsize=13, weight="bold", color="#152238", linespacing=1.5
         )
     for column, row in ((columns[0], before), (columns[1], after)):
-        valid = row.get("schema_valid", row.get("valid_json", False))
+        valid = _schema_valid(row)
         fig.text(
             column,
             0.785,
@@ -212,8 +218,8 @@ def render_pair(
         "matched_fields_after": correct_after,
         "changed_fields": changed,
         "normalized_changed_fields": normalized_changed,
-        "before_schema_valid": before["schema_valid"],
-        "after_schema_valid": after["schema_valid"],
+        "before_schema_valid": _schema_valid(before),
+        "after_schema_valid": _schema_valid(after),
     }
 
 

@@ -1,0 +1,131 @@
+[
+  {
+    "sample_id": "X00016469670",
+    "image_path": "data/raw/sroie/SROIE2019/test/img/X00016469670.jpg",
+    "image_sha256": "f9c8699bb1adcfa3a49cd8425057c1818b5b4ec62d003a6f8bd5b0af8d7ccd53",
+    "figure": "01_X00016469670.png",
+    "before": {
+      "company": "OJC MARKETING SDN BHD",
+      "address": "NO 2 & 4, JALAN BAYU 4, BANDAR SERI ALAM, 81750 MAISAL, JOHOR",
+      "date": "15/01/2019",
+      "total": "193.00"
+    },
+    "after": {
+      "company": "OJC MARKETING SDN BHD",
+      "address": "NO 2 & 4, JALAN BAYU 4, BANDAR SERI ALAM, 81750 MASAI, JOHOR",
+      "date": "15/01/2019",
+      "total": "193.00"
+    },
+    "reference": {
+      "company": "OJC MARKETING SDN BHD",
+      "address": "NO 2 & 4, JALAN BAYU 4, BANDAR SERI ALAM, B1750 MASAI, JOHOR",
+      "date": "15/01/2019",
+      "total": "193.00"
+    },
+    "matched_fields_before": [
+      "company",
+      "date",
+      "total"
+    ],
+    "matched_fields_after": [
+      "company",
+      "date",
+      "total"
+    ],
+    "changed_fields": [
+      "address"
+    ],
+    "normalized_changed_fields": [
+      "address"
+    ],
+    "before_schema_valid": true,
+    "after_schema_valid": true
+  },
+  {
+    "sample_id": "X51005200931",
+    "image_path": "data/raw/sroie/SROIE2019/test/img/X51005200931.jpg",
+    "image_sha256": "9f17b0634272f91e8fced6ecabd5e1d2edfd69880870d2832bf2ebbf4d30b64f",
+    "figure": "02_X51005200931.png",
+    "before": {
+      "company": "PERNIIAAN ZHENG HUI",
+      "address": "NO.589 JALAN PERIANS 915 BANDAR BARU PERMAS JAYA 81750 JOHOR BAHRU",
+      "date": "02/07/2018",
+      "total": "411.50"
+    },
+    "after": {
+      "company": "PERNIAGAAN ZHENG HUI",
+      "address": "NO.59 JALAN PERMAS 9/5 BANDAR BARU PERMAS JAYA 81780 JOHOR BAHRU",
+      "date": "09/02/2018",
+      "total": "438.20"
+    },
+    "reference": {
+      "company": "PERNIAGAAN ZHENG HUI",
+      "address": "NO.59 JALAN PERMAS 9/5 BANDAR BARU PERMAS JAYA 81750 JOHOR BAHRU",
+      "date": "09/02/2018",
+      "total": "436.20"
+    },
+    "matched_fields_before": [],
+    "matched_fields_after": [
+      "company",
+      "date"
+    ],
+    "changed_fields": [
+      "company",
+      "address",
+      "date",
+      "total"
+    ],
+    "normalized_changed_fields": [
+      "company",
+      "address",
+      "date",
+      "total"
+    ],
+    "before_schema_valid": true,
+    "after_schema_valid": true
+  },
+  {
+    "sample_id": "X51005230616",
+    "image_path": "data/raw/sroie/SROIE2019/test/img/X51005230616.jpg",
+    "image_sha256": "26a26d8de50c0078d21c7c09ab2cad6d3decbffe55b2a304cef1de316c314db6",
+    "figure": "03_X51005230616.png",
+    "before": {
+      "company": "GERBANG ALF RESTAURANTS SDN BHD",
+      "address": "LEVEL 6, BUANGANTH, DAMASARA UPTOWN NO.3, JALAN SS21/39,47040 PETALING JAYA SELANGOR",
+      "date": "18/01/2017",
+      "total": "38.90"
+    },
+    "after": {
+      "company": "GERBANG AIAF RESTAURANTS SDN BHD",
+      "address": "LEVEL 6, BANGUNAN TH, DAMANSARA UPTOWN3 NO.3, JALAN SS21/39,47400 PETALING JAYA SELANGOR",
+      "date": "18/01/2018",
+      "total": "38.90"
+    },
+    "reference": {
+      "company": "GERBANG ALAF RESTAURANTS SDN BHD",
+      "address": "LEVEL 6, BANGUNAN TH, DAMANSARA UPTOWN3 NO.3, JALAN SS21/39,47400 PETALING JAYA SELANGOR",
+      "date": "18/01/2018",
+      "total": "38.90"
+    },
+    "matched_fields_before": [
+      "total"
+    ],
+    "matched_fields_after": [
+      "address",
+      "date",
+      "total"
+    ],
+    "changed_fields": [
+      "company",
+      "address",
+      "date"
+    ],
+    "normalized_changed_fields": [
+      "company",
+      "address",
+      "date"
+    ],
+    "before_schema_valid": true,
+    "after_schema_valid": true
+  }
+]
