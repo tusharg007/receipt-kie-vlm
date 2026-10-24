@@ -67,6 +67,16 @@ Start with [the service runbook](RECEIPTOPS.md),
 
 ![Quality analysis](artifacts/experiments/quality_gate/quality_analysis.png)
 
+## Larger-model training on Kaggle
+
+An isolated [Qwen3-VL-2B QLoRA training package](KAGGLE_TRAINING.md) now supports
+private Kaggle GPU jobs, a real optimizer-step smoke test, merchant-disjoint
+validation, and paired quantized-base versus adapted-model evaluation. The
+current protocol uses 445 fit images, 174 validation images and the 239-record
+historical retrospective comparison. It does not upgrade the local V2 dependency
+stack or replace the service model. Submitted jobs are not accuracy results;
+verified metrics will be published only after training and evaluation finish.
+
 ## Run the inference service
 
 Install the existing VLM environment, the API, and constrained-decoding dependencies:
@@ -83,7 +93,7 @@ The default 1024 px setting reduces memory use and routes results to review.
 See [the runbook](RECEIPTOPS.md) for authentication, feedback, configuration,
 monitoring and deployment instructions.
 
-Local validation: **85 unit and API contract tests pass**, with clean Ruff and
+Local validation: **91 unit and API contract tests pass**, with clean Ruff and
 dependency checks. Reproduce with:
 
 ```powershell

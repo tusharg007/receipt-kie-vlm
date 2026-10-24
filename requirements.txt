@@ -4,6 +4,8 @@ torchvision==0.20.1
 transformers==4.46.3
 trl==0.12.1
 datasets==3.1.0
+# Keep Linux wheels compatible with the NumPy 1.x training stack.
+pyarrow==19.0.1
 peft==0.13.2
 accelerate==1.1.1
 
