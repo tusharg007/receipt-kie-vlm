@@ -16,10 +16,19 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from receipt_kie.metrics import evaluate_predictions, normalize_field  # noqa: E402
 from receipt_kie.prompts import CANONICAL_FIELDS  # noqa: E402
+from receipt_kie.structured import strict_receipt  # noqa: E402
 
 
 def read_rows(path: Path) -> list[dict]:
     return [json.loads(line) for line in path.read_text("utf-8").splitlines() if line.strip()]
+
+
+def verify_raw_predictions(rows: list[dict]) -> None:
+    """Do not let stale parsed fields or validity flags change reported accuracy."""
+    for row in rows:
+        parsed, _ = strict_receipt(row["raw_output"])
+        if row.get("parsed_prediction") != parsed or row.get("valid_json") != (parsed is not None):
+            raise ValueError(f"Saved parsing differs from raw output for {row['sample_id']}")
 
 
 def verify_alignment(variants: dict[str, list[dict]], hashes: dict[str, str]) -> list[str]:
@@ -118,6 +127,8 @@ def main() -> int:
         "qwen_base": read_rows(args.run_dir / "base_predictions.jsonl"),
         "qwen_qlora": read_rows(args.run_dir / "adapted_predictions.jsonl"),
     }
+    for name in ("qwen_base", "qwen_qlora"):
+        verify_raw_predictions(variants[name])
     ids = verify_alignment(variants, hashes)
     frozen = json.loads((args.run_dir / "frozen_selection.json").read_text("utf-8"))
     if frozen.get("deployment_allowed") is not False:
@@ -126,19 +137,43 @@ def main() -> int:
     vectors = {name: correct_vectors(rows, ids) for name, rows in variants.items()}
     rng = np.random.default_rng(42)
     resamples = rng.integers(0, len(ids), size=(2000, len(ids)))
+    references = {row["sample_id"]: row["ground_truth"] for row in variants["v2"]}
+    merchant_keys = [
+        normalize_field("company", references[sample_id]["company"]) for sample_id in ids
+    ]
+    unique_merchants = sorted(set(merchant_keys))
+    membership = np.array(
+        [[key == merchant for key in merchant_keys] for merchant in unique_merchants]
+    )
+    merchant_sizes = membership.sum(axis=1)
+    cluster_draws = rng.integers(0, len(unique_merchants), size=(2000, len(unique_merchants)))
     intervals = {}
     for before, after in (("v2", "qwen_base"), ("v2", "qwen_qlora"), ("qwen_base", "qwen_qlora")):
         intervals[f"{after}_minus_{before}"] = {}
         for index, metric in enumerate(("macro_exact", "complete_record_exact")):
             difference = vectors[after][index] - vectors[before][index]
             lower, upper = np.quantile(difference[resamples].mean(axis=1), [0.025, 0.975])
+            group_sums = membership @ difference
+            cluster_gains = group_sums[cluster_draws].sum(axis=1) / merchant_sizes[
+                cluster_draws
+            ].sum(axis=1)
+            cluster_lower, cluster_upper = np.quantile(cluster_gains, [0.025, 0.975])
             intervals[f"{after}_minus_{before}"][metric] = {
                 "point_difference": float(difference.mean()),
                 "paired_bootstrap_95_percent": [float(lower), float(upper)],
+                "paired_merchant_cluster_bootstrap_95_percent": [
+                    float(cluster_lower),
+                    float(cluster_upper),
+                ],
             }
     report = {
         "scope": "239-record content-disjoint retrospective comparison, not fresh test data",
         "sample_count": len(ids),
+        "normalized_merchant_count": len(unique_merchants),
+        "equal_merchant_weighted_macro_exact": {
+            name: float(((membership @ value[0]) / merchant_sizes).mean())
+            for name, value in vectors.items()
+        },
         "metrics": metrics,
         "paired_bootstrap": intervals,
         "bootstrap_resamples": 2000,
@@ -150,6 +185,8 @@ def main() -> int:
             "Historical V2 used different image preprocessing and parsing; timings are not paired",
             "Paired Qwen base/adapted predictions use the same NF4, images, prompt and decoding",
             "No default-model promotion, fresh-data accuracy or production scale claim",
+            "Image bootstrap assumes independent records; merchant-cluster intervals are "
+            "also reported, but normalized names may leave merchant aliases ungrouped",
         ],
     }
     args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -207,10 +244,22 @@ def main() -> int:
     for name, values in intervals.items():
         item = values["macro_exact"]
         lower, upper = item["paired_bootstrap_95_percent"]
+        cluster_lower, cluster_upper = item["paired_merchant_cluster_bootstrap_95_percent"]
         lines.append(
             f"- `{name}` macro gain: {item['point_difference'] * 100:+.2f} pp; "
-            f"paired 95% interval [{lower * 100:+.2f}, {upper * 100:+.2f}] pp."
+            f"paired image-level 95% interval [{lower * 100:+.2f}, {upper * 100:+.2f}] pp; "
+            f"merchant-cluster interval [{cluster_lower * 100:+.2f}, "
+            f"{cluster_upper * 100:+.2f}] pp."
         )
+    lines.extend(
+        [
+            "",
+            f"The evaluation contains {len(unique_merchants)} normalized merchant groups.",
+            "Equal-merchant-weighted macro exact (each observed merchant gets equal weight):",
+        ]
+    )
+    for name, value in report["equal_merchant_weighted_macro_exact"].items():
+        lines.append(f"- {labels[name]}: {value:.1%}.")
     lines.extend(["", "## Limits", ""] + [f"- {item}." for item in report["limitations"]])
     chart_link = Path(
         os.path.relpath(args.output_dir / "accuracy_comparison.png", args.report.parent)

@@ -110,12 +110,33 @@ python scripts/analyze_qwen_experiment.py --run-dir .cache/kaggle-training/downl
 
 This refuses incomplete runs, missing or repeated IDs, changed image hashes and
 changed normalized reference labels. It reports all three models on the same
-239 IDs and 2,000-resample paired bootstrap intervals. The full run is currently
+239 IDs and 2,000-resample paired image and merchant-cluster bootstrap intervals.
+It also checks that saved parsed fields agree with the raw model response and
+reports equal-merchant-weighted accuracy. The full run is currently
 in progress; the smoke summaries do not imply improved extraction accuracy.
 
 The original FastAPI service continues to use V2. Any Qwen promotion also needs
 an inference integration, memory/latency checks, a new quality-model calibration,
 and a documented evaluation decision. This package does not silently swap models.
+
+## Optional single-image inference
+
+`scripts/qwen_inference.py` loads the pinned base or an exported adapter. Run it
+in a separate environment with a matched CUDA Torch/torchvision pair and
+`requirements-cloud.txt`; do not upgrade the existing V2 environment in place.
+After retrieving the full-run adapter directory from Kaggle:
+
+```powershell
+python scripts/qwen_inference.py --image path/to/bill.jpg --base --output .cache/qwen-base.json
+python scripts/qwen_inference.py --image path/to/bill.jpg --adapter .cache/kaggle-training/download/receiptops-train/adapter --output .cache/qwen-adapted.json
+```
+
+GPU inference uses NF4 and the same 1,048,576-pixel cap as the comparison.
+`--max-pixels` can lower memory use, but changes the evaluated preprocessing.
+No 4GB GPU-fit claim is made. `--cpu` explicitly loads unquantized FP32 weights
+and requires substantially more system RAM; CPU execution has not been measured.
+The command preserves raw output, parsing failures, adapter hash and runtime
+metadata. Every result requires review; the old quality classifier is not reused.
 
 Primary references: [Qwen model card](https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct),
 [Qwen fine-tuning framework](https://github.com/QwenLM/Qwen3-VL/tree/main/qwen-vl-finetune),

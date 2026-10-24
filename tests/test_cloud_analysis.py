@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 from pathlib import Path
 
 import pytest
@@ -42,3 +43,15 @@ def test_comparison_rejects_relabeling_and_keeps_invalid_results_in_denominator(
     invalid = {**_row(), "valid_json": False, "parsed_prediction": None}
     macro, complete = module.correct_vectors([invalid], ["A"])
     assert macro.tolist() == complete.tolist() == [0.0]
+
+
+def test_comparison_detects_saved_fields_that_disagree_with_model_output():
+    module = _module()
+    row = _row()
+    row["raw_output"] = json.dumps(row["parsed_prediction"])
+    module.verify_raw_predictions([row])
+    row["raw_output"] = "```json\n" + row["raw_output"] + "\n```"
+    with pytest.raises(ValueError, match="Saved parsing"):
+        module.verify_raw_predictions([row])
+    row["valid_json"], row["parsed_prediction"] = False, None
+    module.verify_raw_predictions([row])

@@ -57,7 +57,7 @@ confidence.
   replacing V2. See [the full Bolt pilot](BOLT_PILOT.md). The verified checkpoint
   declares text/text; direct vision and 4GB GPU fit were not tested.
 - **Deployment assets:** Dockerfile, AWS ECS template and GitHub Actions workflow;
-  remote CPU CI passed on commit `06eacf7`. Docker and cloud hosting remain
+  remote CPU CI passed on commit `432d59e`. Docker and cloud hosting remain
   unexecuted blueprints. SQLite and one GPU worker are a single-replica prototype.
 
 Start with [the service runbook](RECEIPTOPS.md),
@@ -96,7 +96,7 @@ The default 1024 px setting reduces memory use and routes results to review.
 See [the runbook](RECEIPTOPS.md) for authentication, feedback, configuration,
 monitoring and deployment instructions.
 
-Local validation: **94 unit and API contract tests pass**, with clean Ruff and
+Local validation: **95 unit and API contract tests pass**, with clean Ruff and
 dependency checks. Reproduce with:
 
 ```powershell
