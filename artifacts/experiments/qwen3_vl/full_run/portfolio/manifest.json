@@ -1,0 +1,699 @@
+[
+  {
+    "sample_id": "X51005230657",
+    "image_path": "data/raw/sroie/SROIE2019/test/img/X51005230657.jpg",
+    "image_sha256": "15f6a1f2970a5fcae83f1a7d72d92ea778b15e5a2fc2529371110950e55327cf",
+    "figure": "01_v2_multi_field_recovery_X51005230657.png",
+    "before": {
+      "company": "CROSS CHANNEL NETWORK SDN. BHD.",
+      "address": "47, JALAN MERANTI 1, SEK. 3, BANDAR UTAMA BATANG KALI, SELANGOR.",
+      "date": "31/12/2017",
+      "total": "7.50"
+    },
+    "after": {
+      "company": "CROSS CHANNEL NETWORK SDN. BHD.",
+      "address": "47, JALAN MERANTI 1, SEK. 3, BANDAR UTAMA BATANG KALI, 44300 BATANG KALI, SELANGOR.",
+      "date": "31/12/2017",
+      "total": "7.95"
+    },
+    "reference": {
+      "company": "CROSS CHANNEL NETWORK SDN. BHD.",
+      "address": "47, JALAN MERANTI 1, SEK. 3, BANDAR UTAMA BATANG KALI, 44300 BATANG KALI, SELANGOR.",
+      "date": "31/12/2017",
+      "total": "7.95"
+    },
+    "matched_fields_before": [
+      "company",
+      "date"
+    ],
+    "matched_fields_after": [
+      "company",
+      "address",
+      "date",
+      "total"
+    ],
+    "changed_fields": [
+      "address",
+      "total"
+    ],
+    "normalized_changed_fields": [
+      "address",
+      "total"
+    ],
+    "before_schema_valid": true,
+    "after_schema_valid": true,
+    "before_model": "v2",
+    "category": "multi_field_recovery",
+    "title": "Several fields recovered",
+    "eligible_count_before_diversity_filter": 71,
+    "raw_output_before": "{\"company\": \"CROSS CHANNEL NETWORK SDN. BHD.\", \"address\": \"47, JALAN MERANTI 1, SEK. 3, BANDAR UTAMA BATANG KALI, SELANGOR.\", \"date\": \"31/12/2017\", \"total\": \"7.50\"}",
+    "raw_output_after": "{\"company\": \"CROSS CHANNEL NETWORK SDN. BHD.\", \"address\": \"47, JALAN MERANTI 1, SEK. 3, BANDAR UTAMA BATANG KALI, 44300 BATANG KALI, SELANGOR.\", \"date\": \"31/12/2017\", \"total\": \"7.95\"}",
+    "figure_sha256": "75fb49582c5deef9f8e59508bde98ac299a9ff7a60150e0ea0f04675a35362d3"
+  },
+  {
+    "sample_id": "X51005268408",
+    "image_path": "data/raw/sroie/SROIE2019/test/img/X51005268408.jpg",
+    "image_sha256": "5865fb577ccc84b137e8041b302b5af1d1b041aeaf23b362bda1aa61d523b53b",
+    "figure": "02_v2_total_correction_X51005268408.png",
+    "before": {
+      "company": "99 SPEED MART 5/B",
+      "address": "LOT P.T., 2811, JALAN ANGSA, TAMAN BERKELEY 41150 KLANG, SELANGOR 1413-SETIA ALAM 2",
+      "date": "20-11-17",
+      "total": "160.17"
+    },
+    "after": {
+      "company": "99 SPEED MART S/B",
+      "address": "LOT P.T. 2811, JALAN ANGSA, TAMAN BERKELEY 41150 KLANG, SELANGOR 1413-SETIA ALAM 2",
+      "date": "20-11-17",
+      "total": "169.80"
+    },
+    "reference": {
+      "company": "99 SPEED MART S/B",
+      "address": "LOT P.T. 2811, JALAN ANGSA, TAMAN BERKELEY 41150 KLANG, SELANGOR 1413-SETIA ALAM 2",
+      "date": "20-11-17",
+      "total": "169.80"
+    },
+    "matched_fields_before": [
+      "address",
+      "date"
+    ],
+    "matched_fields_after": [
+      "company",
+      "address",
+      "date",
+      "total"
+    ],
+    "changed_fields": [
+      "company",
+      "address",
+      "total"
+    ],
+    "normalized_changed_fields": [
+      "company",
+      "total"
+    ],
+    "before_schema_valid": true,
+    "after_schema_valid": true,
+    "before_model": "v2",
+    "category": "total_correction",
+    "title": "Total corrected",
+    "eligible_count_before_diversity_filter": 77,
+    "raw_output_before": "{\"company\": \"99 SPEED MART 5/B\", \"address\": \"LOT P.T., 2811, JALAN ANGSA, TAMAN BERKELEY 41150 KLANG, SELANGOR 1413-SETIA ALAM 2\", \"date\": \"20-11-17\", \"total\": \"160.17\"}",
+    "raw_output_after": "{\"company\": \"99 SPEED MART S/B\", \"address\": \"LOT P.T. 2811, JALAN ANGSA, TAMAN BERKELEY 41150 KLANG, SELANGOR 1413-SETIA ALAM 2\", \"date\": \"20-11-17\", \"total\": \"169.80\"}",
+    "figure_sha256": "7d2d2948a8bc4468f9f766c68c5ea4d12bc98f4e4bfa65aea295de5826cb9fd4"
+  },
+  {
+    "sample_id": "X51005200931",
+    "image_path": "data/raw/sroie/SROIE2019/test/img/X51005200931.jpg",
+    "image_sha256": "9f17b0634272f91e8fced6ecabd5e1d2edfd69880870d2832bf2ebbf4d30b64f",
+    "figure": "03_v2_date_correction_X51005200931.png",
+    "before": {
+      "company": "PERNIIAAN ZHENG HUI",
+      "address": "NO.589 JALAN PERIANS 915 BANDAR BARU PERMAS JAYA 81750 JOHOR BAHRU",
+      "date": "02/07/2018",
+      "total": "411.50"
+    },
+    "after": {
+      "company": "PERNIAGAAN ZHENG HUI",
+      "address": "NO.59 JALAN PERMAS 9/5 BANDAR BARU PERMAS JAYA 81780 JOHOR BAHRU",
+      "date": "09/02/2018",
+      "total": "438.20"
+    },
+    "reference": {
+      "company": "PERNIAGAAN ZHENG HUI",
+      "address": "NO.59 JALAN PERMAS 9/5 BANDAR BARU PERMAS JAYA 81750 JOHOR BAHRU",
+      "date": "09/02/2018",
+      "total": "436.20"
+    },
+    "matched_fields_before": [],
+    "matched_fields_after": [
+      "company",
+      "date"
+    ],
+    "changed_fields": [
+      "company",
+      "address",
+      "date",
+      "total"
+    ],
+    "normalized_changed_fields": [
+      "company",
+      "address",
+      "date",
+      "total"
+    ],
+    "before_schema_valid": true,
+    "after_schema_valid": true,
+    "before_model": "v2",
+    "category": "date_correction",
+    "title": "Date corrected",
+    "eligible_count_before_diversity_filter": 28,
+    "raw_output_before": "{\"company\": \"PERNIIAAN ZHENG HUI\", \"address\": \"NO.589 JALAN PERIANS 915 BANDAR BARU PERMAS JAYA 81750 JOHOR BAHRU\", \"date\": \"02/07/2018\", \"total\": \"411.50\"}",
+    "raw_output_after": "{\"company\": \"PERNIAGAAN ZHENG HUI\", \"address\": \"NO.59 JALAN PERMAS 9/5 BANDAR BARU PERMAS JAYA 81780 JOHOR BAHRU\", \"date\": \"09/02/2018\", \"total\": \"438.20\"}",
+    "figure_sha256": "8ec617db75d0c1a2ca14b4eb5198859f62bf02599f642576172e4b31acfc4a41"
+  },
+  {
+    "sample_id": "X51005337877",
+    "image_path": "data/raw/sroie/SROIE2019/test/img/X51005337877.jpg",
+    "image_sha256": "23ce403184c4a9b551c8f3a82e50b6b26437683ca76fda532370fc77ba47e1aa",
+    "figure": "04_v2_company_correction_X51005337877.png",
+    "before": {
+      "company": "UROKO JAPANESE CUSINE SDN BHD",
+      "address": "22A-1, JALAN 17/54, SECTION 17, 46400 PETALING JAYA, SELANGOR.",
+      "date": "20/03/2018",
+      "total": "46.00"
+    },
+    "after": {
+      "company": "UROKO JAPANESE CUISINE SDN BHD",
+      "address": "22A-1, JALAN 17/54, SECTION 17, 46400 PETALING JAYA, SELANGOR.",
+      "date": "20/03/2018",
+      "total": "53.00"
+    },
+    "reference": {
+      "company": "UROKO JAPANESE CUISINE SDN BHD",
+      "address": "22A-1, JALAN 17/54, SECTION 17, 46400 PETALING JAYA, SELANGOR.",
+      "date": "20/03/2018",
+      "total": "53.00"
+    },
+    "matched_fields_before": [
+      "address",
+      "date"
+    ],
+    "matched_fields_after": [
+      "company",
+      "address",
+      "date",
+      "total"
+    ],
+    "changed_fields": [
+      "company",
+      "total"
+    ],
+    "normalized_changed_fields": [
+      "company",
+      "total"
+    ],
+    "before_schema_valid": true,
+    "after_schema_valid": true,
+    "before_model": "v2",
+    "category": "company_correction",
+    "title": "Merchant corrected",
+    "eligible_count_before_diversity_filter": 61,
+    "raw_output_before": "{\"company\": \"UROKO JAPANESE CUSINE SDN BHD\", \"address\": \"22A-1, JALAN 17/54, SECTION 17, 46400 PETALING JAYA, SELANGOR.\", \"date\": \"20/03/2018\", \"total\": \"46.00\"}",
+    "raw_output_after": "{\"company\": \"UROKO JAPANESE CUISINE SDN BHD\", \"address\": \"22A-1, JALAN 17/54, SECTION 17, 46400 PETALING JAYA, SELANGOR.\", \"date\": \"20/03/2018\", \"total\": \"53.00\"}",
+    "figure_sha256": "aa772c535ba16a62def531207d542611cc6f81d188db9171cc23ab6a895db138"
+  },
+  {
+    "sample_id": "X51005230616",
+    "image_path": "data/raw/sroie/SROIE2019/test/img/X51005230616.jpg",
+    "image_sha256": "26a26d8de50c0078d21c7c09ab2cad6d3decbffe55b2a304cef1de316c314db6",
+    "figure": "05_v2_address_correction_X51005230616.png",
+    "before": {
+      "company": "GERBANG ALF RESTAURANTS SDN BHD",
+      "address": "LEVEL 6, BUANGANTH, DAMASARA UPTOWN NO.3, JALAN SS21/39,47040 PETALING JAYA SELANGOR",
+      "date": "18/01/2017",
+      "total": "38.90"
+    },
+    "after": {
+      "company": "GERBANG AIAF RESTAURANTS SDN BHD",
+      "address": "LEVEL 6, BANGUNAN TH, DAMANSARA UPTOWN3 NO.3, JALAN SS21/39,47400 PETALING JAYA SELANGOR",
+      "date": "18/01/2018",
+      "total": "38.90"
+    },
+    "reference": {
+      "company": "GERBANG ALAF RESTAURANTS SDN BHD",
+      "address": "LEVEL 6, BANGUNAN TH, DAMANSARA UPTOWN3 NO.3, JALAN SS21/39,47400 PETALING JAYA SELANGOR",
+      "date": "18/01/2018",
+      "total": "38.90"
+    },
+    "matched_fields_before": [
+      "total"
+    ],
+    "matched_fields_after": [
+      "address",
+      "date",
+      "total"
+    ],
+    "changed_fields": [
+      "company",
+      "address",
+      "date"
+    ],
+    "normalized_changed_fields": [
+      "company",
+      "address",
+      "date"
+    ],
+    "before_schema_valid": true,
+    "after_schema_valid": true,
+    "before_model": "v2",
+    "category": "address_correction",
+    "title": "Address corrected",
+    "eligible_count_before_diversity_filter": 120,
+    "raw_output_before": "{\"company\": \"GERBANG ALF RESTAURANTS SDN BHD\", \"address\": \"LEVEL 6, BUANGANTH, DAMASARA UPTOWN NO.3, JALAN SS21/39,47040 PETALING JAYA SELANGOR\", \"date\": \"18/01/2017\", \"total\": \"38.90\"}",
+    "raw_output_after": "{\"company\": \"GERBANG AIAF RESTAURANTS SDN BHD\", \"address\": \"LEVEL 6, BANGUNAN TH, DAMANSARA UPTOWN3 NO.3, JALAN SS21/39,47400 PETALING JAYA SELANGOR\", \"date\": \"18/01/2018\", \"total\": \"38.90\"}",
+    "figure_sha256": "8569416313975c6aed7dc2d0931952a530aafcfd6484392b3f61560145799266"
+  },
+  {
+    "sample_id": "X00016469671",
+    "image_path": "data/raw/sroie/SROIE2019/test/img/X00016469671.jpg",
+    "image_sha256": "d5a69148459666ea0ea9f00831960886caa7f859c54e802c86d1500935ddbdb8",
+    "figure": "06_v2_unchanged_fields_X00016469671.png",
+    "before": {
+      "company": "OJC MARKETING SDN BHD",
+      "address": "NO 2 & 4, JALAN BAYU 4, BANDAR SERI ALAM, 81750 MASAI, JOHOR",
+      "date": "02/01/2019",
+      "total": "170.00"
+    },
+    "after": {
+      "company": "OJC MARKETING SDN BHD",
+      "address": "NO 2 & 4, JALAN BAYU 4, BANDAR SERI ALAM, 81750 MASAI, JOHOR",
+      "date": "02/01/2019",
+      "total": "170.00"
+    },
+    "reference": {
+      "company": "OJC MARKETING SDN BHD",
+      "address": "NO 2 & 4, JALAN BAYU 4, BANDAR SERI ALAM, 81750 MASAI, JOHOR",
+      "date": "02/01/2019",
+      "total": "170.00"
+    },
+    "matched_fields_before": [
+      "company",
+      "address",
+      "date",
+      "total"
+    ],
+    "matched_fields_after": [
+      "company",
+      "address",
+      "date",
+      "total"
+    ],
+    "changed_fields": [],
+    "normalized_changed_fields": [],
+    "before_schema_valid": true,
+    "after_schema_valid": true,
+    "before_model": "v2",
+    "category": "unchanged_fields",
+    "title": "Extracted fields unchanged",
+    "eligible_count_before_diversity_filter": 40,
+    "raw_output_before": "{\"company\": \"OJC MARKETING SDN BHD\", \"address\": \"NO 2 & 4, JALAN BAYU 4, BANDAR SERI ALAM, 81750 MASAI, JOHOR\", \"date\": \"02/01/2019\", \"total\": \"170.00\"}",
+    "raw_output_after": "{\"company\": \"OJC MARKETING SDN BHD\", \"address\": \"NO 2 & 4, JALAN BAYU 4, BANDAR SERI ALAM, 81750 MASAI, JOHOR\", \"date\": \"02/01/2019\", \"total\": \"170.00\"}",
+    "figure_sha256": "242bdb3a99883ca59d9fc7aee21785241bb61cd01ee59954ded1d07e44d7c18c"
+  },
+  {
+    "sample_id": "X51005724628",
+    "image_path": "data/raw/sroie/SROIE2019/test/img/X51005724628.jpg",
+    "image_sha256": "73a5cc15da83d73085107d9b1016e4da6df982fc86ea18a79c0dc2b699ae4bb3",
+    "figure": "07_v2_regression_X51005724628.png",
+    "before": {
+      "company": "KEDAI PAPAN YEW CHUAN",
+      "address": "LOT 276 JALAN BANTING 43800 DENGKIL, SELANGOR.",
+      "date": "10/03/2018",
+      "total": "84.80"
+    },
+    "after": {
+      "company": "KEDAI PAPAN YEW C HUAN",
+      "address": "LOT 276 JALAN BANTING 43800 DENGKIL, SELANGOR.",
+      "date": "10/03/2018",
+      "total": "84.80"
+    },
+    "reference": {
+      "company": "KEDAI PAPAN YEW CHUAN",
+      "address": "LOT 276 JALAN BANTING 43800 DENGKIL, SELANGOR.",
+      "date": "10/03/2018",
+      "total": "84.80"
+    },
+    "matched_fields_before": [
+      "company",
+      "address",
+      "date",
+      "total"
+    ],
+    "matched_fields_after": [
+      "address",
+      "date",
+      "total"
+    ],
+    "changed_fields": [
+      "company"
+    ],
+    "normalized_changed_fields": [
+      "company"
+    ],
+    "before_schema_valid": true,
+    "after_schema_valid": true,
+    "before_model": "v2",
+    "category": "regression",
+    "title": "Fewer correct fields after the upgrade",
+    "eligible_count_before_diversity_filter": 6,
+    "raw_output_before": "{\"company\": \"KEDAI PAPAN YEW CHUAN\", \"address\": \"LOT 276 JALAN BANTING 43800 DENGKIL, SELANGOR.\", \"date\": \"10/03/2018\", \"total\": \"84.80\"}",
+    "raw_output_after": "{\"company\": \"KEDAI PAPAN YEW C HUAN\", \"address\": \"LOT 276 JALAN BANTING 43800 DENGKIL, SELANGOR.\", \"date\": \"10/03/2018\", \"total\": \"84.80\"}",
+    "figure_sha256": "c59f2e8524df845520d84c6aaf0875e829d3b2addffdcde7fde30d93045f0df1"
+  },
+  {
+    "sample_id": "X51005705729",
+    "image_path": "data/raw/sroie/SROIE2019/test/img/X51005705729.jpg",
+    "image_sha256": "81055f6b66c1a0554c491c4e076cf516ed26e2ae7f946d54c45fb426db164883",
+    "figure": "08_qwen_base_multi_field_recovery_X51005705729.png",
+    "before": {
+      "company": "ASO ELECTRICAL TRADING SDN BHD",
+      "address": "NO 31G, JALAN SEPADU C 25/C, SECTION 26, TAMAN INDUSTRIES, AXIS 40400 SHAH ALAM, SELANGOR.",
+      "date": "13/10/2017",
+      "total": "89.26"
+    },
+    "after": {
+      "company": "ASO ELECTRICAL TRADING SDN BHD",
+      "address": "NO 31G, JALAN SEPADU C 25/C, SECTION 25, TAMAN INDUSTRIES, AXIS 40400 SHAH ALAM, SELANGOR.",
+      "date": "13/10/2017",
+      "total": "94.60"
+    },
+    "reference": {
+      "company": "ASO ELECTRICAL TRADING SDN BHD",
+      "date": "13/10/2017",
+      "address": "NO 31G, JALAN SEPADU C 25/C, SECTION 25, TAMAN INDUSTRIES, AXIS 40400 SHAH ALAM, SELANGOR.",
+      "total": "94.60"
+    },
+    "matched_fields_before": [
+      "company",
+      "date"
+    ],
+    "matched_fields_after": [
+      "company",
+      "address",
+      "date",
+      "total"
+    ],
+    "changed_fields": [
+      "address",
+      "total"
+    ],
+    "normalized_changed_fields": [
+      "address",
+      "total"
+    ],
+    "before_schema_valid": false,
+    "after_schema_valid": true,
+    "before_model": "qwen_base",
+    "category": "multi_field_recovery",
+    "title": "Several fields recovered",
+    "eligible_count_before_diversity_filter": 12,
+    "raw_output_before": "```json\n{\n  \"company\": \"ASO ELECTRICAL TRADING SDN BHD\",\n  \"address\": \"NO 31G, JALAN SEPADU C 25/C, SECTION 26, TAMAN INDUSTRIES, AXIS 40400 SHAH ALAM, SELANGOR.\",\n  \"date\": \"13/10/2017\",\n  \"total\": \"89.26\"\n}\n```",
+    "raw_output_after": "{\"company\": \"ASO ELECTRICAL TRADING SDN BHD\", \"address\": \"NO 31G, JALAN SEPADU C 25/C, SECTION 25, TAMAN INDUSTRIES, AXIS 40400 SHAH ALAM, SELANGOR.\", \"date\": \"13/10/2017\", \"total\": \"94.60\"}",
+    "annotation_note": "Visual annotation discrepancy: the printed address appears to say SECTION 26, while the reference says SECTION 25. The adapter's address matches the reference, but the base matches the visible text. Green cells mean reference agreement. The 89.26 to 94.60 total correction is visible on the bill. Original references are preserved and benchmark scores are unchanged.",
+    "figure_sha256": "ef32e2f1fd6ad180a635105ca0682beb76663779781ffc0411197c0f9fd53a53"
+  },
+  {
+    "sample_id": "X51005230648",
+    "image_path": "data/raw/sroie/SROIE2019/test/img/X51005230648.jpg",
+    "image_sha256": "7f2d2cd7cfd47948f12e3f711d8d6926724c78cb174dfbf48b9ed6b9fe4d62f0",
+    "figure": "09_qwen_base_total_correction_X51005230648.png",
+    "before": {
+      "company": "CROSS CHANNEL NETWORK SDN. BHD.",
+      "address": "47, JALAN MERANTI 1, SEK. 3, BANDAR UTAMA BATANG KALI, 44300 BATANG KALI, SELANGOR.",
+      "date": "29/01/2018",
+      "total": "6.00"
+    },
+    "after": {
+      "company": "CROSS CHANNEL NETWORK SDN. BHD.",
+      "address": "47, JALAN MERANTI 1, SEK. 3, BANDAR UTAMA BATANG KALI, 44300 BATANG KALI, SELANGOR.",
+      "date": "29/01/2018",
+      "total": "6.35"
+    },
+    "reference": {
+      "company": "CROSS CHANNEL NETWORK SDN. BHD.",
+      "date": "29/01/2018",
+      "address": "47, JALAN MERANTI 1, SEK. 3, BANDAR UTAMA BATANG KALI, 44300 BATANG KALI, SELANGOR.",
+      "total": "6.35"
+    },
+    "matched_fields_before": [
+      "company",
+      "address",
+      "date"
+    ],
+    "matched_fields_after": [
+      "company",
+      "address",
+      "date",
+      "total"
+    ],
+    "changed_fields": [
+      "total"
+    ],
+    "normalized_changed_fields": [
+      "total"
+    ],
+    "before_schema_valid": false,
+    "after_schema_valid": true,
+    "before_model": "qwen_base",
+    "category": "total_correction",
+    "title": "Total corrected",
+    "eligible_count_before_diversity_filter": 18,
+    "raw_output_before": "```json\n{\n  \"company\": \"CROSS CHANNEL NETWORK SDN. BHD.\",\n  \"address\": \"47, JALAN MERANTI 1, SEK. 3, BANDAR UTAMA BATANG KALI, 44300 BATANG KALI, SELANGOR.\",\n  \"date\": \"29/01/2018\",\n  \"total\": \"6.00\"\n}\n```",
+    "raw_output_after": "{\"company\": \"CROSS CHANNEL NETWORK SDN. BHD.\", \"address\": \"47, JALAN MERANTI 1, SEK. 3, BANDAR UTAMA BATANG KALI, 44300 BATANG KALI, SELANGOR.\", \"date\": \"29/01/2018\", \"total\": \"6.35\"}",
+    "figure_sha256": "8748ef14a0376577640208299217df8b97a7ca4148d9f2b8bf09332320ebafff"
+  },
+  {
+    "sample_id": "X51005568866",
+    "image_path": "data/raw/sroie/SROIE2019/test/img/X51005568866.jpg",
+    "image_sha256": "54453ac23ff461d4c2f57e5aee4e4aca5c68febf7779f42d587c7290f08d6af9",
+    "figure": "10_qwen_base_date_correction_X51005568866.png",
+    "before": {
+      "company": "POPULAR BOOK CO. (M) SDN BHD",
+      "address": "No 8, Jalan 7/118B, Desa Tun Razak 56000 Kuala Lumpur, Malaysia CHERAS LEISURE MALL",
+      "date": "25 AUG - 3 Sept 2017",
+      "total": "5.05"
+    },
+    "after": {
+      "company": "POPULAR BOOK CO. (M) SDN BHD",
+      "address": "NO 8, JALAN 7/118B, DESA TUN RAZAK 56000 KUALA LUMPUR, MALAYSIA CHERAS LEISURE MALL",
+      "date": "20/08/17",
+      "total": "5.05"
+    },
+    "reference": {
+      "company": "POPULAR BOOK CO. (M) SDN BHD",
+      "date": "20/08/17",
+      "address": "NO 8, JALAN 7/118B, DESA TUN RAZAK 56000 KUALA LUMPUR, MALAYSIA",
+      "total": "5.05"
+    },
+    "matched_fields_before": [
+      "company",
+      "total"
+    ],
+    "matched_fields_after": [
+      "company",
+      "date",
+      "total"
+    ],
+    "changed_fields": [
+      "address",
+      "date"
+    ],
+    "normalized_changed_fields": [
+      "date"
+    ],
+    "before_schema_valid": false,
+    "after_schema_valid": true,
+    "before_model": "qwen_base",
+    "category": "date_correction",
+    "title": "Date corrected",
+    "eligible_count_before_diversity_filter": 9,
+    "raw_output_before": "```json\n{\n  \"company\": \"POPULAR BOOK CO. (M) SDN BHD\",\n  \"address\": \"No 8, Jalan 7/118B, Desa Tun Razak 56000 Kuala Lumpur, Malaysia CHERAS LEISURE MALL\",\n  \"date\": \"25 AUG - 3 Sept 2017\",\n  \"total\": \"5.05\"\n}\n```",
+    "raw_output_after": "{\"company\": \"POPULAR BOOK CO. (M) SDN BHD\", \"address\": \"NO 8, JALAN 7/118B, DESA TUN RAZAK 56000 KUALA LUMPUR, MALAYSIA CHERAS LEISURE MALL\", \"date\": \"20/08/17\", \"total\": \"5.05\"}",
+    "figure_sha256": "7cc7006483f2050d030de97be0185dd9dcc949aa97c7da73d40f825e111c8683"
+  },
+  {
+    "sample_id": "X51005447844",
+    "image_path": "data/raw/sroie/SROIE2019/test/img/X51005447844.jpg",
+    "image_sha256": "19a416dbbd94cec7d322e27bc939e2bb72b49497c6cab1e3b047983f9a5faa4e",
+    "figure": "11_qwen_base_company_correction_X51005447844.png",
+    "before": {
+      "company": "RESTAURANT JIAWEI",
+      "address": "13, JLN TASI K UTAMA 8 MEDAN NIAGA DAMAI SG BESI 57000 KL",
+      "date": "23/2/2018",
+      "total": "110.00"
+    },
+    "after": {
+      "company": "RESTAURANT JIAWEI JIAWEI HOUSE",
+      "address": "13, JLN TASIK UTAMA 8 MEDAN NIAGA DAMAI SG BESI 57000 KL",
+      "date": "23/2/2018",
+      "total": "110.00"
+    },
+    "reference": {
+      "company": "RESTAURANT JIAWEI JIAWEI HOUSE",
+      "date": "23/2/2018",
+      "address": "13, JLN TASIK UTAMA 8 MEDAN NIAGA DAMAI SG BESI",
+      "total": "110.00"
+    },
+    "matched_fields_before": [
+      "date",
+      "total"
+    ],
+    "matched_fields_after": [
+      "company",
+      "date",
+      "total"
+    ],
+    "changed_fields": [
+      "company",
+      "address"
+    ],
+    "normalized_changed_fields": [
+      "company",
+      "address"
+    ],
+    "before_schema_valid": false,
+    "after_schema_valid": true,
+    "before_model": "qwen_base",
+    "category": "company_correction",
+    "title": "Merchant corrected",
+    "eligible_count_before_diversity_filter": 26,
+    "raw_output_before": "```json\n{\n  \"company\": \"RESTAURANT JIAWEI\",\n  \"address\": \"13, JLN TASI K UTAMA 8 MEDAN NIAGA DAMAI SG BESI 57000 KL\",\n  \"date\": \"23/2/2018\",\n  \"total\": \"110.00\"\n}\n```",
+    "raw_output_after": "{\"company\": \"RESTAURANT JIAWEI JIAWEI HOUSE\", \"address\": \"13, JLN TASIK UTAMA 8 MEDAN NIAGA DAMAI SG BESI 57000 KL\", \"date\": \"23/2/2018\", \"total\": \"110.00\"}",
+    "figure_sha256": "23c0f273a2c12fbfc548611a4fdb44c014c47265a470dc409a2efc03bea35dfa"
+  },
+  {
+    "sample_id": "X51005433543",
+    "image_path": "data/raw/sroie/SROIE2019/test/img/X51005433543.jpg",
+    "image_sha256": "323ba9805df1655f5742cd49d3db09342270e07ceded5f1730d5ad64683e5acf",
+    "figure": "12_qwen_base_address_correction_X51005433543.png",
+    "before": {
+      "company": "UNIHAKKA INTERNATIONAL SDN BHD",
+      "address": "12, Jalan Tampa 7/4 Kawasan Perindustrian, Tampa 81200 Johor Bahru, Johor",
+      "date": "13 Mar 2018",
+      "total": "57.10"
+    },
+    "after": {
+      "company": "UNIHAKKA INTERNATIONAL SDN BHD",
+      "address": "12, JALAN TAMPOI 7/4 KAWASAN PERINDUSTRIAN TAMPOI 81200 JOHOR BAHRU, JOHOR",
+      "date": "13 MAR 2018",
+      "total": "57.10"
+    },
+    "reference": {
+      "company": "UNIHAKKA INTERNATIONAL SDN BHD",
+      "date": "13 MAR 2018",
+      "address": "12, JALAN TAMPOI 7/4,KAWASAN PERINDUSTRIAN TAMPOI,81200 JOHOR BAHRU,JOHOR",
+      "total": "$8.20"
+    },
+    "matched_fields_before": [
+      "company",
+      "date"
+    ],
+    "matched_fields_after": [
+      "company",
+      "address",
+      "date"
+    ],
+    "changed_fields": [
+      "address",
+      "date"
+    ],
+    "normalized_changed_fields": [
+      "address"
+    ],
+    "before_schema_valid": false,
+    "after_schema_valid": true,
+    "before_model": "qwen_base",
+    "category": "address_correction",
+    "title": "Address corrected",
+    "eligible_count_before_diversity_filter": 40,
+    "raw_output_before": "```json\n{\n  \"company\": \"UNIHAKKA INTERNATIONAL SDN BHD\",\n  \"address\": \"12, Jalan Tampa 7/4 Kawasan Perindustrian, Tampa 81200 Johor Bahru, Johor\",\n  \"date\": \"13 Mar 2018\",\n  \"total\": \"57.10\"\n}\n```",
+    "raw_output_after": "{\"company\": \"UNIHAKKA INTERNATIONAL SDN BHD\", \"address\": \"12, JALAN TAMPOI 7/4 KAWASAN PERINDUSTRIAN TAMPOI 81200 JOHOR BAHRU, JOHOR\", \"date\": \"13 MAR 2018\", \"total\": \"57.10\"}",
+    "figure_sha256": "ba3865e77103b20936fa5c2b6ce31883fde6a51b37de5e49057fd3f4057d40f6"
+  },
+  {
+    "sample_id": "X00016469670",
+    "image_path": "data/raw/sroie/SROIE2019/test/img/X00016469670.jpg",
+    "image_sha256": "f9c8699bb1adcfa3a49cd8425057c1818b5b4ec62d003a6f8bd5b0af8d7ccd53",
+    "figure": "13_qwen_base_unchanged_fields_X00016469670.png",
+    "before": {
+      "company": "OJC MARKETING SDN BHD",
+      "address": "NO 2 & 4, JALAN BAYU 4, BANDAR SERI ALAM, 81750 MASAI, JOHOR",
+      "date": "15/01/2019",
+      "total": "193.00"
+    },
+    "after": {
+      "company": "OJC MARKETING SDN BHD",
+      "address": "NO 2 & 4, JALAN BAYU 4, BANDAR SERI ALAM, 81750 MASAI, JOHOR",
+      "date": "15/01/2019",
+      "total": "193.00"
+    },
+    "reference": {
+      "company": "OJC MARKETING SDN BHD",
+      "date": "15/01/2019",
+      "address": "NO 2 & 4, JALAN BAYU 4, BANDAR SERI ALAM, B1750 MASAI, JOHOR",
+      "total": "193.00"
+    },
+    "matched_fields_before": [
+      "company",
+      "date",
+      "total"
+    ],
+    "matched_fields_after": [
+      "company",
+      "date",
+      "total"
+    ],
+    "changed_fields": [],
+    "normalized_changed_fields": [],
+    "before_schema_valid": false,
+    "after_schema_valid": true,
+    "before_model": "qwen_base",
+    "category": "unchanged_fields",
+    "title": "Extracted fields unchanged",
+    "eligible_count_before_diversity_filter": 138,
+    "raw_output_before": "```json\n{\n  \"company\": \"OJC MARKETING SDN BHD\",\n  \"address\": \"NO 2 & 4, JALAN BAYU 4, BANDAR SERI ALAM, 81750 MASAI, JOHOR\",\n  \"date\": \"15/01/2019\",\n  \"total\": \"193.00\"\n}\n```",
+    "raw_output_after": "{\"company\": \"OJC MARKETING SDN BHD\", \"address\": \"NO 2 & 4, JALAN BAYU 4, BANDAR SERI ALAM, 81750 MASAI, JOHOR\", \"date\": \"15/01/2019\", \"total\": \"193.00\"}",
+    "figure_sha256": "b4b786443de0d1be02527801881bfcf7944f53a48447c28d9e2626922d1a0a0d"
+  },
+  {
+    "sample_id": "X51005230621",
+    "image_path": "data/raw/sroie/SROIE2019/test/img/X51005230621.jpg",
+    "image_sha256": "237c48627388c41df835814b64b95134819deae3bb8c055ba6c69ba44dca375e",
+    "figure": "14_qwen_base_regression_X51005230621.png",
+    "before": {
+      "company": "SIN LIANHAP SDN BHD",
+      "address": "LOT 13, JALAN IPOH, KG BATU 30, ULU YAM LAMA 44300 BTG KALI, SELANGOR.",
+      "date": "05/02/2018",
+      "total": "7.30"
+    },
+    "after": {
+      "company": "SIN LIANHAP SDN BHD",
+      "address": "LOT 13, JALAN LOT 13, JALAN IPOH, KG BATU 30 , ULU YAM LAMA 44300 BTG KALI, SELANGOR.",
+      "date": "05/02/2018",
+      "total": "7.30"
+    },
+    "reference": {
+      "company": "SIN LIANHAP SDN BHD",
+      "date": "05/02/2018",
+      "address": "LOT 13, JALAN IPOH, KG BATU 30, ULU YAM LAMA 44300 BTG KALI, SELANGOR.",
+      "total": "7.30"
+    },
+    "matched_fields_before": [
+      "company",
+      "address",
+      "date",
+      "total"
+    ],
+    "matched_fields_after": [
+      "company",
+      "date",
+      "total"
+    ],
+    "changed_fields": [
+      "address"
+    ],
+    "normalized_changed_fields": [
+      "address"
+    ],
+    "before_schema_valid": false,
+    "after_schema_valid": true,
+    "before_model": "qwen_base",
+    "category": "regression",
+    "title": "Fewer correct fields after the upgrade",
+    "eligible_count_before_diversity_filter": 10,
+    "raw_output_before": "```json\n{\n  \"company\": \"SIN LIANHAP SDN BHD\",\n  \"address\": \"LOT 13, JALAN IPOH, KG BATU 30, ULU YAM LAMA 44300 BTG KALI, SELANGOR.\",\n  \"date\": \"05/02/2018\",\n  \"total\": \"7.30\"\n}\n```",
+    "raw_output_after": "{\"company\": \"SIN LIANHAP SDN BHD\", \"address\": \"LOT 13, JALAN LOT 13, JALAN IPOH, KG BATU 30 , ULU YAM LAMA 44300 BTG KALI, SELANGOR.\", \"date\": \"05/02/2018\", \"total\": \"7.30\"}",
+    "figure_sha256": "9ccb73c6e5343b19bf18e07219e17260cdf5d53e0cd8878d212d1a27bd596a64"
+  }
+]

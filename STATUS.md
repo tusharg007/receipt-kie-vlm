@@ -5,7 +5,7 @@
 ReceiptOps adds a class-weighted quality classifier, bounded text-only Bolt
 review adapter, persistent FastAPI inference, Prometheus metrics, SQLite
 feedback/export, feature PSI, input/auth/concurrency checks, CI and Docker/ECS
-blueprints. Full local suite: 97 passing tests at this update. A real V2 API
+blueprints. Full local suite: 98 passing tests at this update. A real V2 API
 request returned HTTP 200 in about 8.3 seconds at 1024 px and was routed to review.
 
 The content audit found seven cross-official-split duplicate image groups. Seven
@@ -37,7 +37,12 @@ base and adapter raw outputs for one validation image; this is a reproducibility
 check, not an accuracy estimate. See [the reload record](artifacts/experiments/qwen3_vl/full_run/export_reload_verification.json).
 The earlier CI dependency failure was fixed with PyArrow 19.0.1; remote run
 40070331478 passed 94 tests on commit 432d59e. Current local validation passes
-97 tests, including raw-output consistency checks for the cloud result verifier.
+98 tests, including raw-output consistency checks and portfolio outcome-count checks.
+
+The README now includes the system design, experiment progression, implementation
+map and measured tradeoffs. Its expanded gallery has 14 distinct bills covering
+field corrections, unchanged outputs and regressions. CI audits the gallery's
+selection, displayed values, source outputs and figure checksums without raw images.
 
 The following July release status is archived. Its 246-ID evaluation novelty
 claims are superseded by the content audit; original artifacts remain unchanged.

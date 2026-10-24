@@ -1,0 +1,129 @@
+{
+  "sample_count": 239,
+  "scope": "239-record content-disjoint retrospective comparison, not fresh test data",
+  "outcomes": {
+    "v2": {
+      "sample_count": 239,
+      "improved": 167,
+      "equal_count": 66,
+      "regressed": 6,
+      "identical_fields": 40,
+      "complete_record_recovered": 137,
+      "complete_record_lost": 5,
+      "both_complete": 39,
+      "both_incomplete": 58
+    },
+    "qwen_base": {
+      "sample_count": 239,
+      "improved": 78,
+      "equal_count": 151,
+      "regressed": 10,
+      "identical_fields": 138,
+      "complete_record_recovered": 58,
+      "complete_record_lost": 7,
+      "both_complete": 118,
+      "both_incomplete": 56
+    }
+  },
+  "case_count": 14,
+  "selection": [
+    {
+      "before_model": "v2",
+      "category": "multi_field_recovery",
+      "title": "Several fields recovered",
+      "sample_id": "X51005230657",
+      "eligible_count_before_diversity_filter": 71
+    },
+    {
+      "before_model": "v2",
+      "category": "total_correction",
+      "title": "Total corrected",
+      "sample_id": "X51005268408",
+      "eligible_count_before_diversity_filter": 77
+    },
+    {
+      "before_model": "v2",
+      "category": "date_correction",
+      "title": "Date corrected",
+      "sample_id": "X51005200931",
+      "eligible_count_before_diversity_filter": 28
+    },
+    {
+      "before_model": "v2",
+      "category": "company_correction",
+      "title": "Merchant corrected",
+      "sample_id": "X51005337877",
+      "eligible_count_before_diversity_filter": 61
+    },
+    {
+      "before_model": "v2",
+      "category": "address_correction",
+      "title": "Address corrected",
+      "sample_id": "X51005230616",
+      "eligible_count_before_diversity_filter": 120
+    },
+    {
+      "before_model": "v2",
+      "category": "unchanged_fields",
+      "title": "Extracted fields unchanged",
+      "sample_id": "X00016469671",
+      "eligible_count_before_diversity_filter": 40
+    },
+    {
+      "before_model": "v2",
+      "category": "regression",
+      "title": "Fewer correct fields after the upgrade",
+      "sample_id": "X51005724628",
+      "eligible_count_before_diversity_filter": 6
+    },
+    {
+      "before_model": "qwen_base",
+      "category": "multi_field_recovery",
+      "title": "Several fields recovered",
+      "sample_id": "X51005705729",
+      "eligible_count_before_diversity_filter": 12
+    },
+    {
+      "before_model": "qwen_base",
+      "category": "total_correction",
+      "title": "Total corrected",
+      "sample_id": "X51005230648",
+      "eligible_count_before_diversity_filter": 18
+    },
+    {
+      "before_model": "qwen_base",
+      "category": "date_correction",
+      "title": "Date corrected",
+      "sample_id": "X51005568866",
+      "eligible_count_before_diversity_filter": 9
+    },
+    {
+      "before_model": "qwen_base",
+      "category": "company_correction",
+      "title": "Merchant corrected",
+      "sample_id": "X51005447844",
+      "eligible_count_before_diversity_filter": 26
+    },
+    {
+      "before_model": "qwen_base",
+      "category": "address_correction",
+      "title": "Address corrected",
+      "sample_id": "X51005433543",
+      "eligible_count_before_diversity_filter": 40
+    },
+    {
+      "before_model": "qwen_base",
+      "category": "unchanged_fields",
+      "title": "Extracted fields unchanged",
+      "sample_id": "X00016469670",
+      "eligible_count_before_diversity_filter": 138
+    },
+    {
+      "before_model": "qwen_base",
+      "category": "regression",
+      "title": "Fewer correct fields after the upgrade",
+      "sample_id": "X51005230621",
+      "eligible_count_before_diversity_filter": 10
+    }
+  ]
+}

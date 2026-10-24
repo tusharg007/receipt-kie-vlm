@@ -31,3 +31,5 @@ jobs:
           --output-dir .cache/qwen-reproduction --report .cache/qwen-reproduction.md
       - name: Check dependency compatibility
         run: pip check
+      - name: Audit portfolio gallery against saved outputs (no raw images)
+        run: python scripts/build_portfolio_report.py --verify-only

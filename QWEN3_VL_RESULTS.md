@@ -56,3 +56,5 @@ A fresh Kaggle T4 process reloaded the saved adapter and reproduced the exact ba
 [Bill-by-bill before/after examples](artifacts/experiments/qwen3_vl/full_run/image_comparisons/README.md)
 
 [Legacy V2 versus latest Qwen examples](artifacts/experiments/qwen3_vl/full_run/v2_image_comparisons/README.md)
+
+[Expanded 14-case output gallery and outcome analysis](artifacts/experiments/qwen3_vl/full_run/portfolio/README.md)

@@ -523,6 +523,12 @@ def main() -> int:
         )
         legacy_link = Path(os.path.relpath(legacy_gallery, args.report.parent)).as_posix()
         lines.extend([f"[Legacy V2 versus latest Qwen examples]({legacy_link})", ""])
+    portfolio = args.output_dir / "portfolio/README.md"
+    if portfolio.is_file():
+        portfolio_link = Path(os.path.relpath(portfolio, args.report.parent)).as_posix()
+        lines.extend(
+            [f"[Expanded 14-case output gallery and outcome analysis]({portfolio_link})", ""]
+        )
     args.report.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
     print(json.dumps({"metrics": metrics, "paired_bootstrap": intervals}, indent=2))
     return 0
