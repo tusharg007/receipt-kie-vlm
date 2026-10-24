@@ -1,5 +1,5 @@
 {
-  "dataset": "E:\\VLM-Receipt-OCR-main\\VLM-Receipt-OCR-main\\data\\raw\\sroie\\SROIE2019",
+  "dataset": "data/raw/sroie/SROIE2019 (local dataset; not included)",
   "splits": {
     "train": {
       "image_count": 626,

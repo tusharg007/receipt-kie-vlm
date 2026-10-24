@@ -23,5 +23,11 @@ jobs:
         run: pytest -q -p no:cacheprovider
       - name: Reproduce quality model from committed predictions
         run: python scripts/train_quality_gate.py --output-dir .cache/quality-reproduction
+      - name: Verify published Qwen accuracy and validation selection (no GPU)
+        if: hashFiles('artifacts/experiments/qwen3_vl/full_run/training_summary.json') != ''
+        run: >-
+          python scripts/analyze_qwen_experiment.py
+          --run-dir artifacts/experiments/qwen3_vl/full_run
+          --output-dir .cache/qwen-reproduction --report .cache/qwen-reproduction.md
       - name: Check dependency compatibility
         run: pip check

@@ -1,0 +1,76 @@
+{
+  "adapted": {
+    "sample_count": 174,
+    "valid_json_rate": 0.9942528735632183,
+    "per_field": {
+      "company": {
+        "raw_exact_match": 0.9137931034482759,
+        "normalized_exact_match": 0.9195402298850575,
+        "normalized_similarity": 0.9847275533316384
+      },
+      "address": {
+        "raw_exact_match": 0.6896551724137931,
+        "normalized_exact_match": 0.8045977011494253,
+        "normalized_similarity": 0.9869619741358832
+      },
+      "date": {
+        "raw_exact_match": 0.9712643678160919,
+        "normalized_exact_match": 0.9827586206896551,
+        "normalized_similarity": 0.9901204159824849
+      },
+      "total": {
+        "raw_exact_match": 0.7586206896551724,
+        "normalized_exact_match": 0.9597701149425287,
+        "normalized_similarity": 0.98227969348659
+      }
+    },
+    "company_accuracy": 0.9195402298850575,
+    "address_similarity": 0.9869619741358832,
+    "date_accuracy": 0.9827586206896551,
+    "total_accuracy": 0.9597701149425287,
+    "complete_record_raw_exact_match": 0.5,
+    "complete_record_normalized_exact_match": 0.7183908045977011,
+    "macro_normalized_exact_match": 0.9166666666666666,
+    "macro_normalized_similarity": 0.9860224092341492,
+    "average_inference_latency_seconds": 10.908379179166687,
+    "median_inference_latency_seconds": 10.662453415000073,
+    "peak_gpu_memory_mib": null
+  },
+  "base": {
+    "sample_count": 174,
+    "valid_json_rate": 0.0,
+    "per_field": {
+      "company": {
+        "raw_exact_match": 0.0,
+        "normalized_exact_match": 0.0,
+        "normalized_similarity": 0.0
+      },
+      "address": {
+        "raw_exact_match": 0.0,
+        "normalized_exact_match": 0.0,
+        "normalized_similarity": 0.0
+      },
+      "date": {
+        "raw_exact_match": 0.0,
+        "normalized_exact_match": 0.0,
+        "normalized_similarity": 0.0
+      },
+      "total": {
+        "raw_exact_match": 0.0,
+        "normalized_exact_match": 0.0,
+        "normalized_similarity": 0.0
+      }
+    },
+    "company_accuracy": 0.0,
+    "address_similarity": 0.0,
+    "date_accuracy": 0.0,
+    "total_accuracy": 0.0,
+    "complete_record_raw_exact_match": 0.0,
+    "complete_record_normalized_exact_match": 0.0,
+    "macro_normalized_exact_match": 0.0,
+    "macro_normalized_similarity": 0.0,
+    "average_inference_latency_seconds": 8.0907576181954,
+    "median_inference_latency_seconds": 8.099979193999843,
+    "peak_gpu_memory_mib": null
+  }
+}

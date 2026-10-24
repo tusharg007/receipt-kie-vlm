@@ -1,0 +1,30 @@
+{
+  "model_id": "Qwen/Qwen3-VL-2B-Instruct",
+  "model_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "base_model_license": "Apache-2.0",
+  "adapter_file": "adapter_model.safetensors",
+  "adapter_sha256": "90583f801f2668c931732c9e3a8a25f0ee76c9c34d3c6f41441d65e66fe433a5",
+  "adapter_bytes": 69788264,
+  "selected_checkpoint": 112,
+  "optimizer_steps": 168,
+  "epochs": 3,
+  "selection": "Minimum merchant-disjoint validation loss",
+  "gpu": "Tesla T4",
+  "training_peak_allocated_mib": 5522.703125,
+  "dtype": "torch.float16",
+  "quantization": "NF4 double quantization",
+  "lora": {"rank": 16, "alpha": 32, "dropout": 0.05},
+  "evaluation": {
+    "records": 239,
+    "normalized_merchants": 113,
+    "scope": "Content-disjoint retrospective comparison, not fresh test data",
+    "macro_normalized_exact_match": 0.9215481171548117,
+    "complete_record_normalized_exact_match": 0.7364016736401674,
+    "strict_json_valid_count": 239,
+    "strict_json_valid_rate": 1.0,
+    "average_inference_latency_seconds": 10.77097383477405
+  },
+  "deployment_allowed": false,
+  "review_required": true,
+  "report": "QWEN3_VL_RESULTS.md"
+}

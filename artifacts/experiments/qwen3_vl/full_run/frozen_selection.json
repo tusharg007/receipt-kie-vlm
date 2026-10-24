@@ -1,0 +1,6 @@
+{
+  "selected": "qwen_qlora",
+  "criterion": "Higher validation macro exact with no complete-record exact regression",
+  "based_on": "Merchant-disjoint validation only, before evaluation predictions",
+  "deployment_allowed": false
+}

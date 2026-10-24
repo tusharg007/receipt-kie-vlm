@@ -55,3 +55,29 @@ def test_comparison_detects_saved_fields_that_disagree_with_model_output():
         module.verify_raw_predictions([row])
     row["valid_json"], row["parsed_prediction"] = False, None
     module.verify_raw_predictions([row])
+
+
+def test_comparison_rejects_a_report_that_disagrees_with_recomputed_field_metrics():
+    module = _module()
+    actual = module.evaluate_predictions([_row()])
+    reported = json.loads(json.dumps(actual))
+    reported["per_field"]["address"]["normalized_exact_match"] = 0.5
+    with pytest.raises(ValueError, match="Reported metrics differ"):
+        module.verify_metric_report(actual, reported)
+
+
+def test_fenced_json_is_recovered_for_field_accuracy_but_not_strict_schema():
+    module = _module()
+    row = _row()
+    row["raw_output"] = "```json\n" + json.dumps(row["ground_truth"]) + "\n```"
+    row["parsed_prediction"], row["valid_json"] = None, False
+    compared, compliance = module.comparison_rows([row])
+    macro, complete = module.correct_vectors(compared, ["A"])
+    assert macro.tolist() == complete.tolist() == [1.0]
+    assert compliance["strict_json_valid_count"] == 0
+    assert compliance["recovered_by_tolerant_parser"] == 1
+    invalid = {**row, "raw_output": "not json"}
+    compared, compliance = module.comparison_rows([invalid])
+    macro, complete = module.correct_vectors(compared, ["A"])
+    assert macro.tolist() == complete.tolist() == [0.0]
+    assert compliance["recovered_by_tolerant_parser"] == 0

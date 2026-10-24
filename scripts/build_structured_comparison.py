@@ -105,6 +105,15 @@ def render_pair(
         fig.text(
             column, 0.84, heading, fontsize=13, weight="bold", color="#152238", linespacing=1.5
         )
+    for column, row in ((columns[0], before), (columns[1], after)):
+        valid = row.get("schema_valid", row.get("valid_json", False))
+        fig.text(
+            column,
+            0.785,
+            "Schema: valid" if valid else "Schema: invalid; raw response saved separately",
+            fontsize=8,
+            color="#48566c",
+        )
     for index, field in enumerate(CANONICAL_FIELDS):
         y = 0.735 - index * 0.155
         fig.text(0.30, y + 0.033, field.upper(), fontsize=10, weight="bold", color="#48566c")
@@ -126,7 +135,11 @@ def render_pair(
                     zorder=0,
                 )
             )
-            value = str(values.get(field, "")) or "(empty)"
+            value = (
+                "(no schema-valid field object)"
+                if correct is not None and not values
+                else str(values.get(field, "")) or "(empty)"
+            )
             lines = textwrap.wrap(value, width=28, break_long_words=True) or ["(empty)"]
             # All text is retained; shrink only for exceptionally long merchant strings.
             font_size = 11.5 if len(lines) <= 4 else 10

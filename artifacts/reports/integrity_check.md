@@ -1,6 +1,6 @@
 # Result Integrity Check
 
-Generated: 2026-07-26T16:30:33.455311+00:00
+Generated: 2026-10-24T10:17:34.535332+00:00
 
 | Check | Status | Evidence |
 |---|---|---|
@@ -69,7 +69,7 @@ Generated: 2026-07-26T16:30:33.455311+00:00
 | No raw dataset is tracked | PASS |  |
 | No intermediate checkpoints, caches, environments, or logs tracked | PASS |  |
 | No tracked file exceeds 100 MiB | PASS |  |
-| All local Markdown links and images exist | PASS | checked=37 |
+| All local Markdown links and images exist | PASS | checked=90 |
 | No credential-like strings in tracked text | PASS |  |
 | No local absolute paths in tracked text | PASS |  |
 

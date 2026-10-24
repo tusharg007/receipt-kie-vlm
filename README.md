@@ -11,11 +11,11 @@ entities:
 {"company":"...","address":"...","date":"...","total":"..."}
 ```
 
-This repository contains a structured-KIE pipeline, two versioned LoRA adapters,
-and auditable evaluation artifacts. V2 is the recommended high-resolution model
-under `models/receipt-kie-lora-v2-highres/`; the original V1 adapter remains
-under `models/receipt-kie-lora/` as a reproducible historical baseline. SmolVLM
-was not trained from scratch.
+This repository contains a structured-KIE pipeline, three versioned LoRA
+adapters, and auditable evaluation artifacts. V2 remains the service default;
+the experimental Qwen3-VL challenger is under
+`models/receipt-kie-qwen3-vl-qlora/`. V1 remains a reproducible historical
+baseline. The base models were not trained from scratch.
 
 ## Current evidence and limitations
 
@@ -74,11 +74,20 @@ Kaggle GPU jobs, merchant-disjoint validation and paired quantized-base versus
 adapted-model evaluation. The protocol uses 445 fit images, 174 validation images
 and the 239-record historical retrospective comparison.
 
-A real T4 smoke test completed two native-FP16 optimizer steps with finite losses,
-changed LoRA weights and about 5.1 GiB peak allocated memory. The three-epoch
-experiment is running. It does not upgrade the local V2 dependency stack or
-replace the service model. Accuracy results will be published only after training
-and evaluation finish. [Verified smoke summary](artifacts/experiments/qwen3_vl/smoke_fp16.json).
+The three-epoch T4 run completed 168 optimizer steps and selected checkpoint 112
+by validation loss. On the same 239 retrospective records, the QLoRA adapter
+scored 92.2% normalized macro field exact and 73.6% complete-record exact, versus
+83.6% and 52.3% for the pinned Qwen base and 63.1% and 18.4% for historical V2.
+Field accuracy uses the same tolerant parser; strict JSON validity is reported
+separately (100%, 0%, and 98.7%). All 239 base outputs were recoverable after
+removing code fences. Paired bootstrap intervals and limitations are in the
+[full report](QWEN3_VL_RESULTS.md), with
+[bill-by-bill comparisons](artifacts/experiments/qwen3_vl/full_run/image_comparisons/README.md).
+
+The adapter does not change the V2 service default and every output still
+requires review. Training used 5.4 GiB peak allocated VRAM; no 4 GB or production
+scale claim is made. See the [complete Kaggle protocol](KAGGLE_TRAINING.md) and
+[published adapter package](models/receipt-kie-qwen3-vl-qlora/README.md).
 
 ## Run the inference service
 
@@ -96,7 +105,7 @@ The default 1024 px setting reduces memory use and routes results to review.
 See [the runbook](RECEIPTOPS.md) for authentication, feedback, configuration,
 monitoring and deployment instructions.
 
-Local validation: **95 unit and API contract tests pass**, with clean Ruff and
+Local validation: **97 unit and API contract tests pass**, with clean Ruff and
 dependency checks. Reproduce with:
 
 ```powershell

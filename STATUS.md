@@ -5,7 +5,7 @@
 ReceiptOps adds a class-weighted quality classifier, bounded text-only Bolt
 review adapter, persistent FastAPI inference, Prometheus metrics, SQLite
 feedback/export, feature PSI, input/auth/concurrency checks, CI and Docker/ECS
-blueprints. Full local suite: 95 passing tests at this update. A real V2 API
+blueprints. Full local suite: 97 passing tests at this update. A real V2 API
 request returned HTTP 200 in about 8.3 seconds at 1024 px and was routed to review.
 
 The content audit found seven cross-official-split duplicate image groups. Seven
@@ -23,15 +23,19 @@ macro exact versus saved V2's 25.0%; neither got a complete record correct and
 one Bolt request exhausted its output budget. Bolt remains experimental. See
 [Bolt pilot](BOLT_PILOT.md). No Bolt GPU-fit, fine-tuning or cloud claim is made.
 
-Kaggle training update: the Qwen3-VL-2B NF4 smoke completed two actual optimizer
-steps on a Tesla T4, with finite losses, nonzero LoRA updates and 5.1 GiB peak
-allocated memory. Native FP16 reduced the measured two-step runtime from 82.4
-seconds in emulated BF16 to 10.4 seconds. This small test is not an accuracy or
-production-throughput result. Full three-epoch training and the paired
-retrospective evaluation are in progress. See [Kaggle protocol](KAGGLE_TRAINING.md).
+Kaggle training update: Qwen3-VL-2B NF4 QLoRA completed three epochs (168 steps)
+on a Tesla T4. Checkpoint 112 was selected by merchant-disjoint validation loss.
+On 239 content-disjoint retrospective records, the adapted model scored 92.2%
+macro field exact and 73.6% complete-record exact, up from 83.6%/52.3% for the
+same pinned Qwen base and 63.1%/18.4% for V2. The base emitted code-fenced JSON;
+strict schema validity is 0% for that base and 100% for QLoRA, while field
+accuracy uses a common tolerant parser. Training peak allocated memory was
+5.4 GiB. This retrospective evaluation is not fresh test data, and the API still
+uses V2. See [full results](QWEN3_VL_RESULTS.md) and the
+[Kaggle protocol](KAGGLE_TRAINING.md). A fresh export reload check is underway.
 The earlier CI dependency failure was fixed with PyArrow 19.0.1; remote run
 40070331478 passed 94 tests on commit 432d59e. Current local validation passes
-95 tests, including raw-output consistency checks for the cloud result verifier.
+97 tests, including raw-output consistency checks for the cloud result verifier.
 
 The following July release status is archived. Its 246-ID evaluation novelty
 claims are superseded by the content audit; original artifacts remain unchanged.

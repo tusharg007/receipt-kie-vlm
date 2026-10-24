@@ -5,9 +5,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import shutil
 import sys
+from collections import Counter
 from pathlib import Path
 
 import numpy as np
@@ -15,7 +17,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from receipt_kie.metrics import evaluate_predictions, normalize_field  # noqa: E402
+from receipt_kie.metrics import evaluate_predictions, extract_json, normalize_field  # noqa: E402
 from receipt_kie.prompts import CANONICAL_FIELDS  # noqa: E402
 from receipt_kie.structured import strict_receipt  # noqa: E402
 
@@ -30,6 +32,51 @@ def verify_raw_predictions(rows: list[dict]) -> None:
         parsed, _ = strict_receipt(row["raw_output"])
         if row.get("parsed_prediction") != parsed or row.get("valid_json") != (parsed is not None):
             raise ValueError(f"Saved parsing differs from raw output for {row['sample_id']}")
+
+
+def comparison_rows(rows: list[dict]) -> tuple[list[dict], dict]:
+    """Apply the production tolerant parser to every model; track strict schema separately."""
+    result_rows, methods = [], Counter()
+    strict_valid_count = 0
+    for row in rows:
+        strict_value, _ = strict_receipt(row["raw_output"])
+        if strict_value is not None:
+            value, method = strict_value, "strict_json"
+            strict_valid_count += 1
+        else:
+            parsed = extract_json(row["raw_output"])
+            value, method = (parsed.value, parsed.method) if parsed.valid else (None, "invalid")
+        methods[method] += 1
+        result_rows.append(
+            {
+                **row,
+                "parsed_prediction": value,
+                "strict_schema_valid": strict_value is not None,
+                "valid_json": value is not None,
+            }
+        )
+    count = len(rows)
+    return result_rows, {
+        "sample_count": count,
+        "strict_json_valid_count": strict_valid_count,
+        "strict_json_valid_rate": strict_valid_count / count if count else 0.0,
+        "recovered_by_tolerant_parser": count - strict_valid_count - methods["invalid"],
+        "parse_methods": dict(sorted(methods.items())),
+    }
+
+
+def verify_metric_report(actual: dict, reported: dict) -> None:
+    if actual.keys() != reported.keys():
+        raise ValueError("Reported metrics differ: keys")
+    for key, value in actual.items():
+        expected = reported[key]
+        if isinstance(value, dict):
+            verify_metric_report(value, expected)
+        elif isinstance(value, float) and isinstance(expected, (float, int)):
+            if not math.isclose(value, expected, rel_tol=1e-10, abs_tol=1e-10):
+                raise ValueError(f"Reported metrics differ: {key}")
+        elif value != expected:
+            raise ValueError(f"Reported metrics differ: {key}")
 
 
 def verify_alignment(variants: dict[str, list[dict]], hashes: dict[str, str]) -> list[str]:
@@ -97,7 +144,8 @@ def plot_metrics(metrics: dict, output: Path) -> None:
     figure.text(
         0.5,
         0.025,
-        "Same image bytes; V2 preprocessing differs. Paired intervals in report.",
+        "Fields use the same tolerant parser; strict JSON validity is reported separately. "
+        "V2 preprocessing differs. Paired intervals in report.",
         ha="center",
         fontsize=9,
     )
@@ -126,7 +174,7 @@ def render_examples(variants: dict, ids: list[str], destination: Path) -> Path:
         "order, independent of model outcomes. These examples are not an accuracy estimate.",
         "",
         "Before = pinned NF4 base; after = selected QLoRA adapter. The image, prompt, "
-        "pixel cap, decoding and strict parsing are identical. Colors compare normalized "
+        "pixel cap and decoding are identical. Colors compare normalized "
         "values with dataset annotations; annotations can contain errors.",
         "",
     ]
@@ -191,8 +239,53 @@ def main() -> int:
     frozen = json.loads((args.run_dir / "frozen_selection.json").read_text("utf-8"))
     if frozen.get("deployment_allowed") is not False:
         raise ValueError("A validation choice is not deployment approval")
-    metrics = {name: evaluate_predictions(rows) for name, rows in variants.items()}
-    vectors = {name: correct_vectors(rows, ids) for name, rows in variants.items()}
+    strict_metrics = {name: evaluate_predictions(rows) for name, rows in variants.items()}
+    cloud_report = json.loads((args.run_dir / "comparison.json").read_text("utf-8"))
+    for local, cloud in (("qwen_base", "qwen_quantized_base"), ("qwen_qlora", "qwen_qlora")):
+        verify_metric_report(strict_metrics[local], cloud_report[cloud])
+    comparison = {}
+    schema_compliance = {}
+    for name, rows in variants.items():
+        comparison[name], schema_compliance[name] = comparison_rows(rows)
+    metrics = {name: evaluate_predictions(rows) for name, rows in comparison.items()}
+    previous_report = args.run_dir / "verified_comparison.json"
+    if previous_report.is_file():
+        verify_metric_report(metrics, json.loads(previous_report.read_text("utf-8"))["metrics"])
+    manifest = json.loads((args.run_dir / "split_manifest.json").read_text("utf-8"))
+    validation_rows = {
+        "base": read_rows(args.run_dir / "base_validation_predictions.jsonl"),
+        "adapted": read_rows(args.run_dir / "validation_predictions.jsonl"),
+    }
+    for rows in validation_rows.values():
+        verify_raw_predictions(rows)
+    validation_hashes = {row["sample_id"]: row["sha256"] for row in manifest["validation"]}
+    references = [
+        {
+            "sample_id": row["sample_id"],
+            "image_sha256": row["sha256"],
+            "ground_truth": row["target"],
+        }
+        for row in manifest["validation"]
+    ]
+    verify_alignment({"reference": references, **validation_rows}, validation_hashes)
+    validation_metrics = {
+        name: evaluate_predictions(rows) for name, rows in validation_rows.items()
+    }
+    verify_metric_report(
+        validation_metrics,
+        json.loads((args.run_dir / "validation_metrics.json").read_text("utf-8")),
+    )
+    base, adapted = validation_metrics["base"], validation_metrics["adapted"]
+    expected_selection = (
+        "qwen_qlora"
+        if adapted["macro_normalized_exact_match"] > base["macro_normalized_exact_match"]
+        and adapted["complete_record_normalized_exact_match"]
+        >= base["complete_record_normalized_exact_match"]
+        else "qwen_quantized_base"
+    )
+    if frozen["selected"] != expected_selection:
+        raise ValueError("Frozen selection disagrees with validation-only criterion")
+    vectors = {name: correct_vectors(rows, ids) for name, rows in comparison.items()}
     rng = np.random.default_rng(42)
     resamples = rng.integers(0, len(ids), size=(2000, len(ids)))
     references = {row["sample_id"]: row["ground_truth"] for row in variants["v2"]}
@@ -232,6 +325,11 @@ def main() -> int:
             name: float(((membership @ value[0]) / merchant_sizes).mean())
             for name, value in vectors.items()
         },
+        "schema_compliance": schema_compliance,
+        "field_accuracy_parser": (
+            "Strict four-field JSON first; then the existing tolerant receipt parser. "
+            "Unparseable outputs remain incorrect across all fields."
+        ),
         "metrics": metrics,
         "paired_bootstrap": intervals,
         "bootstrap_resamples": 2000,
@@ -274,14 +372,15 @@ def main() -> int:
         "",
         report["scope"] + ". All invalid predictions remain in the denominator.",
         "",
-        "| Model | Macro field exact | Complete-record exact | Valid output |",
-        "|---|---:|---:|---:|",
+        "| Model | Macro field exact | Complete-record exact | Parseable | Strict JSON |",
+        "|---|---:|---:|---:|---:|",
     ]
     for name, values in metrics.items():
         lines.append(
             f"| {labels[name]} | {values['macro_normalized_exact_match']:.1%} | "
             f"{values['complete_record_normalized_exact_match']:.1%} | "
-            f"{values['valid_json_rate']:.1%} |"
+            f"{values['valid_json_rate']:.1%} | "
+            f"{schema_compliance[name]['strict_json_valid_rate']:.1%} |"
         )
     lines.extend(
         [
@@ -290,8 +389,14 @@ def main() -> int:
             "",
             "This does not automatically replace V2 or approve the Qwen backend for deployment.",
             "",
+            "Field accuracy uses the same tolerant parser for every model. Strict JSON "
+            "compliance is separate; Qwen base code-fence recovery does not count as strict JSON.",
+            "",
             f"Training: {summary['global_steps']} optimizer steps on {summary['gpu']}, "
             f"{summary['dtype']}, peak allocated {summary['peak_allocated_gpu_mib']:.0f} MiB.",
+            "",
+            f"Exported adapter: `{Path(summary['best_checkpoint']).name}`, selected by "
+            "minimum validation loss; total run steps are not the selected checkpoint step.",
             "",
             "The code and weights are pinned; the training summary records software versions.",
             "",
@@ -318,13 +423,21 @@ def main() -> int:
     )
     for name, value in report["equal_merchant_weighted_macro_exact"].items():
         lines.append(f"- {labels[name]}: {value:.1%}.")
+    lines.extend(["", "## Strict output format", ""])
+    for name, details in schema_compliance.items():
+        recovered = details["recovered_by_tolerant_parser"]
+        lines.append(
+            f"- {labels[name]}: {details['strict_json_valid_count']}/{details['sample_count']} "
+            f"strict JSON; {recovered} additional output(s) parsed by the tolerant parser; "
+            f"methods: {details['parse_methods']}."
+        )
     lines.extend(["", "## Limits", ""] + [f"- {item}." for item in report["limitations"]])
     chart_link = Path(
         os.path.relpath(args.output_dir / "accuracy_comparison.png", args.report.parent)
     ).as_posix()
     lines.extend(["", f"![Retrospective accuracy comparison]({chart_link})", ""])
     if args.render_examples:
-        gallery = render_examples(variants, ids, args.output_dir / "image_comparisons")
+        gallery = render_examples(comparison, ids, args.output_dir / "image_comparisons")
         gallery_link = Path(os.path.relpath(gallery, args.report.parent)).as_posix()
         lines.extend([f"[Bill-by-bill before/after examples]({gallery_link})", ""])
     args.report.write_text("\n".join(lines) + "\n", encoding="utf-8")

@@ -117,23 +117,34 @@ This refuses incomplete runs, missing or repeated IDs, changed image hashes and
 changed normalized reference labels. It reports all three models on the same
 239 IDs and 2,000-resample paired image and merchant-cluster bootstrap intervals.
 It also checks that saved parsed fields agree with the raw model response and
-reports equal-merchant-weighted accuracy. The full run is currently
-in progress; the smoke summaries do not imply improved extraction accuracy.
+reports equal-merchant-weighted accuracy. The full run completed 168 steps;
+selected checkpoint 112 by merchant-disjoint validation loss. The verified
+adapter and complete metrics are in
+[QWEN3_VL_RESULTS.md](QWEN3_VL_RESULTS.md), the committed
+[experiment artifacts](artifacts/experiments/qwen3_vl/full_run/), and the
+[adapter package](models/receipt-kie-qwen3-vl-qlora/README.md). A fresh T4 reload
+check is also recorded in the experiment artifacts after completion.
 
-The original FastAPI service continues to use V2. Any Qwen promotion also needs
-an inference integration, memory/latency checks, a new quality-model calibration,
-and a documented evaluation decision. This package does not silently swap models.
+The original FastAPI service continues to use V2. The adapter averaged 10.8 s
+per image in this comparison; training peak allocated memory was 5.4 GiB. These
+measurements do not establish production throughput or 4 GB compatibility. Any
+Qwen promotion also needs an inference integration, memory/latency checks, a new
+quality-model calibration, and a documented evaluation decision. This package
+does not silently swap models.
 
 ## Optional single-image inference
 
 `scripts/qwen_inference.py` loads the pinned base or an exported adapter. Run it
 in a separate environment with a matched CUDA Torch/torchvision pair and
 `requirements-cloud.txt`; do not upgrade the existing V2 environment in place.
-After retrieving the full-run adapter directory from Kaggle:
+The selected adapter is committed under
+`models/receipt-kie-qwen3-vl-qlora/`; the training output and prediction files
+remain reproducible in `.cache/kaggle-training/` when retrievable from Kaggle.
+Run:
 
 ```powershell
 python scripts/qwen_inference.py --image path/to/bill.jpg --base --output .cache/qwen-base.json
-python scripts/qwen_inference.py --image path/to/bill.jpg --adapter .cache/kaggle-training/download/receiptops-train/adapter --output .cache/qwen-adapted.json
+python scripts/qwen_inference.py --image path/to/bill.jpg --adapter models/receipt-kie-qwen3-vl-qlora --output .cache/qwen-adapted.json
 ```
 
 GPU inference uses NF4 and the same 1,048,576-pixel cap as the comparison.
