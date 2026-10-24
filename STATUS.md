@@ -32,7 +32,9 @@ strict schema validity is 0% for that base and 100% for QLoRA, while field
 accuracy uses a common tolerant parser. Training peak allocated memory was
 5.4 GiB. This retrospective evaluation is not fresh test data, and the API still
 uses V2. See [full results](QWEN3_VL_RESULTS.md) and the
-[Kaggle protocol](KAGGLE_TRAINING.md). A fresh export reload check is underway.
+[Kaggle protocol](KAGGLE_TRAINING.md). A fresh T4 process exactly reproduced the
+base and adapter raw outputs for one validation image; this is a reproducibility
+check, not an accuracy estimate. See [the reload record](artifacts/experiments/qwen3_vl/full_run/export_reload_verification.json).
 The earlier CI dependency failure was fixed with PyArrow 19.0.1; remote run
 40070331478 passed 94 tests on commit 432d59e. Current local validation passes
 97 tests, including raw-output consistency checks for the cloud result verifier.

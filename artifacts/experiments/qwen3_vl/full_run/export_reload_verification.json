@@ -1,0 +1,33 @@
+{
+  "status": "export_reload_passed",
+  "sample_id": "X00016469612",
+  "selection": "First lexicographic validation bill with JSON recoverable after optional JSON-fence removal",
+  "versions": {
+    "torch": "2.11.0+cu128",
+    "torchvision": "0.26.0+cu128",
+    "transformers": "4.57.6",
+    "peft": "0.17.1",
+    "accelerate": "1.11.0",
+    "bitsandbytes": "0.48.2"
+  },
+  "image_sha256": "8b85d2c325c68579b53446177602709a8f8faeeec710912f62b6ad369234887c",
+  "scope": "One fixed validation image, not an accuracy estimate",
+  "checks": {
+    "base": {
+      "parsed_prediction_matches_training_process": true,
+      "raw_output_matches_training_process": true,
+      "review_required": true,
+      "deployment_allowed": false,
+      "generation_seconds": 11.368634713000006,
+      "adapter_sha256": null
+    },
+    "qlora": {
+      "parsed_prediction_matches_training_process": true,
+      "raw_output_matches_training_process": true,
+      "review_required": true,
+      "deployment_allowed": false,
+      "generation_seconds": 12.230820913999992,
+      "adapter_sha256": "90583f801f2668c931732c9e3a8a25f0ee76c9c34d3c6f41441d65e66fe433a5"
+    }
+  }
+}

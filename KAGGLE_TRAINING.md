@@ -122,8 +122,11 @@ selected checkpoint 112 by merchant-disjoint validation loss. The verified
 adapter and complete metrics are in
 [QWEN3_VL_RESULTS.md](QWEN3_VL_RESULTS.md), the committed
 [experiment artifacts](artifacts/experiments/qwen3_vl/full_run/), and the
-[adapter package](models/receipt-kie-qwen3-vl-qlora/README.md). A fresh T4 reload
-check is also recorded in the experiment artifacts after completion.
+[adapter package](models/receipt-kie-qwen3-vl-qlora/README.md). A fresh T4
+process reloaded the committed adapter and exactly reproduced its saved raw
+output on one fixed validation image; see
+[reload verification](artifacts/experiments/qwen3_vl/full_run/export_reload_verification.json).
+This is a one-image reproducibility check, not an accuracy or general VRAM claim.
 
 The original FastAPI service continues to use V2. The adapter averaged 10.8 s
 per image in this comparison; training peak allocated memory was 5.4 GiB. These

@@ -46,6 +46,16 @@ Equal-merchant-weighted macro exact (each observed merchant gets equal weight):
 - No default-model promotion, fresh-data accuracy or production scale claim.
 - Image bootstrap assumes independent records; merchant-cluster intervals are also reported, but normalized names may leave merchant aliases ungrouped.
 
+## Fresh export reload check
+
+The committed adapter was loaded from disk in a fresh Kaggle T4 process. On one
+fixed validation image, the fresh base and adapter raw outputs exactly matched
+the training-process outputs under the recorded package versions. The adapter
+SHA-256 matched the committed weight file. Both results retained
+`review_required=true` and `deployment_allowed=false`. This is a reproducibility
+smoke check on one image, not an accuracy estimate or a general GPU-memory claim.
+See [the machine-readable verification](artifacts/experiments/qwen3_vl/full_run/export_reload_verification.json).
+
 ![Retrospective accuracy comparison](artifacts/experiments/qwen3_vl/full_run/accuracy_comparison.png)
 
 [Bill-by-bill before/after examples](artifacts/experiments/qwen3_vl/full_run/image_comparisons/README.md)
