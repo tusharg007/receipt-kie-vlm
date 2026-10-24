@@ -1,0 +1,29 @@
+{
+  "package": "typellm==0.7.2",
+  "wheel_sha256": "cca86744173abf02e3f6b4f7c5c7e9500907e1bd4f15f2d527fbc0e0dd47d72b",
+  "checks": [
+    {
+      "thinking_budget": 0,
+      "fields": [
+        "company",
+        "address",
+        "date",
+        "total",
+        "total_source"
+      ],
+      "compiled": true
+    },
+    {
+      "thinking_budget": 256,
+      "fields": [
+        "company",
+        "address",
+        "date",
+        "total",
+        "total_source"
+      ],
+      "compiled": true
+    }
+  ],
+  "scope": "Actual pinned schema compiler only; no SGLang inference performed"
+}

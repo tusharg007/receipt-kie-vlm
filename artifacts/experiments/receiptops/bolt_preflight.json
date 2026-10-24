@@ -1,0 +1,27 @@
+{
+  "model_repo": "nvidia/NVIDIA-Nemotron-3.5-Bolt-E4B-4GB",
+  "verified_repo_revision": "1db54d5b12533ff1bcaa8e42cf4c667988a1f1be",
+  "verified_input_output": "text/text",
+  "verified_context_limit": 65536,
+  "official_model_card": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Bolt-E4B-4GB",
+  "gpu": "NVIDIA GeForce RTX 3050 Laptop GPU, 4096 MiB, 3964 MiB",
+  "ram": {
+    "total_gib": 15.68,
+    "available_gib": 5.85
+  },
+  "free_disk_gib": 41.97,
+  "runtimes_on_path": {
+    "llama-server": null,
+    "unsloth": null,
+    "docker": null
+  },
+  "endpoint": "http://127.0.0.1:8081",
+  "health_http_status": null,
+  "bolt_inference_run": false,
+  "weights_downloaded_by_this_script": false,
+  "notes": [
+    "Official Q4_K_M weights are approximately 6.18 GB; 4 GB VRAM is not total memory",
+    "Vision-projector files in another distribution do not validate the official text checkpoint as a receipt VLM",
+    "No automatic fit decision: context, offloading, free RAM, and runtime buffers matter"
+  ]
+}

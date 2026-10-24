@@ -1,5 +1,31 @@
 # ReceiptKIE-VLM Execution Status
 
+## Current update — 2026-10-24 (Asia/Calcutta)
+
+ReceiptOps adds a class-weighted quality classifier, bounded text-only Bolt
+review adapter, persistent FastAPI inference, Prometheus metrics, SQLite
+feedback/export, feature PSI, input/auth/concurrency checks, CI and Docker/ECS
+blueprints. Full local suite: 85 passing tests at this update. A real V2 API
+request returned HTTP 200 in about 8.3 seconds at 1024 px and was routed to review.
+
+The content audit found seven cross-official-split duplicate image groups. Seven
+historical evaluation IDs are excluded for train/prior-test/repeated content,
+leaving 239 retrospective, content-disjoint records. V2 macro exact is 63.1%
+versus V1 43.8%. After quarantining one incomplete validation annotation, quality
+AP is 0.275 versus prevalence 0.184. The candidate's 80% calibration precision
+fell to 37.0% on retrospective evaluation, so promotion is disabled and every
+service output requires review. See [ReceiptOps runbook](RECEIPTOPS.md).
+
+The official Bolt Q4_K_M weights were downloaded, hash-verified and tested using
+llama.cpp b11459 on CPU. The corrected schema-constrained review cycle completed
+with abstention. A fixed three-bill OCR + Bolt development pilot scored 33.3%
+macro exact versus saved V2's 25.0%; neither got a complete record correct and
+one Bolt request exhausted its output budget. Bolt remains experimental. See
+[Bolt pilot](BOLT_PILOT.md). No Bolt GPU-fit, fine-tuning or cloud claim is made.
+
+The following July release status is archived. Its 246-ID evaluation novelty
+claims are superseded by the content audit; original artifacts remain unchanged.
+
 Last updated: 2026-07-26 (Asia/Calcutta)
 
 ## Current phase

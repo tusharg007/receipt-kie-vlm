@@ -1,5 +1,13 @@
 # High-Resolution Continued Training V2
 
+## October 2026 content-audit correction
+
+The original 246-ID comparison below predates image-content deduplication.
+ID-only novelty did not establish content novelty. Use the current
+[239-image retrospective reanalysis](artifacts/experiments/receiptops/content_disjoint_results.json)
+and [ReceiptOps methodology](RECEIPTOPS.md). The stored adapters and historical
+predictions remain unchanged; no fresh untouched test result is claimed.
+
 ## Decision
 
 **Success gate: PASS.** V2 met the predeclared improvement threshold.

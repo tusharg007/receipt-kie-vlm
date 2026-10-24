@@ -1,7 +1,8 @@
-# ReceiptKIE-VLM
+# ReceiptOps: quality-aware receipt ML
 
-LoRA fine-tuning and evaluation of an open-weight vision-language model for
-structured financial receipt understanding.
+A document ML project combining fine-tuned receipt extraction, content-leakage
+auditing, an imbalance-aware quality classifier, and an instrumented inference API.
+The original ReceiptKIE-VLM training pipeline and V1/V2 adapters remain available.
 
 ReceiptKIE-VLM takes a receipt image and generates JSON with exactly four SROIE
 entities:
@@ -15,6 +16,84 @@ and auditable evaluation artifacts. V2 is the recommended high-resolution model
 under `models/receipt-kie-lora-v2-highres/`; the original V1 adapter remains
 under `models/receipt-kie-lora/` as a reproducible historical baseline. SmolVLM
 was not trained from scratch.
+
+## Current evidence and limitations
+
+An October 2026 SHA-256 content audit found duplicates that earlier ID-only
+checks missed. Of the original 246 evaluation IDs, four duplicate official-train
+images, two duplicate previously evaluated test images, and one repeats another
+evaluation image. The corrected **239-image, content-disjoint retrospective
+subset** retains V2's improvement; it is not a new untouched test set.
+
+| Normalized metric | V1 | V2 |
+|---|---:|---:|
+| Macro field exact match | 43.8% | 63.1% |
+| Complete-record exact match | 4.2% | 18.4% |
+| Company exact match | 52.3% | 68.6% |
+| Date exact match | 63.6% | 85.4% |
+| Total exact match | 43.5% | 64.4% |
+| Address similarity | 82.2% | 90.7% |
+
+One incomplete validation annotation is quarantined. The quality classifier uses
+46 fit records and 16 separate calibration records. On the 239 retrospective
+evaluation records, it achieves **0.275 average precision** against a **0.184
+prevalence baseline**. A candidate threshold reaches 80% precision on calibration
+but only 37.0% on evaluation. Promotion is disabled: the shipped service routes
+**every** receipt to review. The ranker does not correct OCR or supply calibrated
+confidence.
+
+- **Implemented:** persistent-model FastAPI service, request size/pixel limits,
+  bounded inference concurrency with HTTP 429 backpressure, API-key support,
+  readiness/liveness, Prometheus metrics, local SQLite feedback, feature drift
+  checks, and explicit feedback export.
+- **Measured:** a real V2 API smoke request on the fictional demo returned HTTP
+  200 in about 8.3 seconds at 1024 px and was routed to review. This is one
+  in-process ASGI request, not a load or production throughput benchmark.
+- **Bolt integration:** a bounded text-review agent with a read-only diagnostic
+  tool and schema-constrained decisions, tested with the official Q4_K_M model
+  on CPU. An experimental CPU-OCR → Bolt challenger scored 33.3% versus V2's
+  25.0% macro exact on three fixed development bills, with no complete-record
+  successes and one token-budget failure. This tiny pilot does not justify
+  replacing V2. See [the full Bolt pilot](BOLT_PILOT.md). The verified checkpoint
+  declares text/text; direct vision and 4GB GPU fit were not tested.
+- **Deployment assets:** Dockerfile, AWS ECS template and GitHub Actions workflow;
+  these files do not constitute an executed cloud deployment or a passing remote
+  CI run. SQLite and one GPU worker are a single-replica prototype.
+
+Start with [the service runbook](RECEIPTOPS.md),
+[type-safe extraction](TYPE_SAFE_EXTRACTION.md), and the
+[Bolt development pilot](BOLT_PILOT.md). Full corrected results:
+[`content_disjoint_results.json`](artifacts/experiments/receiptops/content_disjoint_results.json).
+
+![Quality analysis](artifacts/experiments/quality_gate/quality_analysis.png)
+
+## Run the inference service
+
+Install the existing VLM environment, the API, and constrained-decoding dependencies:
+
+```powershell
+python -m pip install -r requirements.txt -r requirements-api.txt -r requirements-structured.txt
+$env:PYTHONPATH = "src"
+python -m receipt_kie.service
+```
+
+The API binds to localhost:8000 by default. Send a PNG/JPEG request body to
+`POST /v1/extract`; inspect `/health/ready`, `/metrics`, and `/v1/monitoring`.
+The default 1024 px setting reduces memory use and routes results to review.
+See [the runbook](RECEIPTOPS.md) for authentication, feedback, configuration,
+monitoring and deployment instructions.
+
+Local validation: **85 unit and API contract tests pass**, with clean Ruff and
+dependency checks. Reproduce with:
+
+```powershell
+python -m pip install -r requirements-dev.txt
+python -m pytest -q -p no:cacheprovider
+python -m ruff check src scripts tests
+python -m pip check
+```
+
+[![Test and audit](https://github.com/tusharg007/receipt-kie-vlm/actions/workflows/ci.yml/badge.svg)](https://github.com/tusharg007/receipt-kie-vlm/actions/workflows/ci.yml)
 
 ## Clone and Run the Trained Model
 
@@ -62,11 +141,31 @@ Training and evaluation require the separately obtained SROIE dataset.
 image; it is not a promise that this small research model predicts every field
 exactly.
 
+## Type-safe extraction (optional)
+
+Constrain the existing V2 adapter to its four-field JSON Schema during generation:
+
+```bash
+pip install -r requirements-structured.txt
+python scripts/demo_inference.py --structured --image path/to/receipt.jpg
+```
+
+Strict schema validation rejects incomplete or incorrectly typed outputs; review
+signals flag missing fields and suspicious dates/amounts. Schema compliance does
+not guarantee correct OCR. On limited GPU memory, explicitly add
+`--image-longest-edge 1024` (this changes image detail).
+
+A separate native TypeLLM/SGLang integration adds nullable typed fields, a
+dependency-aware check of the total's source, optional thinking, and permutation
+averaging for that check. TypeLLM requires a separate environment because its
+Transformers dependency conflicts with the pinned training stack.
+See [setup, limitations, and paired validation](TYPE_SAFE_EXTRACTION.md).
+
 ## Research Progression
 
 ### Iteration 1 — Low-resolution LoRA baseline
 
-V1 used leakage-free training at a 512 px longest edge with rank-16 LoRA on the
+V1 used ID-disjoint training at a 512 px longest edge with rank-16 LoRA on the
 attention projections. Its original 563/63 official-train split, 100-receipt
 official-test evaluation, raw predictions, plots, and limitations are retained
 unchanged so the development path remains reproducible. Those historical V1
@@ -86,14 +185,17 @@ ablation subset.
 
 ![Resolution ablation](artifacts/figures/highres_ablation.png)
 
-### Iteration 2 — High-resolution continued adaptation
+### Iteration 2 — Historical high-resolution comparison
+
+The 246-ID results below are retained as historical evidence. Use the corrected
+239-image content audit above for current reporting.
 
 V2 continued from V1 for three additional epochs and 210 optimizer steps using
 1536 px tiled images, a 512 px maximum patch edge, image splitting, and the same
 four-field JSON target. Checkpoint 210 and deterministic 256-token generation
 with repetition penalty 1.08 were selected using only 63 official-train
-validation receipts. The final comparison used all 246 official-test receipts
-absent from every prior V1, robustness, qualitative, and ablation artifact.
+validation receipts. The original comparison used 246 official-test IDs absent
+from prior artifacts; the subsequent content audit found duplicates across IDs.
 
 | Metric | Base | V1 | V2 | V2 − V1 |
 |---|---:|---:|---:|---:|
@@ -111,8 +213,8 @@ fields to be correct after normalization.
 
 High-resolution V2 continued adaptation achieved 99.2% valid JSON, 69.1%
 company exact match, 90.7% address similarity, 85.8% date exact match, 64.6%
-total exact match and 18.3% complete-record exact match on 246 previously unseen
-SROIE test receipts.
+total exact match and 18.3% complete-record exact match on the historical 246-ID
+SROIE evaluation. These figures predate the content-leakage audit.
 
 Paired 2,000-resample bootstrap intervals support the main gains:
 

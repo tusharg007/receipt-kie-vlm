@@ -1,5 +1,13 @@
 # ReceiptKIE-VLM Experiment Report
 
+## October 2026 content-audit correction
+
+This report is historical. Its 246-ID "unseen" claim was based on ID accounting;
+an image-content audit found overlap. The current
+[239-image content-disjoint retrospective reanalysis](artifacts/experiments/receiptops/content_disjoint_results.json)
+retains the V2 gain (macro exact 43.8% to 63.1%). See the
+[ReceiptOps runbook](RECEIPTOPS.md) for corrected evaluation and serving work.
+
 ## Executive summary
 
 ReceiptKIE-VLM is a reproducible structured key-information extraction project

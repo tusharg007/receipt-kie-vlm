@@ -1,0 +1,85 @@
+{
+  "scope": "First sorted original-validation pilot IDs; development comparison, not held-out evidence",
+  "sample_ids": [
+    "X00016469672",
+    "X51005361900",
+    "X51005361946"
+  ],
+  "baseline_source": "artifacts\\experiments\\structured_decoding\\pilot10_1024\\unconstrained.jsonl",
+  "status": "complete",
+  "notes": "Same original images. Backend-specific preprocessing differs. No reference annotations enter OCR or Bolt context.",
+  "original_v2": {
+    "sample_count": 3,
+    "valid_json_rate": 1.0,
+    "per_field": {
+      "company": {
+        "raw_exact_match": 0.0,
+        "normalized_exact_match": 0.0,
+        "normalized_similarity": 0.6056767534600047
+      },
+      "address": {
+        "raw_exact_match": 0.0,
+        "normalized_exact_match": 0.0,
+        "normalized_similarity": 0.5298794128212665
+      },
+      "date": {
+        "raw_exact_match": 0.3333333333333333,
+        "normalized_exact_match": 0.3333333333333333,
+        "normalized_similarity": 0.9333333333333333
+      },
+      "total": {
+        "raw_exact_match": 0.6666666666666666,
+        "normalized_exact_match": 0.6666666666666666,
+        "normalized_similarity": 0.8148148148148148
+      }
+    },
+    "company_accuracy": 0.0,
+    "address_similarity": 0.5298794128212665,
+    "date_accuracy": 0.3333333333333333,
+    "total_accuracy": 0.6666666666666666,
+    "complete_record_raw_exact_match": 0.0,
+    "complete_record_normalized_exact_match": 0.0,
+    "macro_normalized_exact_match": 0.25,
+    "macro_normalized_similarity": 0.7209260786073548,
+    "average_inference_latency_seconds": 18.874199599997763,
+    "median_inference_latency_seconds": 18.789353899999696,
+    "peak_gpu_memory_mib": 1197.048828125
+  },
+  "ocr_bolt": {
+    "sample_count": 3,
+    "valid_json_rate": 0.6666666666666666,
+    "per_field": {
+      "company": {
+        "raw_exact_match": 0.3333333333333333,
+        "normalized_exact_match": 0.3333333333333333,
+        "normalized_similarity": 0.4603174603174603
+      },
+      "address": {
+        "raw_exact_match": 0.0,
+        "normalized_exact_match": 0.0,
+        "normalized_similarity": 0.6140973903685768
+      },
+      "date": {
+        "raw_exact_match": 0.6666666666666666,
+        "normalized_exact_match": 0.6666666666666666,
+        "normalized_similarity": 0.6666666666666666
+      },
+      "total": {
+        "raw_exact_match": 0.6666666666666666,
+        "normalized_exact_match": 0.6666666666666666,
+        "normalized_similarity": 0.6666666666666666
+      }
+    },
+    "company_accuracy": 0.3333333333333333,
+    "address_similarity": 0.6140973903685768,
+    "date_accuracy": 0.6666666666666666,
+    "total_accuracy": 0.6666666666666666,
+    "complete_record_raw_exact_match": 0.0,
+    "complete_record_normalized_exact_match": 0.0,
+    "macro_normalized_exact_match": 0.41666666666666663,
+    "macro_normalized_similarity": 0.6019370460048425,
+    "average_inference_latency_seconds": 39.118833233333135,
+    "median_inference_latency_seconds": 39.437739499997406,
+    "peak_gpu_memory_mib": null
+  }
+}

@@ -254,3 +254,9 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Personal preparation documents stay local.
+/*_ALIGNMENT.md
+/RESUME_*.md
+/INTERVIEW_*.md
+/*_STUDY_GUIDE.md

@@ -1,0 +1,59 @@
+{
+  "runtime": "llama.cpp b11459 Windows CPU; ctx=2048; GPU layers=0",
+  "elapsed_seconds_including_possible_queue": 33.324282100002165,
+  "result": {
+    "action": "abstain",
+    "reason": "insufficient_evidence",
+    "fields": [],
+    "status": "unavailable_or_invalid",
+    "error_type": "ValueError",
+    "trace": [
+      {
+        "tool": "inspect_receipt",
+        "result": {
+          "schema_valid": true,
+          "schema_errors": [],
+          "review_required": false,
+          "review_issues": [],
+          "features": {
+            "schema_valid": 1.0,
+            "missing_count": 0.0,
+            "date_flag": 0.0,
+            "amount_flag": 0.0,
+            "company_length_log": 3.58351893845611,
+            "address_length_log": 3.58351893845611,
+            "company_digit_ratio": 0.2,
+            "address_digit_ratio": 0.2,
+            "company_address_overlap": 1.0,
+            "company_address_length_ratio": 1.0,
+            "repeated_word_ratio": 0.4117647058823529,
+            "token_limit_hit": 0.0
+          }
+        }
+      }
+    ],
+    "model": "nemotron-bolt",
+    "image_verified": false
+  },
+  "assistant_responses": [
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "type": "function",
+          "function": {
+            "name": "inspect_receipt",
+            "arguments": "{}"
+          },
+          "id": "u5MO7FUXqZ3L1RM2373Q4E6T5AzJ3XvE"
+        }
+      ]
+    },
+    {
+      "role": "assistant",
+      "content": "{\n  \"decision\": \"abstain\"\n}"
+    }
+  ],
+  "note": "Second diagnostic run on the same fictional receipt; original failure preserved in bolt_live_smoke.json. Reasoning content omitted; only public assistant outputs retained."
+}

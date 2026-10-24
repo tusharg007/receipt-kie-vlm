@@ -1,5 +1,13 @@
 # ReceiptKIE-VLM Model Versions
 
+## October 2026 content-audit correction
+
+The historical results below use 246 IDs. Exact image hashing subsequently found
+train/test and previously evaluated-content overlap that ID checks missed. Use
+the [239-image retrospective reanalysis](artifacts/experiments/receiptops/content_disjoint_results.json)
+for current claims: V1 macro exact 43.8%, V2 63.1%. See
+[the current methodology and limitations](RECEIPTOPS.md). This is not a fresh test set.
+
 Both adapters are committed and independently reproducible. V2 is recommended
 for inference; V1 remains available as the historical baseline.
 

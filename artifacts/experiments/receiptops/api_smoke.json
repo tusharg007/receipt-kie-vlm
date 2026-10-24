@@ -1,0 +1,48 @@
+{
+  "scope": "Real V2 model, one synthetic receipt, in-process ASGI request; not a network/load benchmark",
+  "readiness_status": 200,
+  "http_status": 200,
+  "result": {
+    "request_id": "4dde8384-ad26-4ca8-985d-cb6b0fed2d10",
+    "prediction": {
+      "company": "12 SAMPLE ROAD FICTIONAL CITY 10000",
+      "address": "12 SAMPLE ROAD FICTIONAL CITY 10000",
+      "date": "12/07/2026",
+      "total": "42.50"
+    },
+    "schema_errors": [],
+    "quality_score": 0.9991700893823957,
+    "quality_model_version": "receipt-quality-v1-balanced_logistic-86edf8895741",
+    "threshold": 0.6233724937115727,
+    "action": "review",
+    "review_reasons": [
+      "quality:company_matches_address",
+      "quality:extractor_configuration_mismatch",
+      "quality:deployment_not_approved"
+    ],
+    "schema_valid": true,
+    "deployment_allowed": false,
+    "latency_seconds": 8.330254300002707,
+    "bolt_review": null
+  },
+  "service_source_sha256": "fa06b2c474b7b90a40586c49057424d6f29f6efa2434d44205e27a239f37b6e0",
+  "quality_source_sha256": "9509d99c903c2eac3c81b613379e2694a2a7705f6c8cdf792a24bd298c570c65",
+  "quality_artifact_sha256": "6029d287d67214ce00192e725d5fe889e275a45220ce3509752a1333215b0c1f",
+  "monitoring": {
+    "window_size": 500,
+    "model_version": "receipt-quality-v1-balanced_logistic-86edf8895741",
+    "sample_count": 1,
+    "schema_valid_rate": 1.0,
+    "review_rate": 1.0,
+    "average_latency_seconds": 8.330254300002707,
+    "feedback_count": 0,
+    "feedback_coverage": 0.0,
+    "labeled_complete_accuracy": null,
+    "drift_status": "insufficient_samples",
+    "feature_psi": {},
+    "drift_alerts": [],
+    "notes": "PSI >0.2 is a heuristic. Voluntary feedback is selection-biased; it is not population accuracy."
+  },
+  "image_longest_edge": 1024,
+  "total_with_startup_seconds": 20.693403799999942
+}

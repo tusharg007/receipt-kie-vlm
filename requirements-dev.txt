@@ -1,4 +1,6 @@
 -r requirements.txt
+-r requirements-api.txt
+-r requirements-structured.txt
 
 ipykernel>=6.29,<7
 jupyterlab>=4.2,<5

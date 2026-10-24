@@ -1,0 +1,2 @@
+# Optional addition to the existing requirements.txt environment.
+lm-format-enforcer==0.11.3

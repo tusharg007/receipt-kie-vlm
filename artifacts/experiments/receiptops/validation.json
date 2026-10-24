@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-24",
+  "unit_and_contract_tests": {
+    "command": "python -m pytest -q -p no:cacheprovider --basetemp=.cache/pytest-receiptops-release-final",
+    "passed": 85,
+    "failed": 0,
+    "elapsed_seconds": 14.66
+  },
+  "ruff": "passed",
+  "pip_check": "No broken requirements found",
+  "actual_inference": [
+    "artifacts/experiments/receiptops/api_smoke.json",
+    "artifacts/experiments/receiptops/bolt_live_verified_schema.json",
+    "artifacts/experiments/ocr_bolt_pilot/comparison.json"
+  ],
+  "limitations": [
+    "No Docker build or cloud deployment executed",
+    "No remote CI run claimed",
+    "No load benchmark",
+    "Bolt tested on CPU; no 4GB VRAM fit test",
+    "Three-bill challenger pilot is development only",
+    "Quality gate promotion disabled"
+  ]
+}

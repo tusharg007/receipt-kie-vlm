@@ -1,0 +1,355 @@
+[
+  {
+    "sample_id": "X00016469672",
+    "image_path": "data/raw/sroie/SROIE2019/train/img/X00016469672.jpg",
+    "image_sha256": "37d946848416af4747cecc6563d0b91b2ed39a8d46222b1647d546c59ae43dad",
+    "figure": "01_X00016469672.png",
+    "before": {
+      "company": "NO.53/SALAM PUTRA 1",
+      "address": "TAMAN SRI PUTRA 8, 6200 JOHOR BAHRU 41000, 70701 TAMAN SEWARA",
+      "date": "11/01/2019",
+      "total": "327.00"
+    },
+    "after": {
+      "company": "NO.53/SALAM PUTRA 1",
+      "address": "TAMAN SRI PUTRA 8, 6200 JOHOR BAHRU 41000, 70701 TAMAN SEWARA",
+      "date": "11/01/2019",
+      "total": "327.00"
+    },
+    "reference": {
+      "company": "SOON HUAT MACHINERY ENTERPRISE",
+      "address": "NO.53 JALAN PUTRA 1, TAMAN SRI PUTRA, 81200 JOHOR BAHRU JOHOR",
+      "date": "11/01/2019",
+      "total": "327.00"
+    },
+    "matched_fields_before": [
+      "date",
+      "total"
+    ],
+    "matched_fields_after": [
+      "date",
+      "total"
+    ],
+    "changed_fields": [],
+    "normalized_changed_fields": [],
+    "before_schema_valid": true,
+    "after_schema_valid": true
+  },
+  {
+    "sample_id": "X51005361900",
+    "image_path": "data/raw/sroie/SROIE2019/train/img/X51005361900.jpg",
+    "image_sha256": "b83b374733bc1a68a3af659d61c31642145101dab0ca9cd965176d4c48bf8939",
+    "figure": "02_X51005361900.png",
+    "before": {
+      "company": "TEO HENG STATIONERY BOKS",
+      "address": "NO.5, SEJAR BARAN 45008-1395 BATANG PERIJANANG 16103/27, SAYANG TERIB",
+      "date": "25/01/2018",
+      "total": "18.00"
+    },
+    "after": {
+      "company": "TEO HENG STATIONERY BOKS",
+      "address": "NO.5, SEJAR BARAN 45008-1395 BATANG PERIJANANG 16103/27, SAYANG TERIB",
+      "date": "25/01/2018",
+      "total": "18.00"
+    },
+    "reference": {
+      "company": "TEO HENG STATIONERY & BOOKS",
+      "address": "NO.53,JALAN BESAR,45600 BATANG BERJUNTAI SELANGOR DARUL EHSAN",
+      "date": "23/01/2018",
+      "total": "18.00"
+    },
+    "matched_fields_before": [
+      "total"
+    ],
+    "matched_fields_after": [
+      "total"
+    ],
+    "changed_fields": [],
+    "normalized_changed_fields": [],
+    "before_schema_valid": true,
+    "after_schema_valid": true
+  },
+  {
+    "sample_id": "X51005361946",
+    "image_path": "data/raw/sroie/SROIE2019/train/img/X51005361946.jpg",
+    "image_sha256": "c5d7271ea478624ed5b63b45b620799532637934dc72590d29b79ca78845f625",
+    "figure": "03_X51005361946.png",
+    "before": {
+      "company": "MR. D.T. MANU",
+      "address": "SOCI JERAMAN BALANGKAS, 43001 SEREM BAGAN, SELANGOR ADHESING, 958-24/JOHABAN BALANGKAS",
+      "date": "12/03/2018",
+      "total": "2.00"
+    },
+    "after": {
+      "company": "MR. D.T. MANU",
+      "address": "SOCI JERAMAN BALANGKAS, 43001 SEREM BAGAN, SELANGOR ADHESING, 958-24/JOHABAN BALANGKAS",
+      "date": "12/03/2018",
+      "total": "2.00"
+    },
+    "reference": {
+      "company": "MR. D.I.Y. (M) SDN BHD",
+      "address": "LOT 1851-A & 1851-B, JALAN KPB 6, KAWASAN PERINDUSTRIAN BALAKONG, 43300 SERI KEMBANGAN, SELANGOR",
+      "date": "14-03-18",
+      "total": "37.10"
+    },
+    "matched_fields_before": [],
+    "matched_fields_after": [],
+    "changed_fields": [],
+    "normalized_changed_fields": [],
+    "before_schema_valid": true,
+    "after_schema_valid": true
+  },
+  {
+    "sample_id": "X51005433492",
+    "image_path": "data/raw/sroie/SROIE2019/train/img/X51005433492.jpg",
+    "image_sha256": "42b51a97846a2ab591d4739574a4c0721e24b52c070f42564ded1ddf4d86c8db",
+    "figure": "04_X51005433492.png",
+    "before": {
+      "company": "UNIHARKA INTERNATIONAL SDN BHD",
+      "address": "12 JALAN TEMPO 7/4 KASAWIN PENUSTUISTAN TAMPO &TAMPO 1200 JOHOR BRUHAS,JOHOR",
+      "date": "30-05-2018",
+      "total": "$5.50"
+    },
+    "after": {
+      "company": "UNIHARKA INTERNATIONAL SDN BHD",
+      "address": "12 JALAN TEMPO 7/4 KASAWIN PENUSTUISTAN TAMPO &TAMPO 1200 JOHOR BRUHAS,JOHOR",
+      "date": "30-05-2018",
+      "total": "$5.50"
+    },
+    "reference": {
+      "company": "UNIHAKKA INTERNATIONAL SDN BHD",
+      "address": "12, JALAN TAMPOI 7/4,KAWASAN PERINDUSTRIAN TAMPOI,81200 JOHOR BAHRU,JOHOR",
+      "date": "05 MAR 2018",
+      "total": "$8.20"
+    },
+    "matched_fields_before": [],
+    "matched_fields_after": [],
+    "changed_fields": [],
+    "normalized_changed_fields": [],
+    "before_schema_valid": true,
+    "after_schema_valid": true
+  },
+  {
+    "sample_id": "X51005433514",
+    "image_path": "data/raw/sroie/SROIE2019/train/img/X51005433514.jpg",
+    "image_sha256": "913b015e5926d9b1dbce40c7650b26fcc35ed94687e083f6ee7f4460c83e56b3",
+    "figure": "05_X51005433514.png",
+    "before": {
+      "company": "UNIHAKKA INTERNATIONAL SDN BHD",
+      "address": "12, JALAN TAMPLI 86/3020 JOHBHON, BERLIN",
+      "date": "03 MAR 2018",
+      "total": "$7.10"
+    },
+    "after": {
+      "company": "UNIHAKKA INTERNATIONAL SDN BHD",
+      "address": "12, JALAN TAMPLI 86/3020 JOHBHON, BERLIN",
+      "date": "03 MAR 2018",
+      "total": "$7.10"
+    },
+    "reference": {
+      "company": "UNIHAKKA INTERNATIONAL SDN BHD",
+      "address": "12, JALAN TAMPOI 7/4,KAWASAN PERINDUSTRIAN TAMPOI 81200 JOHOR BAHRU,JOHOR",
+      "date": "03 MAR 2018",
+      "total": "$8.20"
+    },
+    "matched_fields_before": [
+      "company",
+      "date"
+    ],
+    "matched_fields_after": [
+      "company",
+      "date"
+    ],
+    "changed_fields": [],
+    "normalized_changed_fields": [],
+    "before_schema_valid": true,
+    "after_schema_valid": true
+  },
+  {
+    "sample_id": "X51005442327",
+    "image_path": "data/raw/sroie/SROIE2019/train/img/X51005442327.jpg",
+    "image_sha256": "9413db2433e85c150526004d5158c9dfee66be124f344296c7e8d29e6e184f73",
+    "figure": "06_X51005442327.png",
+    "before": {
+      "company": "UNIHAKKA INTERNATIONAL SDN BHD",
+      "address": "12 JALAN TEMPORARY 8/10 JOHOR BURUJOHOR TAMAL NESL SDN BHD",
+      "date": "18 MAR 2018",
+      "total": "$5.40"
+    },
+    "after": {
+      "company": "UNIHAKKA INTERNATIONAL SDN BHD",
+      "address": "12 JALAN TEMPORARY 8/10 JOHOR BURUJOHOR TAMAL NESL SDN BHD",
+      "date": "18 MAR 2018",
+      "total": "$5.40"
+    },
+    "reference": {
+      "company": "UNIHAKKA INTERNATIONAL SDN BHD",
+      "address": "12, JALAN TAMPOI 7/4,KAWASAN PARINDUSTRIAN TAMPOI,81200 JOHOR BAHRU,JOHOR",
+      "date": "18 MAR 2018",
+      "total": "$8.60"
+    },
+    "matched_fields_before": [
+      "company",
+      "date"
+    ],
+    "matched_fields_after": [
+      "company",
+      "date"
+    ],
+    "changed_fields": [],
+    "normalized_changed_fields": [],
+    "before_schema_valid": true,
+    "after_schema_valid": true
+  },
+  {
+    "sample_id": "X51005442338",
+    "image_path": "data/raw/sroie/SROIE2019/train/img/X51005442338.jpg",
+    "image_sha256": "df5059e40d0915f244e5264f2caf9e5106f75814b9fd1394645f98bc4b1ae379",
+    "figure": "07_X51005442338.png",
+    "before": {
+      "company": "PASSER MINT JIAN SENG",
+      "address": "379, JIAN PALONG BARU PAPAS MJAYAT 61750, PALONG NO. 4, OEMOR",
+      "date": "18/03/18",
+      "total": "28.60"
+    },
+    "after": {
+      "company": "PASSER MINT JIAN SENG",
+      "address": "379, JIAN PALONG BARU PAPAS MJAYAT 61750, PALONG NO. 4, OEMOR",
+      "date": "18/03/18",
+      "total": "28.60"
+    },
+    "reference": {
+      "company": "PASAR MINI JIN SENG",
+      "address": "379, JALAN PERMAS SATU, BANDAR BARU PERMAS JAYA 81750 PLENTONG, JOHOR.",
+      "date": "18/03/18",
+      "total": "28.60"
+    },
+    "matched_fields_before": [
+      "date",
+      "total"
+    ],
+    "matched_fields_after": [
+      "date",
+      "total"
+    ],
+    "changed_fields": [],
+    "normalized_changed_fields": [],
+    "before_schema_valid": true,
+    "after_schema_valid": true
+  },
+  {
+    "sample_id": "X51005447860",
+    "image_path": "data/raw/sroie/SROIE2019/train/img/X51005447860.jpg",
+    "image_sha256": "21dfd16bfc3c7dd1da5c1432fe23dfd6bb07d56db092c913d8963b38b3295b76",
+    "figure": "08_X51005447860.png",
+    "before": {
+      "company": "AEON CO. (M) BHD",
+      "address": "3RD FLR, AEON TAMAN MALURI SC JLN JEJAKA, TAMAN MALURI CHERAS, 55100 KUALA LUMPUR",
+      "date": "19/02/2018",
+      "total": "17.70"
+    },
+    "after": {
+      "company": "AEON CO. (M) BHD",
+      "address": "3RD FLR, AEON TAMAN MALURI SC JLN JEJAKA, TAMAN MALURI CHERAS, 55100 KUALA LUMPUR",
+      "date": "19/02/2018",
+      "total": "17.70"
+    },
+    "reference": {
+      "company": "AEON CO. (M) BHD",
+      "address": "3RD FLR, AEON TAMAN MALURI SC JLN JEJAKA, TAMAN MALURI CHERAS, 55100 KUALA LUMPUR",
+      "date": "19/02/2018",
+      "total": "17.70"
+    },
+    "matched_fields_before": [
+      "company",
+      "address",
+      "date",
+      "total"
+    ],
+    "matched_fields_after": [
+      "company",
+      "address",
+      "date",
+      "total"
+    ],
+    "changed_fields": [],
+    "normalized_changed_fields": [],
+    "before_schema_valid": true,
+    "after_schema_valid": true
+  },
+  {
+    "sample_id": "X51005568881",
+    "image_path": "data/raw/sroie/SROIE2019/train/img/X51005568881.jpg",
+    "image_sha256": "d7bfcb8d418724f9680b528186d249c98860fa60a1d452e2b7956b6c4685768d",
+    "figure": "09_X51005568881.png",
+    "before": {
+      "company": "HON HWA HARDWARE TRADING COMPANY REG. NO : 00158194X NO 37, JALAN MANIS 7, TAMAN SEGAR, 56100 CHERAS, KUALA LUMPUR.",
+      "address": "NO 37, JALAN MANIS 7, TAMAN SEGAR, 56100 CHERAS, KUALA LUMPUR.",
+      "date": "21/09/2017",
+      "total": "10.40"
+    },
+    "after": {
+      "company": "HON HWA HARDWARE TRADING COMPANY REG. NO : 00158194X NO 37, JALAN MANIS 7, TAMAN SEGAR, 56100 CHERAS, KUALA LUMPUR",
+      "address": "NO 37, JALAN MANIS 7, TAMAN SEGAR, 56100 CHERAS, KUALA LUMPUR",
+      "date": "21/09/2017",
+      "total": "10.40"
+    },
+    "reference": {
+      "company": "HON HWA HARDWARE TRADING",
+      "address": "NO 37, JALAN MANIS 7, TAMAN SEGAR, 56100 CHERAS, KUALA LUMPUR.",
+      "date": "21/09/2017",
+      "total": "10.40"
+    },
+    "matched_fields_before": [
+      "address",
+      "date",
+      "total"
+    ],
+    "matched_fields_after": [
+      "address",
+      "date",
+      "total"
+    ],
+    "changed_fields": [
+      "company",
+      "address"
+    ],
+    "normalized_changed_fields": [],
+    "before_schema_valid": true,
+    "after_schema_valid": true
+  },
+  {
+    "sample_id": "X51005568884",
+    "image_path": "data/raw/sroie/SROIE2019/train/img/X51005568884.jpg",
+    "image_sha256": "86d87b54d62426eaf14765ea4ab932b3ef90f98d27b3ad0235eae9786c3d2acf",
+    "figure": "10_X51005568884.png",
+    "before": {
+      "company": "MR. D.IY. SDN BHD",
+      "address": "LOT 1851-A & 1851-B, JALAN KPB 6, KAWASAN PERINDUSTRIAN BALAKONG, 43300 SERI KEMBANGAN, SELANGOR (GST ID NO: 0019288528),",
+      "date": "12/14",
+      "total": "3.90"
+    },
+    "after": {
+      "company": "MR. D.IY. SDN BHD",
+      "address": "LOT 1851-A & 1851-B, JALAN KPB 6, KAWASAN PERINDUSTRIAN BALAKONG, 43300 SERI KEMBANGAN, SELANGOR (GST ID NO: 0019288528),",
+      "date": "12/14",
+      "total": "3.90"
+    },
+    "reference": {
+      "company": "MR. D.I.Y. SDN BHD",
+      "address": "LOT 1851-A & 1851-B, JALAN KPB 6, KAWASAN PERINDUSTRIAN BALAKONG, 43300 SERI KEMBANGAN, SELANGOR",
+      "date": "24-11-17",
+      "total": "RM 3.90"
+    },
+    "matched_fields_before": [
+      "total"
+    ],
+    "matched_fields_after": [
+      "total"
+    ],
+    "changed_fields": [],
+    "normalized_changed_fields": [],
+    "before_schema_valid": true,
+    "after_schema_valid": true
+  }
+]

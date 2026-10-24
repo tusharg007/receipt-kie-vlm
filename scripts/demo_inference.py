@@ -115,6 +115,14 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--image", type=Path, default=DEFAULT_IMAGE)
     parser.add_argument(
+        "--structured", action="store_true",
+        help="Enforce the receipt JSON Schema during decoding (optional dependency).",
+    )
+    parser.add_argument(
+        "--image-longest-edge", type=int,
+        help="Explicit image-size override, e.g. 1024 for limited GPU memory.",
+    )
+    parser.add_argument(
         "--model-version",
         choices=sorted(MODEL_VERSIONS),
         default="v2",
@@ -130,11 +138,16 @@ def main() -> int:
             args.model_version,
             base_config,
         )
+        if args.image_longest_edge is not None:
+            if args.image_longest_edge <= 0:
+                raise ValueError("--image-longest-edge must be positive")
+            model_config["image_longest_edge"] = args.image_longest_edge
         checksum, _ = _verify_adapter(adapter_path)
         predictor = ReceiptKIEPredictor(
             model_config,
             base_config["paths"]["hf_cache"],
             adapter_path=adapter_path,
+            structured_output=args.structured,
         )
         if not isinstance(predictor.model, PeftModel) or not predictor.model.peft_config:
             raise RuntimeError(
@@ -178,7 +191,11 @@ def main() -> int:
     print(prediction["raw_output"])
     print("Parsed JSON:")
     print(json.dumps(prediction["parsed_prediction"], ensure_ascii=False, indent=2))
-    return 0
+    print(f"Schema valid: {prediction['schema_valid']}")
+    print(f"Review required: {prediction['review_required']}")
+    if prediction["review_issues"]:
+        print(f"Review issues: {', '.join(prediction['review_issues'])}")
+    return 0 if not args.structured or prediction["schema_valid"] else 1
 
 
 if __name__ == "__main__":

@@ -1,0 +1,157 @@
+{
+  "experiment": "structured_decoding_validation",
+  "status": "complete",
+  "source_split": "official_train_validation",
+  "sample_ids": [
+    "X00016469672",
+    "X51005361900",
+    "X51005361946",
+    "X51005433492",
+    "X51005433514",
+    "X51005442327",
+    "X51005442338",
+    "X51005447860",
+    "X51005568881",
+    "X51005568884"
+  ],
+  "config": {
+    "paths": {
+      "dataset_root": "data/raw/sroie/SROIE2019",
+      "hf_cache": ".cache/huggingface",
+      "adapter_path": "models/receipt-kie-lora-v2-highres",
+      "reports_dir": "artifacts/reports",
+      "predictions_dir": "artifacts/predictions",
+      "figures_dir": "artifacts/figures"
+    },
+    "model": {
+      "model_id": "HuggingFaceTB/SmolVLM-256M-Instruct",
+      "attention": "auto",
+      "precision": "auto",
+      "image_longest_edge": 1024,
+      "max_image_patch_edge": 512,
+      "do_image_splitting": true
+    },
+    "evaluation": {
+      "split": "test",
+      "sample_limit": 100,
+      "robustness_sample_limit": 20,
+      "seed": 42
+    },
+    "generation": {
+      "max_new_tokens": 256,
+      "do_sample": false,
+      "repetition_penalty": 1.08
+    }
+  },
+  "adapter_sha256": "3e0e5a88c36f0d6a0db6baf2a3b521e40be4ef84b212ed2eafecab431604bf79",
+  "package_versions": {
+    "torch": "2.5.1+cu124",
+    "torchvision": "0.20.1+cu124",
+    "transformers": "4.46.3",
+    "datasets": "3.1.0",
+    "accelerate": "1.1.1",
+    "peft": "0.13.2",
+    "trl": "0.12.1",
+    "pillow": "11.3.0",
+    "pandas": "2.3.3",
+    "numpy": "1.26.4",
+    "scikit-learn": "1.6.1",
+    "rapidfuzz": "3.14.5",
+    "matplotlib": "3.11.1",
+    "pyyaml": "6.0.3"
+  },
+  "variants": {
+    "unconstrained": {
+      "sample_count": 10,
+      "valid_json_rate": 1.0,
+      "per_field": {
+        "company": {
+          "raw_exact_match": 0.3,
+          "normalized_exact_match": 0.3,
+          "normalized_similarity": 0.796785107627101
+        },
+        "address": {
+          "raw_exact_match": 0.2,
+          "normalized_exact_match": 0.2,
+          "normalized_similarity": 0.6947697857004982
+        },
+        "date": {
+          "raw_exact_match": 0.6,
+          "normalized_exact_match": 0.6,
+          "normalized_similarity": 0.9
+        },
+        "total": {
+          "raw_exact_match": 0.5,
+          "normalized_exact_match": 0.6,
+          "normalized_similarity": 0.7944444444444444
+        }
+      },
+      "company_accuracy": 0.3,
+      "address_similarity": 0.6947697857004982,
+      "date_accuracy": 0.6,
+      "total_accuracy": 0.6,
+      "complete_record_raw_exact_match": 0.1,
+      "complete_record_normalized_exact_match": 0.1,
+      "macro_normalized_exact_match": 0.425,
+      "macro_normalized_similarity": 0.7964998344430109,
+      "average_inference_latency_seconds": 23.64153922999976,
+      "median_inference_latency_seconds": 22.252362950002862,
+      "peak_gpu_memory_mib": 1197.048828125,
+      "schema_valid_rate": 1.0,
+      "review_required_rate": 0.1,
+      "generation_limit_hit_rate": 0.0
+    },
+    "constrained": {
+      "sample_count": 10,
+      "valid_json_rate": 1.0,
+      "per_field": {
+        "company": {
+          "raw_exact_match": 0.3,
+          "normalized_exact_match": 0.3,
+          "normalized_similarity": 0.796785107627101
+        },
+        "address": {
+          "raw_exact_match": 0.1,
+          "normalized_exact_match": 0.2,
+          "normalized_similarity": 0.6947697857004982
+        },
+        "date": {
+          "raw_exact_match": 0.6,
+          "normalized_exact_match": 0.6,
+          "normalized_similarity": 0.9
+        },
+        "total": {
+          "raw_exact_match": 0.5,
+          "normalized_exact_match": 0.6,
+          "normalized_similarity": 0.7944444444444444
+        }
+      },
+      "company_accuracy": 0.3,
+      "address_similarity": 0.6947697857004982,
+      "date_accuracy": 0.6,
+      "total_accuracy": 0.6,
+      "complete_record_raw_exact_match": 0.1,
+      "complete_record_normalized_exact_match": 0.1,
+      "macro_normalized_exact_match": 0.425,
+      "macro_normalized_similarity": 0.7964998344430109,
+      "average_inference_latency_seconds": 22.533362409999974,
+      "median_inference_latency_seconds": 20.274617650000437,
+      "peak_gpu_memory_mib": 1197.486328125,
+      "schema_valid_rate": 1.0,
+      "review_required_rate": 0.1,
+      "generation_limit_hit_rate": 0.0
+    }
+  },
+  "absolute_deltas": {
+    "schema_valid_rate": 0.0,
+    "macro_normalized_exact_match": 0.0,
+    "complete_record_normalized_exact_match": 0.0,
+    "total_accuracy": 0.0
+  },
+  "constraint_version": "0.11.3",
+  "limitations": [
+    "10 sorted original-validation receipts only; descriptive pilot, not a held-out accuracy claim",
+    "1024 px explicitly selected after CUDA out-of-memory errors at 1536 px",
+    "Native TypeLLM/SGLang inference was not run; see typellm_contract.json for actual request-schema compilation checks"
+  ]
+}

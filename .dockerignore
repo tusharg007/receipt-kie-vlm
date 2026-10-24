@@ -1,0 +1,26 @@
+.git
+.venv*
+.cache
+.codex*
+.agents
+.pip-*
+.pytest*
+.ruff_cache
+data
+research_notebooks
+inference_data
+artifacts/checkpoints
+artifacts/predictions
+**/__pycache__
+*.ipynb
+*.log
+.env*
+.aws
+.auth-tools
+models/nemotron-bolt
+
+# Personal preparation documents stay local.
+/*_ALIGNMENT.md
+/RESUME_*.md
+/INTERVIEW_*.md
+/*_STUDY_GUIDE.md

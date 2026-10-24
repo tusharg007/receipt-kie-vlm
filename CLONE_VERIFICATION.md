@@ -229,7 +229,7 @@ sufficient space.
 
 ## Conclusion
 
-**PASS.** An external recruiter can clone the current public repository,
+**PASS.** An external user can clone the current public repository,
 install it in a fresh Python 3.11 environment, download the public base model,
 and run either committed LoRA adapter on CPU. V2 is selected by default, both
 adapters remain active without silent fallback, and parsed JSON is produced

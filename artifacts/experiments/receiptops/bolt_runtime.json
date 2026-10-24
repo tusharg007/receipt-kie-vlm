@@ -1,0 +1,11 @@
+{
+  "runtime": "llama.cpp b11459 / f498f864f / Windows x64 CPU",
+  "gpu_layers": 0,
+  "context_tokens": 2048,
+  "parallel_slots": 1,
+  "threads": 6,
+  "working_set_bytes_snapshot": 5535346688,
+  "peak_working_set_bytes_so_far": 5580947456,
+  "memory_note": "Process working set only; not total system memory, reserved virtual memory or GPU fit evidence.",
+  "weight_manifest": "artifacts/experiments/receiptops/bolt_download.json"
+}

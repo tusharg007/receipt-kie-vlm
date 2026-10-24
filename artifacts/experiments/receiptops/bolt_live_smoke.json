@@ -1,0 +1,38 @@
+{
+  "runtime": "llama.cpp b11459 Windows CPU; ctx=2048; GPU layers=0",
+  "elapsed_seconds": 40.01199450000058,
+  "result": {
+    "action": "abstain",
+    "reason": "insufficient_evidence",
+    "fields": [],
+    "status": "unavailable_or_invalid",
+    "error_type": "ValueError",
+    "trace": [
+      {
+        "tool": "inspect_receipt",
+        "result": {
+          "schema_valid": true,
+          "schema_errors": [],
+          "review_required": false,
+          "review_issues": [],
+          "features": {
+            "schema_valid": 1.0,
+            "missing_count": 0.0,
+            "date_flag": 0.0,
+            "amount_flag": 0.0,
+            "company_length_log": 3.58351893845611,
+            "address_length_log": 3.58351893845611,
+            "company_digit_ratio": 0.2,
+            "address_digit_ratio": 0.2,
+            "company_address_overlap": 1.0,
+            "company_address_length_ratio": 1.0,
+            "repeated_word_ratio": 0.4117647058823529,
+            "token_limit_hit": 0.0
+          }
+        }
+      }
+    ],
+    "model": "nemotron-bolt",
+    "image_verified": false
+  }
+}

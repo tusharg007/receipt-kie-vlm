@@ -1,0 +1,103 @@
+{
+  "scope": "First sorted original-validation pilot IDs; development comparison, not held-out evidence",
+  "sample_ids": [
+    "X00016469672",
+    "X51005361900",
+    "X51005361946"
+  ],
+  "baseline_source": "artifacts\\experiments\\structured_decoding\\pilot10_1024\\unconstrained.jsonl",
+  "status": "complete",
+  "notes": "Same original images. Backend-specific preprocessing differs. No reference annotations enter OCR or Bolt context.",
+  "original_v2": {
+    "sample_count": 3,
+    "valid_json_rate": 1.0,
+    "per_field": {
+      "company": {
+        "raw_exact_match": 0.0,
+        "normalized_exact_match": 0.0,
+        "normalized_similarity": 0.6056767534600047
+      },
+      "address": {
+        "raw_exact_match": 0.0,
+        "normalized_exact_match": 0.0,
+        "normalized_similarity": 0.5298794128212665
+      },
+      "date": {
+        "raw_exact_match": 0.3333333333333333,
+        "normalized_exact_match": 0.3333333333333333,
+        "normalized_similarity": 0.9333333333333333
+      },
+      "total": {
+        "raw_exact_match": 0.6666666666666666,
+        "normalized_exact_match": 0.6666666666666666,
+        "normalized_similarity": 0.8148148148148148
+      }
+    },
+    "company_accuracy": 0.0,
+    "address_similarity": 0.5298794128212665,
+    "date_accuracy": 0.3333333333333333,
+    "total_accuracy": 0.6666666666666666,
+    "complete_record_raw_exact_match": 0.0,
+    "complete_record_normalized_exact_match": 0.0,
+    "macro_normalized_exact_match": 0.25,
+    "macro_normalized_similarity": 0.7209260786073548,
+    "average_inference_latency_seconds": 18.874199599997763,
+    "median_inference_latency_seconds": 18.789353899999696,
+    "peak_gpu_memory_mib": 1197.048828125
+  },
+  "ocr_bolt": {
+    "sample_count": 3,
+    "valid_json_rate": 0.6666666666666666,
+    "per_field": {
+      "company": {
+        "raw_exact_match": 0.3333333333333333,
+        "normalized_exact_match": 0.3333333333333333,
+        "normalized_similarity": 0.4166666666666667
+      },
+      "address": {
+        "raw_exact_match": 0.0,
+        "normalized_exact_match": 0.0,
+        "normalized_similarity": 0.5887005649717514
+      },
+      "date": {
+        "raw_exact_match": 0.3333333333333333,
+        "normalized_exact_match": 0.3333333333333333,
+        "normalized_similarity": 0.6
+      },
+      "total": {
+        "raw_exact_match": 0.3333333333333333,
+        "normalized_exact_match": 0.6666666666666666,
+        "normalized_similarity": 0.6666666666666666
+      }
+    },
+    "company_accuracy": 0.3333333333333333,
+    "address_similarity": 0.5887005649717514,
+    "date_accuracy": 0.3333333333333333,
+    "total_accuracy": 0.6666666666666666,
+    "complete_record_raw_exact_match": 0.0,
+    "complete_record_normalized_exact_match": 0.0,
+    "macro_normalized_exact_match": 0.3333333333333333,
+    "macro_normalized_similarity": 0.5680084745762711,
+    "average_inference_latency_seconds": 29.64458316666787,
+    "median_inference_latency_seconds": 35.340324800003145,
+    "peak_gpu_memory_mib": null
+  },
+  "provenance": {
+    "weight_manifest": "artifacts/experiments/receiptops/bolt_download.json",
+    "runtime_snapshot": "artifacts/experiments/receiptops/bolt_runtime.json",
+    "source_sha256": {
+      "src/receipt_kie/ocr_bolt.py": "50de178ca800f6d7205456246075157ad9db900c3b7f1e3a61dafdee4c44dcb6",
+      "scripts/compare_ocr_bolt.py": "670c9ce2bb702f109b472f400672bee9268b64e82cacc6bc629dc1a108754fc6",
+      "requirements-ocr.txt": "4e487b04afae31184f6320042f583e5e93c1dbc13cb35fd4fc4d929aa5c8f36b"
+    },
+    "baseline_sha256": "b274bf5ae5dff882af9689c6ed57bae24a0843261b1a69920fafea7c1142a3a8",
+    "request": {
+      "temperature": 0,
+      "max_tokens": 256,
+      "reasoning_effort": "none",
+      "response_format_schema_path": "response_format.json_schema.schema"
+    },
+    "latency_note": "CPU challenger, cached prefixes, and an interleaved review smoke; historical V2 ran on GPU. No controlled performance comparison."
+  },
+  "initial_protocol_run": "initial_protocol/comparison.json"
+}

@@ -1,0 +1,32 @@
+{
+  "family": "receiptops-demo",
+  "requiresCompatibilities": ["EC2"],
+  "networkMode": "awsvpc",
+  "cpu": "2048",
+  "memory": "8192",
+  "executionRoleArn": "REPLACE_WITH_ECS_EXECUTION_ROLE_ARN",
+  "containerDefinitions": [{
+    "name": "receiptops",
+    "image": "REPLACE_WITH_ECR_IMAGE_URI_AND_IMMUTABLE_TAG",
+    "essential": true,
+    "resourceRequirements": [{"type": "GPU", "value": "1"}],
+    "portMappings": [{"containerPort": 8000, "protocol": "tcp"}],
+    "environment": [
+      {"name": "RECEIPT_HOST", "value": "0.0.0.0"},
+      {"name": "RECEIPT_IMAGE_EDGE", "value": "1024"}
+    ],
+    "secrets": [{"name": "RECEIPT_API_KEY", "valueFrom": "REPLACE_WITH_SECRETS_MANAGER_ARN"}],
+    "healthCheck": {
+      "command": ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=2)\""],
+      "interval": 30, "timeout": 5, "retries": 3, "startPeriod": 180
+    },
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "/receiptops/demo",
+        "awslogs-region": "ap-south-1",
+        "awslogs-stream-prefix": "service"
+      }
+    }
+  }]
+}

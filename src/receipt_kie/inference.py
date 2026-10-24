@@ -19,6 +19,7 @@ from receipt_kie.model import (
     resize_to_longest_edge,
 )
 from receipt_kie.prompts import SYSTEM_PROMPT, build_messages
+from receipt_kie.structured import strict_receipt, structured_metadata
 from receipt_kie.utils import clear_cuda
 
 LOGGER = logging.getLogger(__name__)
@@ -32,8 +33,15 @@ class ReceiptKIEPredictor:
         model_config: dict[str, Any],
         hf_cache: str,
         adapter_path: str | Path | None = None,
+        structured_output: bool = False,
     ) -> None:
+        self.structured_output = structured_output
         self.processor = load_processor(model_config, hf_cache)
+        self._token_constraint = None
+        if structured_output:
+            from receipt_kie.constrained import ReceiptTokenConstraint
+
+            self._token_constraint = ReceiptTokenConstraint(self.processor.tokenizer)
         base_model, self.runtime = load_base_model(model_config, hf_cache, training=False)
         if adapter_path is not None:
             self.model = PeftModel.from_pretrained(base_model, str(adapter_path))
@@ -158,6 +166,10 @@ class ReceiptKIEPredictor:
         }
         if repetition_penalty is not None:
             generation_kwargs["repetition_penalty"] = repetition_penalty
+        if self._token_constraint is not None:
+            generation_kwargs["prefix_allowed_tokens_fn"] = (
+                self._token_constraint.prefix_allowed_tokens_fn()
+            )
         with torch.inference_mode():
             generated = self.model.generate(
                 **inputs,
@@ -173,7 +185,15 @@ class ReceiptKIEPredictor:
             skip_special_tokens=True,
             clean_up_tokenization_spaces=False,
         )[0].strip()
-        parsed: ParsedOutput = extract_json(raw_output)
+        limit_hit = generated_token_count >= max_new_tokens
+        metadata = structured_metadata(raw_output, limit_hit=limit_hit)
+        if self.structured_output:
+            value, errors = strict_receipt(raw_output)
+            parsed = ParsedOutput(
+                value is not None, value, "strict_schema", "; ".join(errors) or None
+            )
+        else:
+            parsed = extract_json(raw_output)
         peak_mib = torch.cuda.max_memory_allocated() / 2**20 if torch.cuda.is_available() else None
         return {
             "raw_output": raw_output,
@@ -184,7 +204,9 @@ class ReceiptKIEPredictor:
             "latency_seconds": latency,
             "peak_gpu_memory_mib": peak_mib,
             "generated_token_count": generated_token_count,
-            "generation_limit_hit": generated_token_count >= max_new_tokens,
+            "generation_limit_hit": limit_hit,
+            "structured_output": self.structured_output,
+            **metadata,
             "visual_tile_count": visual_tile_count,
             "pixel_values_shape": pixel_values_shape,
             "visual_tile_shape": visual_tile_shape,
