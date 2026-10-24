@@ -26,4 +26,4 @@ google-genai>=1.0,<2
 
 # Authenticated model and dataset access.
 huggingface-hub>=0.26,<1
-kaggle>=2,<3
+kaggle>=2.2.5,<3

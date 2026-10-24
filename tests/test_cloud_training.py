@@ -9,7 +9,13 @@ import torch
 from PIL import Image
 
 from receipt_kie.cloud_data import prepare_cloud_data
-from receipt_kie.qwen_cloud import QwenReceiptCollator
+from receipt_kie.qwen_cloud import QwenReceiptCollator, native_training_dtype
+
+
+def test_t4_never_selects_emulated_bf16_even_when_torch_reports_support():
+    assert native_training_dtype((7, 5), True) == torch.float16
+    assert native_training_dtype((8, 0), True) == torch.bfloat16
+    assert native_training_dtype((9, 0), False) == torch.float16
 
 
 def _image(root, split, sample_id, color, company="ACME"):

@@ -1,0 +1,225 @@
+"""Verify paired cloud outputs before publishing retrospective accuracy claims."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import shutil
+import sys
+from pathlib import Path
+
+import numpy as np
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+
+from receipt_kie.metrics import evaluate_predictions, normalize_field  # noqa: E402
+from receipt_kie.prompts import CANONICAL_FIELDS  # noqa: E402
+
+
+def read_rows(path: Path) -> list[dict]:
+    return [json.loads(line) for line in path.read_text("utf-8").splitlines() if line.strip()]
+
+
+def verify_alignment(variants: dict[str, list[dict]], hashes: dict[str, str]) -> list[str]:
+    expected = set(hashes)
+    indexed = {}
+    for name, rows in variants.items():
+        indexed[name] = {row["sample_id"]: row for row in rows}
+        if len(rows) != len(indexed[name]) or set(indexed[name]) != expected:
+            raise ValueError(f"{name}: duplicate, missing or additional evaluation IDs")
+        for row in rows:
+            if name != "v2" and row.get("image_sha256") != hashes[row["sample_id"]]:
+                raise ValueError(f"{name}: image hash mismatch")
+    names = list(indexed)
+    for sample_id in sorted(expected):
+        reference = indexed[names[0]][sample_id]["ground_truth"]
+        for name in names[1:]:
+            other = indexed[name][sample_id]["ground_truth"]
+            if any(
+                normalize_field(field, reference[field]) != normalize_field(field, other[field])
+                for field in CANONICAL_FIELDS
+            ):
+                raise ValueError(f"{name}: reference annotation mismatch for {sample_id}")
+    return sorted(expected)
+
+
+def correct_vectors(rows: list[dict], ids: list[str]) -> tuple[np.ndarray, np.ndarray]:
+    indexed = {row["sample_id"]: row for row in rows}
+    correct = np.array(
+        [
+            [
+                bool(indexed[sample_id].get("valid_json"))
+                and normalize_field(
+                    field, (indexed[sample_id].get("parsed_prediction") or {}).get(field, "")
+                )
+                == normalize_field(field, indexed[sample_id]["ground_truth"][field])
+                for field in CANONICAL_FIELDS
+            ]
+            for sample_id in ids
+        ]
+    )
+    return correct.mean(axis=1), correct.all(axis=1).astype(float)
+
+
+def plot_metrics(metrics: dict, output: Path) -> None:
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    figure, axes = plt.subplots(1, 2, figsize=(10, 4.6))
+    names = ["v2", "qwen_base", "qwen_qlora"]
+    labels = ["Historical V2", "Qwen3-VL\nNF4 base", "Qwen3-VL\nQLoRA"]
+    for axis, key, title in zip(
+        axes,
+        ["macro_normalized_exact_match", "complete_record_normalized_exact_match"],
+        ["Macro field exact match", "Complete-record exact match"],
+        strict=True,
+    ):
+        values = [100 * metrics[name][key] for name in names]
+        bars = axis.bar(labels, values, color=["#718096", "#7098c3", "#43856a"])
+        axis.bar_label(bars, labels=[f"{value:.1f}%" for value in values], padding=4)
+        axis.set(ylim=(0, 106), ylabel="Normalized accuracy (%)", title=title)
+        axis.spines[["top", "right"]].set_visible(False)
+    figure.suptitle("Receipt extraction: 239-record retrospective comparison", fontsize=13)
+    figure.text(
+        0.5,
+        0.025,
+        "Same image bytes; V2 preprocessing differs. Paired intervals in report.",
+        ha="center",
+        fontsize=9,
+    )
+    figure.tight_layout(rect=(0, 0.05, 1, 0.95))
+    figure.savefig(output, dpi=180, bbox_inches="tight")
+    plt.close(figure)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--run-dir", type=Path, required=True)
+    parser.add_argument(
+        "--output-dir", type=Path, default=ROOT / "artifacts/experiments/qwen3_vl/full_run"
+    )
+    parser.add_argument("--report", type=Path, default=ROOT / "QWEN3_VL_RESULTS.md")
+    args = parser.parse_args()
+    summary = json.loads((args.run_dir / "training_summary.json").read_text("utf-8"))
+    if summary.get("status") != "evaluation_complete" or summary.get("global_steps", 0) <= 2:
+        raise ValueError(
+            "Require completed full training and evaluation, not a smoke or partial run"
+        )
+    hashes = json.loads(
+        (ROOT / "artifacts/experiments/receiptops/evaluation_image_sha256.json").read_text("utf-8")
+    )
+    v2_path = ROOT / "artifacts/experiments/highres_training_v2/v2_predictions.jsonl"
+    variants = {
+        "v2": [row for row in read_rows(v2_path) if row["sample_id"] in hashes],
+        "qwen_base": read_rows(args.run_dir / "base_predictions.jsonl"),
+        "qwen_qlora": read_rows(args.run_dir / "adapted_predictions.jsonl"),
+    }
+    ids = verify_alignment(variants, hashes)
+    frozen = json.loads((args.run_dir / "frozen_selection.json").read_text("utf-8"))
+    if frozen.get("deployment_allowed") is not False:
+        raise ValueError("A validation choice is not deployment approval")
+    metrics = {name: evaluate_predictions(rows) for name, rows in variants.items()}
+    vectors = {name: correct_vectors(rows, ids) for name, rows in variants.items()}
+    rng = np.random.default_rng(42)
+    resamples = rng.integers(0, len(ids), size=(2000, len(ids)))
+    intervals = {}
+    for before, after in (("v2", "qwen_base"), ("v2", "qwen_qlora"), ("qwen_base", "qwen_qlora")):
+        intervals[f"{after}_minus_{before}"] = {}
+        for index, metric in enumerate(("macro_exact", "complete_record_exact")):
+            difference = vectors[after][index] - vectors[before][index]
+            lower, upper = np.quantile(difference[resamples].mean(axis=1), [0.025, 0.975])
+            intervals[f"{after}_minus_{before}"][metric] = {
+                "point_difference": float(difference.mean()),
+                "paired_bootstrap_95_percent": [float(lower), float(upper)],
+            }
+    report = {
+        "scope": "239-record content-disjoint retrospective comparison, not fresh test data",
+        "sample_count": len(ids),
+        "metrics": metrics,
+        "paired_bootstrap": intervals,
+        "bootstrap_resamples": 2000,
+        "bootstrap_seed": 42,
+        "validation_choice": frozen,
+        "training_summary": summary,
+        "limitations": [
+            "Exact-content checks do not rule out perceptual duplicates or pretraining exposure",
+            "Historical V2 used different image preprocessing and parsing; timings are not paired",
+            "Paired Qwen base/adapted predictions use the same NF4, images, prompt and decoding",
+            "No default-model promotion, fresh-data accuracy or production scale claim",
+        ],
+    }
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+    for name in (
+        "training_summary.json",
+        "split_manifest.json",
+        "validation_metrics.json",
+        "frozen_selection.json",
+        "comparison.json",
+        "base_predictions.jsonl",
+        "adapted_predictions.jsonl",
+        "validation_predictions.jsonl",
+        "base_validation_predictions.jsonl",
+    ):
+        shutil.copy2(args.run_dir / name, args.output_dir / name)
+    (args.output_dir / "verified_comparison.json").write_text(
+        json.dumps(report, indent=2) + "\n", encoding="utf-8"
+    )
+    plot_metrics(metrics, args.output_dir / "accuracy_comparison.png")
+    labels = {
+        "v2": "Historical V2",
+        "qwen_base": "Qwen3-VL NF4 base",
+        "qwen_qlora": "Qwen3-VL QLoRA",
+    }
+    lines = [
+        "# Qwen3-VL: verified Kaggle experiment",
+        "",
+        report["scope"] + ". All invalid predictions remain in the denominator.",
+        "",
+        "| Model | Macro field exact | Complete-record exact | Valid output |",
+        "|---|---:|---:|---:|",
+    ]
+    for name, values in metrics.items():
+        lines.append(
+            f"| {labels[name]} | {values['macro_normalized_exact_match']:.1%} | "
+            f"{values['complete_record_normalized_exact_match']:.1%} | "
+            f"{values['valid_json_rate']:.1%} |"
+        )
+    lines.extend(
+        [
+            "",
+            f"Validation-only choice before evaluation: `{frozen['selected']}`.",
+            "",
+            "This does not automatically replace V2 or approve the Qwen backend for deployment.",
+            "",
+            f"Training: {summary['global_steps']} optimizer steps on {summary['gpu']}, "
+            f"{summary['dtype']}, peak allocated {summary['peak_allocated_gpu_mib']:.0f} MiB.",
+            "",
+            "The code and weights are pinned; the training summary records software versions.",
+            "",
+            "## Paired uncertainty",
+            "",
+        ]
+    )
+    for name, values in intervals.items():
+        item = values["macro_exact"]
+        lower, upper = item["paired_bootstrap_95_percent"]
+        lines.append(
+            f"- `{name}` macro gain: {item['point_difference'] * 100:+.2f} pp; "
+            f"paired 95% interval [{lower * 100:+.2f}, {upper * 100:+.2f}] pp."
+        )
+    lines.extend(["", "## Limits", ""] + [f"- {item}." for item in report["limitations"]])
+    chart_link = Path(
+        os.path.relpath(args.output_dir / "accuracy_comparison.png", args.report.parent)
+    ).as_posix()
+    lines.extend(["", f"![Retrospective accuracy comparison]({chart_link})", ""])
+    args.report.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(json.dumps({"metrics": metrics, "paired_bootstrap": intervals}, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

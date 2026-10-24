@@ -1,0 +1,88 @@
+{
+  "model": "Qwen/Qwen3-VL-2B-Instruct",
+  "model_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "kernel": "tusharghosh007/receiptops-qwen3-vl-smoke",
+  "private": true,
+  "attempts": [
+    {
+      "version": 1,
+      "outcome": "failed_environment_bootstrap",
+      "details": "Kaggle Python 3.13 ensurepip failed before training; switched to virtualenv."
+    },
+    {
+      "version": 2,
+      "run_id": 361688249,
+      "outcome": "cancel_acknowledged",
+      "details": "Browser showed 1751.5 seconds running with zero output bytes; live-log API returned 500. No optimizer-step result verified. User-authorized task cleanup stopped the exact run."
+    },
+    {
+      "version": 3,
+      "run_id": 361696157,
+      "outcome": "smoke_passed",
+      "details": "Two optimizer steps completed with finite losses and nonzero LoRA updates. PyTorch reported BF16 on T4 through emulation; a native-FP16 follow-up is required for timing.",
+      "source_sha256": {
+        "requirements-cloud.txt": "99409601ad87f9379003fa069051fa67e6491b906f9b7cd361369efca60a6b06",
+        "scripts/train_qwen_cloud.py": "c627f79722ea978da1d4e80ca2b8feb4f85f2e3e63a86916f6d7f52b02f37d79",
+        "src/receipt_kie/__init__.py": "7d586dd8711418af0843553e6335bbbb03260f58f7ea4acf93b742061c920137",
+        "src/receipt_kie/prompts.py": "71fae0bfc501ac100bdf5d6c32c144745a14723981a345ace7e4e07224bd97a8",
+        "src/receipt_kie/metrics.py": "368b0e81927743d06c2d49654664fd455298fb168d5b15c4c8d69ad927c695f4",
+        "src/receipt_kie/structured.py": "d656d2cd2a8fce5bd78c45ae1bf378e720b732082c847269eeca61330e0471e7",
+        "src/receipt_kie/cloud_data.py": "61a01b7737333f00f866ae28f69bb26ae624c2f5461c414a97177e280570268b",
+        "src/receipt_kie/qwen_cloud.py": "f33f4803f4d5a673188eae2e57913c24f66bdf050d09733fe30f4e0103013b6b"
+      }
+    },
+    {
+      "version": 4,
+      "outcome": "smoke_passed",
+      "details": "Native FP16: two optimizer steps in 10.3735 seconds, all trainable weights finite, nonzero adapter update, peak allocated memory 5214.65 MiB.",
+      "source_sha256": {
+        "requirements-cloud.txt": "99409601ad87f9379003fa069051fa67e6491b906f9b7cd361369efca60a6b06",
+        "scripts/train_qwen_cloud.py": "7e80873a850f36e96d0b767a291d8c1b8c73dc36c01bd690ed46fcce1e5b9e8c",
+        "src/receipt_kie/__init__.py": "7d586dd8711418af0843553e6335bbbb03260f58f7ea4acf93b742061c920137",
+        "src/receipt_kie/prompts.py": "71fae0bfc501ac100bdf5d6c32c144745a14723981a345ace7e4e07224bd97a8",
+        "src/receipt_kie/metrics.py": "368b0e81927743d06c2d49654664fd455298fb168d5b15c4c8d69ad927c695f4",
+        "src/receipt_kie/structured.py": "d656d2cd2a8fce5bd78c45ae1bf378e720b732082c847269eeca61330e0471e7",
+        "src/receipt_kie/cloud_data.py": "61a01b7737333f00f866ae28f69bb26ae624c2f5461c414a97177e280570268b",
+        "src/receipt_kie/qwen_cloud.py": "ff4df3256c15107358827d491aedaf584e9c616465fe71bcb165320c3d09fb04"
+      }
+    }
+  ],
+  "full_training_launched": true,
+  "accuracy_improvement_established": false,
+  "quota_note": "Kaggle SDK timedelta total_time_allowed reported 30 hours. Its string JSON rendering omitted the day component; the initial six-hour interpretation was incorrect.",
+  "full_training": {
+    "kernel": "tusharghosh007/receiptops-qwen3-vl-train",
+    "version": 2,
+    "state": "running",
+    "epochs": 3,
+    "timeout_seconds": 14400,
+    "process_watchdog_seconds": 13900,
+    "train_count": 445,
+    "validation_count": 174,
+    "evaluation_count": 239,
+    "source_sha256": {
+      "requirements-cloud.txt": "99409601ad87f9379003fa069051fa67e6491b906f9b7cd361369efca60a6b06",
+      "scripts/train_qwen_cloud.py": "7e80873a850f36e96d0b767a291d8c1b8c73dc36c01bd690ed46fcce1e5b9e8c",
+      "src/receipt_kie/__init__.py": "7d586dd8711418af0843553e6335bbbb03260f58f7ea4acf93b742061c920137",
+      "src/receipt_kie/prompts.py": "71fae0bfc501ac100bdf5d6c32c144745a14723981a345ace7e4e07224bd97a8",
+      "src/receipt_kie/metrics.py": "368b0e81927743d06c2d49654664fd455298fb168d5b15c4c8d69ad927c695f4",
+      "src/receipt_kie/structured.py": "d656d2cd2a8fce5bd78c45ae1bf378e720b732082c847269eeca61330e0471e7",
+      "src/receipt_kie/cloud_data.py": "61a01b7737333f00f866ae28f69bb26ae624c2f5461c414a97177e280570268b",
+      "src/receipt_kie/qwen_cloud.py": "89f7dbfd1b41b5436877ebc206d9da3f0ba2637537c1c19be24b613c059efccb"
+    }
+  },
+  "full_training_attempts": [
+    {
+      "version": 1,
+      "run_id": 361699706,
+      "state": "cancel_acknowledged",
+      "details": "No startup log after approximately five minutes. Stopped before retrying with the managed image setting."
+    },
+    {
+      "version": 2,
+      "state": "running",
+      "details": "Managed image, native FP16, verified cloud package pins and process watchdog.",
+      "run_id": 361701192
+    }
+  ]
+}

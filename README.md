@@ -57,8 +57,8 @@ confidence.
   replacing V2. See [the full Bolt pilot](BOLT_PILOT.md). The verified checkpoint
   declares text/text; direct vision and 4GB GPU fit were not tested.
 - **Deployment assets:** Dockerfile, AWS ECS template and GitHub Actions workflow;
-  these files do not constitute an executed cloud deployment or a passing remote
-  CI run. SQLite and one GPU worker are a single-replica prototype.
+  remote CPU CI passed on commit `06eacf7`. Docker and cloud hosting remain
+  unexecuted blueprints. SQLite and one GPU worker are a single-replica prototype.
 
 Start with [the service runbook](RECEIPTOPS.md),
 [type-safe extraction](TYPE_SAFE_EXTRACTION.md), and the
@@ -69,13 +69,16 @@ Start with [the service runbook](RECEIPTOPS.md),
 
 ## Larger-model training on Kaggle
 
-An isolated [Qwen3-VL-2B QLoRA training package](KAGGLE_TRAINING.md) now supports
-private Kaggle GPU jobs, a real optimizer-step smoke test, merchant-disjoint
-validation, and paired quantized-base versus adapted-model evaluation. The
-current protocol uses 445 fit images, 174 validation images and the 239-record
-historical retrospective comparison. It does not upgrade the local V2 dependency
-stack or replace the service model. Submitted jobs are not accuracy results;
-verified metrics will be published only after training and evaluation finish.
+The isolated [Qwen3-VL-2B QLoRA package](KAGGLE_TRAINING.md) supports private
+Kaggle GPU jobs, merchant-disjoint validation and paired quantized-base versus
+adapted-model evaluation. The protocol uses 445 fit images, 174 validation images
+and the 239-record historical retrospective comparison.
+
+A real T4 smoke test completed two native-FP16 optimizer steps with finite losses,
+changed LoRA weights and about 5.1 GiB peak allocated memory. The three-epoch
+experiment is running. It does not upgrade the local V2 dependency stack or
+replace the service model. Accuracy results will be published only after training
+and evaluation finish. [Verified smoke summary](artifacts/experiments/qwen3_vl/smoke_fp16.json).
 
 ## Run the inference service
 
@@ -93,7 +96,7 @@ The default 1024 px setting reduces memory use and routes results to review.
 See [the runbook](RECEIPTOPS.md) for authentication, feedback, configuration,
 monitoring and deployment instructions.
 
-Local validation: **91 unit and API contract tests pass**, with clean Ruff and
+Local validation: **94 unit and API contract tests pass**, with clean Ruff and
 dependency checks. Reproduce with:
 
 ```powershell

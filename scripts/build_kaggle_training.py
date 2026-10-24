@@ -8,6 +8,10 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+DOCKER_IMAGE = (
+    "gcr.io/kaggle-private-byod/python@sha256:"
+    "9a6bcfda6d03b2cd9aa347ee8c1bae62043328ed0f4afe9bda014e4f8bbf9435"
+)
 SOURCES = (
     "requirements-cloud.txt",
     "scripts/train_qwen_cloud.py",
@@ -39,6 +43,7 @@ def build(username: str, smoke: bool, destination: Path) -> dict:
         "max_sequence_length": 2048,
         "selection_metric": "merchant-disjoint official-train validation loss",
         "dataset_source": "urbikn/sroie-datasetv2",
+        "reference_smoke_container": DOCKER_IMAGE,
         "evaluation_image_sha256": json.loads(
             (ROOT / "artifacts/experiments/receiptops/evaluation_image_sha256.json").read_text(
                 encoding="utf-8"
@@ -56,6 +61,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import time
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -64,6 +70,13 @@ os.environ["WANDB_DISABLED"] = "true"
 os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "1"
 os.environ["USE_TF"] = "0"
 os.environ["USE_FLAX"] = "0"
+os.environ["PYTHONUNBUFFERED"] = "1"
+deadline = time.monotonic() + {1100 if smoke else 13900}
+
+def run(command, **kwargs):
+    remaining = max(1, int(deadline - time.monotonic()))
+    subprocess.run(command, check=True, timeout=remaining, **kwargs)
+
 root = Path("/kaggle/working/receiptops-source")
 sources = {payload!r}
 for relative, text in sources.items():
@@ -76,21 +89,21 @@ roots = [path for path in Path("/kaggle/input").rglob("SROIE2019")
 if len(roots) != 1:
     raise RuntimeError("Attach exactly one urbikn/sroie-datasetv2 dataset: " + str(roots))
 print("Runtime:", sys.version, flush=True)
-subprocess.run(["nvidia-smi"], check=True)
-subprocess.run([sys.executable, "-m", "pip", "install", "--no-cache-dir",
-               "--target", "/tmp/receiptops-bootstrap", "virtualenv>=20.26,<21"], check=True)
+run(["nvidia-smi"])
+run([sys.executable, "-m", "pip", "install", "--no-cache-dir",
+     "--target", "/tmp/receiptops-bootstrap", "virtualenv==20.39.1"])
 bootstrap_environment = dict(os.environ, PYTHONPATH="/tmp/receiptops-bootstrap")
-subprocess.run([sys.executable, "-m", "virtualenv", "--system-site-packages",
-               "/tmp/receiptops-env"], env=bootstrap_environment, check=True)
+run([sys.executable, "-m", "virtualenv", "--system-site-packages",
+     "/tmp/receiptops-env"], env=bootstrap_environment)
 python = "/tmp/receiptops-env/bin/python"
-subprocess.run([python, "-m", "pip", "install", "--no-cache-dir", "-r",
-                str(root / "requirements-cloud.txt")], check=True)
+run([python, "-m", "pip", "install", "--no-cache-dir", "-r",
+     str(root / "requirements-cloud.txt")])
 command = [python, str(root / "scripts/train_qwen_cloud.py"),
            "--dataset-root", str(roots[0]), "--protocol", str(root / "cloud_protocol.json"),
            "--output-dir", "/kaggle/working/receiptops-{mode}"]
 if {smoke!r}:
     command.append("--smoke")
-subprocess.run(command, cwd=root, check=True)
+run(command, cwd=root)
 print("ReceiptOps {mode} job complete", flush=True)
 '''
     compile(script, "receiptops_job.py", "exec")

@@ -1,0 +1,44 @@
+{
+  "status": "smoke_passed",
+  "model_id": "Qwen/Qwen3-VL-2B-Instruct",
+  "model_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "protocol_sha256": "d55902234b77c51b7fc3cea520a8260bf1aeb12a79f3d09005b710eaed7b4270",
+  "gpu": "Tesla T4",
+  "compute_capability": [
+    7,
+    5
+  ],
+  "dtype": "torch.float16",
+  "quantization": "NF4",
+  "max_pixels": 1048576,
+  "global_steps": 2,
+  "train_metrics": {
+    "train_runtime": 10.3735,
+    "train_samples_per_second": 0.193,
+    "train_steps_per_second": 0.193,
+    "total_flos": 25383763722240.0,
+    "train_loss": 0.13437842577695847,
+    "epoch": 0.5
+  },
+  "losses": [
+    0.1286,
+    0.1402
+  ],
+  "checked_parameter": "base_model.model.model.language_model.layers.0.self_attn.q_proj.lora_B.default.weight",
+  "checked_parameter_max_change": 0.0001500637736171484,
+  "all_trainable_weights_finite": true,
+  "peak_allocated_gpu_mib": 5214.65478515625,
+  "peak_reserved_gpu_mib": 5996.0,
+  "best_checkpoint": null,
+  "checkpoint_selection": "Minimum official-train merchant-disjoint validation loss",
+  "elapsed_seconds": 56.150316175,
+  "versions": {
+    "torch": "2.11.0+cu128",
+    "torchvision": "0.26.0+cu128",
+    "transformers": "4.57.6",
+    "peft": "0.17.1",
+    "accelerate": "1.11.0",
+    "bitsandbytes": "0.48.2"
+  },
+  "deployment_allowed": false
+}

@@ -51,6 +51,7 @@ documents, images and model downloads are not bundled.
 python scripts/build_kaggle_training.py --username YOUR_USERNAME --smoke --output-dir .cache/kaggle-training/smoke
 python -m kaggle kernels push -p .cache/kaggle-training/smoke --accelerator NvidiaTeslaT4 -t 1200
 python -m kaggle kernels status YOUR_USERNAME/receiptops-qwen3-vl-smoke
+python -X utf8 -m kaggle kernels logs YOUR_USERNAME/receiptops-qwen3-vl-smoke --follow
 ```
 
 The smoke test must produce finite losses and a nonzero LoRA parameter change.
@@ -58,9 +59,12 @@ It records actual GPU, software versions, peak memory, source hashes and split
 manifest. A submitted or running kernel is not evidence of successful training.
 Inspect `training_summary.json` before proceeding.
 
+Use Kaggle CLI 2.2.5 or later for version-aware status/output retrieval. On
+Windows, `-X utf8` prevents console encoding errors when streaming pip progress.
+
 ```powershell
 python scripts/build_kaggle_training.py --username YOUR_USERNAME --output-dir .cache/kaggle-training/train
-python -m kaggle kernels push -p .cache/kaggle-training/train --accelerator NvidiaTeslaT4 -t 10800
+python -m kaggle kernels push -p .cache/kaggle-training/train --accelerator NvidiaTeslaT4 -t 14400
 python -m kaggle kernels status YOUR_USERNAME/receiptops-qwen3-vl-train
 python -m kaggle kernels output YOUR_USERNAME/receiptops-qwen3-vl-train -p .cache/kaggle-training/download
 ```
@@ -69,7 +73,21 @@ Check the account's actual quota first using `python -m kaggle quota`. Availabil
 and weekly limits depend on the account and platform allocation. The timeout is
 a resource bound, not a prediction of how long training takes.
 
+The launcher also bounds its own subprocesses: 1,100 seconds for smoke and
+13,900 seconds for full training. This starts when Python executes and cannot
+bound a platform stall before execution. Inspect a job with zero output promptly
+and stop a stalled worker rather than repeatedly launching overlapping sessions.
+
 ## Environment and artifacts
+
+The real smoke test completed two optimizer steps on a Tesla T4, with finite
+losses and nonzero LoRA updates. The original BF16 run took 82.4 seconds for the
+two steps; corrected native FP16 took 10.4 seconds, with about 5.1 GiB peak
+allocated memory. This is a small setup/timing check, not an accuracy result or
+a general throughput benchmark. New Torch versions can report emulated BF16 on
+T4, so the dtype policy also checks compute capability and uses FP16 below Ampere.
+Raw summaries: [FP16](artifacts/experiments/qwen3_vl/smoke_fp16.json),
+[emulated BF16](artifacts/experiments/qwen3_vl/smoke_bf16_emulated.json).
 
 Kaggle's current image uses Python 3.13. Its `ensurepip` bootstrap failed in the
 first job, so the launcher uses `virtualenv` with system packages and installs
@@ -83,6 +101,17 @@ Full-run outputs include the selected adapter, training summary, partition
 manifest, validation metrics, paired base/adapted predictions and comparison
 metrics. Actual results belong under `artifacts/experiments/qwen3_vl/` only after
 retrieval and verification. Keep optimizer states and weight caches out of Git.
+
+Verify retrieved full-run outputs before reporting accuracy:
+
+```powershell
+python scripts/analyze_qwen_experiment.py --run-dir .cache/kaggle-training/download/receiptops-train
+```
+
+This refuses incomplete runs, missing or repeated IDs, changed image hashes and
+changed normalized reference labels. It reports all three models on the same
+239 IDs and 2,000-resample paired bootstrap intervals. The full run is currently
+in progress; the smoke summaries do not imply improved extraction accuracy.
 
 The original FastAPI service continues to use V2. Any Qwen promotion also needs
 an inference integration, memory/latency checks, a new quality-model calibration,

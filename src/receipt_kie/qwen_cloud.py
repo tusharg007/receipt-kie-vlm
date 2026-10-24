@@ -22,6 +22,11 @@ MODEL_ID = "Qwen/Qwen3-VL-2B-Instruct"
 MODEL_REVISION = "89644892e4d85e24eaac8bacfd4f463576704203"
 
 
+def native_training_dtype(capability: tuple[int, int], bf16_reported: bool) -> torch.dtype:
+    """New Torch versions may report emulated BF16 on pre-Ampere GPUs."""
+    return torch.bfloat16 if capability[0] >= 8 and bf16_reported else torch.float16
+
+
 def messages(target: dict | None = None) -> list[dict]:
     result = [
         {"role": "system", "content": SYSTEM_PROMPT},
@@ -139,6 +144,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--smoke", action="store_true")
     args = parser.parse_args(argv)
     # Import only in the isolated cloud environment, never upgrade the local V2 stack.
+    print("Importing isolated PEFT and Transformers", flush=True)
     from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
     from transformers import (
         AutoProcessor,
@@ -156,15 +162,24 @@ def main(argv: list[str] | None = None) -> int:
     if args.output_dir.exists() and any(args.output_dir.iterdir()):
         raise FileExistsError("Use a fresh output directory to keep experiment records immutable")
     args.output_dir.mkdir(parents=True, exist_ok=True)
+    print(f"CUDA worker: {torch.cuda.get_device_name()}; torch {torch.__version__}", flush=True)
     protocol = json.loads(args.protocol.read_text(encoding="utf-8"))
     set_seed(protocol["seed"])
+    print("Hashing and validating the dataset before any optimizer step", flush=True)
     split = prepare_cloud_data(args.dataset_root, protocol["evaluation_ids"], protocol["seed"])
     observed_hashes = {row["sample_id"]: row["sha256"] for row in split["evaluation"]}
     if observed_hashes != protocol["evaluation_image_sha256"]:
         raise ValueError("Cloud evaluation images differ from the audited local image hashes")
     _save(args.output_dir / "split_manifest.json", split)
+    print(
+        "Validated partitions: "
+        + str({name: len(split[name]) for name in ("train", "validation", "evaluation")}),
+        flush=True,
+    )
     max_pixels = protocol["max_pixels"]
-    dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
+    capability = torch.cuda.get_device_capability()
+    dtype = native_training_dtype(capability, torch.cuda.is_bf16_supported())
+    print(f"Native compute capability {capability}; training dtype {dtype}", flush=True)
     quantization = BitsAndBytesConfig(
         load_in_4bit=True,
         bnb_4bit_quant_type="nf4",
@@ -172,7 +187,9 @@ def main(argv: list[str] | None = None) -> int:
         bnb_4bit_compute_dtype=dtype,
     )
     started = time.perf_counter()
+    print("Loading the pinned Qwen processor", flush=True)
     processor = AutoProcessor.from_pretrained(MODEL_ID, revision=MODEL_REVISION)
+    print("Loading and quantizing the pinned Qwen model", flush=True)
     model = Qwen3VLForConditionalGeneration.from_pretrained(
         MODEL_ID,
         revision=MODEL_REVISION,
@@ -204,6 +221,7 @@ def main(argv: list[str] | None = None) -> int:
             bias="none",
             target_modules=targets,
             task_type="CAUSAL_LM",
+            revision=MODEL_REVISION,
         ),
     )
     reference_name, reference_parameter = next(
@@ -250,6 +268,7 @@ def main(argv: list[str] | None = None) -> int:
         data_collator=collator,
     )
     torch.cuda.reset_peak_memory_stats()
+    print("Starting actual QLoRA optimizer steps", flush=True)
     trained = trainer.train()
     losses = [item["loss"] for item in trainer.state.log_history if "loss" in item]
     delta = float((reference_parameter.detach().float().cpu() - before).abs().max())
@@ -267,6 +286,7 @@ def main(argv: list[str] | None = None) -> int:
         "model_revision": MODEL_REVISION,
         "protocol_sha256": hashlib.sha256(args.protocol.read_bytes()).hexdigest(),
         "gpu": torch.cuda.get_device_name(),
+        "compute_capability": list(capability),
         "dtype": str(dtype),
         "quantization": "NF4",
         "max_pixels": max_pixels,
