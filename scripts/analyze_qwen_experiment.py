@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import shutil
@@ -105,6 +106,60 @@ def plot_metrics(metrics: dict, output: Path) -> None:
     plt.close(figure)
 
 
+def render_examples(variants: dict, ids: list[str], destination: Path) -> Path:
+    from build_structured_comparison import render_pair
+
+    indexed = {name: {row["sample_id"]: row for row in rows} for name, rows in variants.items()}
+    selected, merchants = [], set()
+    for sample_id in ids:
+        merchant = normalize_field("company", indexed["v2"][sample_id]["ground_truth"]["company"])
+        if merchant not in merchants:
+            selected.append(sample_id)
+            merchants.add(merchant)
+        if len(selected) == 3:
+            break
+    destination.mkdir(parents=True, exist_ok=True)
+    gallery = [
+        "# Bill-by-bill Qwen comparison",
+        "",
+        "Selection: first three distinct normalized merchants in lexicographic evaluation-ID "
+        "order, independent of model outcomes. These examples are not an accuracy estimate.",
+        "",
+        "Before = pinned NF4 base; after = selected QLoRA adapter. The image, prompt, "
+        "pixel cap, decoding and strict parsing are identical. Colors compare normalized "
+        "values with dataset annotations; annotations can contain errors.",
+        "",
+    ]
+    manifest = []
+    for number, sample_id in enumerate(selected, 1):
+        image_path = indexed["v2"][sample_id]["image_path"]
+        before = {**indexed["qwen_base"][sample_id], "image_path": image_path}
+        after = {**indexed["qwen_qlora"][sample_id], "image_path": image_path}
+        if hashlib.sha256((ROOT / image_path).read_bytes()).hexdigest() != before["image_sha256"]:
+            raise ValueError(f"Comparison image changed: {sample_id}")
+        output = destination / f"{number:02d}_{sample_id}.png"
+        manifest.append(
+            render_pair(
+                before,
+                after,
+                output,
+                number,
+                len(selected),
+                comparison_title="Before and after QLoRA fine-tuning",
+                context="Same image, NF4, prompt, pixel cap and greedy decoding",
+                before_heading="BEFORE\nQwen3-VL NF4 base",
+                after_heading="AFTER\nQwen3-VL QLoRA",
+                note="Selected validation-loss checkpoint; examples chosen by merchant/ID "
+                "order, independently of whether fine-tuning helped.",
+            )
+        )
+        gallery.extend([f"## Bill {number}: {sample_id}", "", f"![Comparison]({output.name})", ""])
+    (destination / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", "utf-8")
+    report = destination / "README.md"
+    report.write_text("\n".join(gallery), "utf-8")
+    return report
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run-dir", type=Path, required=True)
@@ -112,6 +167,9 @@ def main() -> int:
         "--output-dir", type=Path, default=ROOT / "artifacts/experiments/qwen3_vl/full_run"
     )
     parser.add_argument("--report", type=Path, default=ROOT / "QWEN3_VL_RESULTS.md")
+    parser.add_argument(
+        "--render-examples", action="store_true", help="Requires local source images"
+    )
     args = parser.parse_args()
     summary = json.loads((args.run_dir / "training_summary.json").read_text("utf-8"))
     if summary.get("status") != "evaluation_complete" or summary.get("global_steps", 0) <= 2:
@@ -265,6 +323,10 @@ def main() -> int:
         os.path.relpath(args.output_dir / "accuracy_comparison.png", args.report.parent)
     ).as_posix()
     lines.extend(["", f"![Retrospective accuracy comparison]({chart_link})", ""])
+    if args.render_examples:
+        gallery = render_examples(variants, ids, args.output_dir / "image_comparisons")
+        gallery_link = Path(os.path.relpath(gallery, args.report.parent)).as_posix()
+        lines.extend([f"[Bill-by-bill before/after examples]({gallery_link})", ""])
     args.report.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(json.dumps({"metrics": metrics, "paired_bootstrap": intervals}, indent=2))
     return 0

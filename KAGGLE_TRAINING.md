@@ -108,6 +108,11 @@ Verify retrieved full-run outputs before reporting accuracy:
 python scripts/analyze_qwen_experiment.py --run-dir .cache/kaggle-training/download/receiptops-train
 ```
 
+Add `--render-examples` when the original local SROIE images are available. This
+renders the first three distinct merchants in sorted evaluation-ID order, with
+the original image, base output, adapted output and dataset annotation. Selection
+does not depend on whether fine-tuning improved the example.
+
 This refuses incomplete runs, missing or repeated IDs, changed image hashes and
 changed normalized reference labels. It reports all three models on the same
 239 IDs and 2,000-resample paired image and merchant-cluster bootstrap intervals.

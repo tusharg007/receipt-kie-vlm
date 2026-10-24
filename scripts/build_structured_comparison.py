@@ -40,7 +40,20 @@ def _matches(prediction: dict, truth: dict) -> list[str]:
     ]
 
 
-def _draw(before: dict, after: dict, destination: Path, position: int, count: int) -> dict:
+def render_pair(
+    before: dict,
+    after: dict,
+    destination: Path,
+    position: int,
+    count: int,
+    *,
+    comparison_title: str = "Before and after typed decoding",
+    context: str = "Same V2 adapter, same receipt, 1024 px, greedy decoding",
+    before_heading: str = "BEFORE\nOriginal V2 model",
+    after_heading: str = "AFTER\nTypeLLM-inspired constraints",
+    note: str = "Comparison: original SmolVLM V2 vs local schema constraints inspired by "
+    "TypeLLM. Native TypeLLM/SGLang was not run.",
+) -> dict:
     sample_id = before["sample_id"]
     if before["ground_truth"] != after["ground_truth"]:
         raise ValueError(f"Ground truth differs for {sample_id}")
@@ -63,7 +76,7 @@ def _draw(before: dict, after: dict, destination: Path, position: int, count: in
     fig.text(
         0.035,
         0.95,
-        f"Bill {position:02d} / {count:02d}  |  Before and after typed decoding",
+        f"Bill {position:02d} / {count:02d}  |  {comparison_title}",
         fontsize=23,
         weight="bold",
         color="#152238",
@@ -71,7 +84,7 @@ def _draw(before: dict, after: dict, destination: Path, position: int, count: in
     fig.text(
         0.035,
         0.91,
-        f"{sample_id}   |   Same V2 adapter, same receipt, 1024 px, greedy decoding",
+        f"{sample_id}   |   {context}",
         fontsize=12,
         color="#48566c",
     )
@@ -82,8 +95,8 @@ def _draw(before: dict, after: dict, destination: Path, position: int, count: in
     image_axis.set_title("Original bill", fontsize=14, loc="left", pad=12)
 
     headings = (
-        "BEFORE\nOriginal V2 model",
-        "AFTER\nTypeLLM-inspired constraints",
+        before_heading,
+        after_heading,
         "REFERENCE\nDataset annotation",
     )
     columns = (0.30, 0.53, 0.76)
@@ -160,8 +173,7 @@ def _draw(before: dict, after: dict, destination: Path, position: int, count: in
     fig.text(
         0.035,
         0.067,
-        "Comparison: original SmolVLM V2 vs local schema constraints inspired by TypeLLM. "
-        "Native TypeLLM/SGLang was not run.",
+        note,
         fontsize=11,
         color="#48566c",
     )
@@ -221,7 +233,7 @@ def main() -> int:
     archive_readme = gallery.copy()
     for number, sample_id in enumerate(before, start=1):
         output = destination / f"{number:02d}_{sample_id}.png"
-        entry = _draw(before[sample_id], after[sample_id], output, number, len(before))
+        entry = render_pair(before[sample_id], after[sample_id], output, number, len(before))
         manifest.append(entry)
         title = f"## Bill {number:02d}: {sample_id}"
         gallery.extend([title, "", f"![Comparison for {sample_id}]({output.as_posix()})", ""])

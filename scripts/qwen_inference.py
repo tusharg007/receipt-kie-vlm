@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.metadata
 import json
 import sys
 import time
@@ -117,6 +118,7 @@ def main() -> int:
         "model_revision": MODEL_REVISION,
         "mode": "qlora" if args.adapter else "base",
         "adapter_sha256": adapter_sha256,
+        "image_sha256": hashlib.sha256(args.image.read_bytes()).hexdigest(),
         "device": str(model.device),
         "dtype": str(dtype),
         "quantization": "none" if args.cpu else "NF4",
@@ -128,6 +130,17 @@ def main() -> int:
         "generation_seconds": time.perf_counter() - started,
         "peak_allocated_gpu_mib": None if args.cpu else torch.cuda.max_memory_allocated() / 2**20,
         "deployment_allowed": False,
+        "versions": {
+            name: importlib.metadata.version(name)
+            for name in (
+                "torch",
+                "torchvision",
+                "transformers",
+                "peft",
+                "accelerate",
+                "bitsandbytes",
+            )
+        },
         **metadata,
     }
     if args.output:
